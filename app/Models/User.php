@@ -16,11 +16,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'role', 'fname', 'mname', 
-        'lname', 'email', 'birthday', 
-        'gender', 'address', 'contact', 
-        'password', 'email_verified_at',
-        'username'
+        'role', 'name', 'email', 'address', 'contact', 
+        'password', 'username', 'avatar'
     ];
 
     /**
@@ -38,12 +35,9 @@ class User extends Authenticatable
      *
      * @var array<string, string>
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
 
     protected $dates = [
-        'created_at', 'updated_at', 'deleted_at', 'birthday', 'email_verified_at'
+        'created_at', 'updated_at', 'deleted_at'
     ];
 
     public function setPasswordAttribute($value) {

@@ -11,7 +11,7 @@
             </div>
             <div class="info">
                 <a href="#" class="d-block" id="profile">
-                    {{ auth()->user()->fname }} {{ auth()->user()->lname }}
+                    {{ auth()->user()->name }}
                 </a>
             </div>
         </div>
@@ -78,12 +78,8 @@
                                     <img src="${user.avatar}" alt="User Avatar" width="200px" height="200px">
                                 </div>
                                 <div class="col-md-9">
-                                    ${input("fname", "First Name", "{{ auth()->user()->fname }}", 2, 10)}
-                                    ${input("mname", "Middle Name", "{{ auth()->user()->mname }}", 2, 10)}
-                                    ${input("lname", "Last Name", "{{ auth()->user()->lname }}", 2, 10)}
+                                    ${input("name", "Name", "{{ auth()->user()->name }}", 2, 10)}
                                     ${input("email", "Email", "{{ auth()->user()->email }}", 2, 10)}
-                                    ${input("birthday", "Birthday", "{{ auth()->user()->birthday }}", 2, 10)}
-                                    ${input("gender", "Gender", "{{ auth()->user()->gender }}", 2, 10)}
                                     ${input("address", "Address", "{{ auth()->user()->address }}", 2, 10)}
                                     ${input("contact", "Contact #", "{{ auth()->user()->contact }}", 2, 10, "number")}
                                 </div>
@@ -91,7 +87,7 @@
                         `,
                         width: "1000px",
                         confirmButtonText: 'Update',
-                        @if(auth()->user()->fname == null && auth()->user()->lname == null)
+                        @if(auth()->user()->name == null && auth()->user()->contact == null)
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                         @else
@@ -103,23 +99,12 @@
                             denyButtonColor: successColor,
                             denyButtonText: 'Change Password',
                         @endif
-                        didOpen: () => {
-                            $('[name="birthday"]').flatpickr({
-                                altInput: true,
-                                altFormat: 'F j, Y',
-                                dateFormat: 'Y-m-d',
-                            })
-                        }
                     }).then(result => {
                         if(result.value){
                             let data = {
                                 id: "{{ auth()->user()->id }}",
-                                fname: $("[name='fname']").val(),
-                                mname: $("[name='mname']").val(),
-                                lname: $("[name='lname']").val(),
+                                name: $("[name='name']").val(),
                                 email: $("[name='email']").val(),
-                                birthday: $("[name='birthday']").val(),
-                                gender: $("[name='gender']").val(),
                                 address: $("[name='address']").val(),
                                 contact: $("[name='contact']").val(),
                             };
@@ -182,7 +167,7 @@
             });
         });
 
-        @if(auth()->user()->fname == null && auth()->user()->lname == null)
+        @if(auth()->user()->name == null && auth()->user()->contact == null)
             $('#profile').click();
         @endif
     </script>

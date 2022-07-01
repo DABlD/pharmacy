@@ -17,19 +17,14 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('username')->unique();
             
-            $table->string('fname')->nullable();
-            $table->string('mname')->nullable();
-            $table->string('lname')->nullable();
+            $table->string('name')->nullable();
             $table->string('avatar')->default('images/default_avatar.png');
             $table->enum('role', ['Admin'])->nullable();
             
             $table->string('email')->unique()->nullable();
-            $table->date('birthday')->nullable();
-            $table->string('gender')->nullable();
             $table->text('address')->nullable();
             $table->string('contact')->nullable();
 
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
             $table->timestamps();

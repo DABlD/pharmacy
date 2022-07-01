@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>{{ "System Name | " . "Login" }}</title>
+	<title>{{ "BG Pharmacy | " . "Login" }}</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -18,7 +18,7 @@
 		<div class="container-login100">
 			<div class="wrap-login100">
 				<div class="login100-pic js-tilt" data-tilt>
-					<img src="{{ asset("images/default_avatar.png"); }}" alt="IMG">
+					<img src="{{ asset("images/pharmacy_logo.png"); }}" alt="IMG">
 				</div>
 
 				<form class="login100-form validate-form" method="POST" action="{{ route('login'); }}">

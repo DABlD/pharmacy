@@ -15,17 +15,12 @@ class UserSeeder extends Seeder
     public function run()
     {
         User::create([
-            'username' => 'dmendoza',
-            'fname' => 'David',
-            'mname' => 'Roga',
-            'lname' => 'Mendoza',
+            'username' => 'centrapharm',
+            'name' => 'CENTRAPHARM',
             'role' => 'Admin',
             'email' => 'davidmendozaofficial@gmail.com',
-            'birthday' => '1997-11-12',
-            'gender' => 'Male',
-            'address' => 'Rm. 628, Park Avenue Mansions, Park Avenue St.,, Barangay 81',
-            'contact' => '09154590172',
-            'email_verified_at' => now()->toDateTimeString(),
+            'address' => 'MALOLOS, BULACAN',
+            'contact' => '8231895',
             'password' => '123456'
         ]);
     }
