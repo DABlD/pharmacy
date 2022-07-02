@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\{User, Rhu};
 use DB;
-use Auth;
 
-class UserController extends Controller
+class RhuController extends Controller
 {
     public function __construct(){
-        $this->table = "users";
+        $this->table = "rhus";
+    }
+
+    public function index(){
+        return $this->_view('index', [
+            'title' => 'Rural Health Unit'
+        ]);
     }
 
     public function get(Request $req){
@@ -37,17 +42,26 @@ class UserController extends Controller
     }
 
     public function store(Request $req){
+        $user = new User();
+        $user->name = $req->name;
+        $user->contact = $req->contact;
+        $user->email = $req->email;
+        $user->address = $req->address;
+        $user->username = $req->username;
+        $user->password = $req->password;
+        $user->role = "RHU";
+        $user->save();
 
+        $rhu = new RHU();
+        $rhu->user_id = $user->id;
+        $rhu->company_name = $req->company_name;
+        $rhu->contact_personnel = $req->contact_personnel;
+        $rhu->company_code = ""; //LEAVE TO MUTATORS
+        $rhu->save();
     }
 
     public function update(Request $req){
         DB::table($this->table)->where('id', $req->id)->update($req->except(['id', '_token']));
-    }
-
-    public function updatePassword(Request $req){
-        $user = User::find(auth()->user()->id);
-        $user->password = $req->password;
-        $user->save();
     }
 
     private function _view($view, $data = array()){

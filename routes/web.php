@@ -23,7 +23,6 @@ Route::group([
     ], function() {
         Route::get('/', "DashboardController@index")->name('dashboard');
 
-
         Route::get('/', 'DashboardController@index')
             ->defaults('sidebar', 1)
             ->defaults('icon', 'fas fa-list')
@@ -42,6 +41,37 @@ Route::group([
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("updatePassword/", ucfirst($cname) . "Controller@updatePassword")->name('updatePassword');
+            }
+        );
+
+        // RHU ROUTES
+        $cname = "rhu";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fas fa-hospital-user")
+                    ->defaults("name", "Rural Health Unit")
+                    ->defaults("roles", array("Admin"))
+                    ->name("rhu")
+                    ->defaults("href", "/rhu");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+            }
+        );
+
+        // DATATABLES
+        $cname = "datatable";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+
+                Route::get("rhu", ucfirst($cname) . "Controller@rhu")->name('rhu');
             }
         );
     }

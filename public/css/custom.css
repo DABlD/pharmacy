@@ -25,3 +25,12 @@
 #swal2-html-container .iRow{
 	margin-top: 5px;
 }
+
+#table thead tr{
+	color: white;
+	background-color: #b96666;
+}
+
+.card-title{
+	margin-top: 12px;
+}

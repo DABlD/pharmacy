@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             
             $table->string('name')->nullable();
             $table->string('avatar')->default('images/default_avatar.png');
-            $table->enum('role', ['Admin'])->nullable();
+            $table->enum('role', ['Admin', 'RHU', 'BHC', 'Approver'])->nullable();
             
             $table->string('email')->unique()->nullable();
             $table->text('address')->nullable();

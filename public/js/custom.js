@@ -29,14 +29,14 @@ function sc(title = "", text = ""){
 	});
 };
 
-function input(name, placeholder, value, c1, c2, type = "text"){
+function input(name, placeholder, value, c1, c2, type = "text", autocomplete=""){
     return `
         <div class="row iRow">
             <div class="col-md-${c1} iLabel">
                 ${placeholder}
             </div>
             <div class="col-md-${c2} iInput">
-                <input type="${type}" name="${name}" placeholder="Enter ${placeholder}" class="form-control"} value="${value ?? ""}">
+                <input type="${type}" name="${name}" placeholder="Enter ${placeholder}" class="form-control" value="${value ?? ""}" ${autocomplete}>
             </div>
         </div>
     `;

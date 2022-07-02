@@ -135,7 +135,7 @@
                                     swal.showLoading();
                                     return new Promise(resolve => {
                                         setTimeout(() => {
-                                            if($("[name='password']").val() == "" || $("[name='password_confirmation']").val() == ""){
+                                            if($('.swal2-container input:placeholder-shown').length){
                                                 Swal.showValidationMessage('Fill all fields');
                                             }
                                             else if($("[name='password']").val().length < 8){
