@@ -41,3 +41,7 @@ function input(name, placeholder, value, c1, c2, type = "text", autocomplete="")
         </div>
     `;
 };
+
+function reload(){
+	$('#table').DataTable().ajax.reload();
+};
