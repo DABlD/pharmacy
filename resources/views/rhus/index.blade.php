@@ -78,17 +78,11 @@
 					{data: 'user.address'},
 					{data: 'actions'},
 				],
-				drawCallback: function(){
-					init();
-				}
+				// drawCallback: function(){
+				// 	init();
+				// }
 			});
 		});
-
-		function init(){
-			$("[title='Add RHU']").on('click', () => {
-				create();
-			});
-		}
 
 		function view(id){
 			$.ajax({
@@ -285,6 +279,7 @@
 							update({
 								url: "{{ route('rhu.update') }}",
 								data: {
+									id: $("[name='id']").val(),
 									company_name: $("[name='company_name']").val(),
 									contact_personnel: $("[name='contact_personnel']").val(),
 								},
