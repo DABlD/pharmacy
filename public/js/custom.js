@@ -21,11 +21,17 @@ function se(title = "", text = ""){
 	});
 };
 
-function sc(title = "", text = ""){
+function sc(title = "", text = "", callback = null){
 	Swal.fire({
-		icon: "danger",
+		icon: "question",
 		title: title,
 		text: text,
+		showCancelButton: true,
+		cancelButtonColor: errorColor
+	}).then(result => {
+		if(typeof callback == "function"){
+			callback(result);
+		}
 	});
 };
 

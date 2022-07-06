@@ -342,5 +342,19 @@
 				}
 			});
 		}
+
+		function del(id){
+			sc("Confirmation", "Are you sure you want to delete?", result => {
+				if(result.value){
+					update({
+						url: "{{ route('rhu.delete') }}",
+						data: {id: id},
+						message: "Success"
+					}, () => {
+						reload();
+					})
+				}
+			});
+		}
 	</script>
 @endpush
