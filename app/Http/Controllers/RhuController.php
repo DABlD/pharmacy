@@ -19,7 +19,7 @@ class RhuController extends Controller
     }
 
     public function get(Request $req){
-        $array = DB::table($this->table)->select($req->cols);
+        $array = Rhu::select($req->select);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
@@ -32,6 +32,13 @@ class RhuController extends Controller
         }
 
         $array = $array->get();
+
+        // IF HAS LOAD
+        if($array->count() && $req->load){
+            foreach($req->load as $table){
+                $array->load($table);
+            }
+        }
 
         // IF HAS GROUP
         if($req->group){

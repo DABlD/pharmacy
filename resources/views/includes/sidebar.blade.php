@@ -65,7 +65,7 @@
             $.ajax({
                 url: "{{ route('user.get') }}",
                 data: {
-                    cols: 'users.*',
+                    select: 'users.*',
                     where: ['id', {{ auth()->user()->id }}]
                 },
                 success: user => {

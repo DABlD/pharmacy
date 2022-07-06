@@ -31,6 +31,10 @@
 	background-color: #b96666;
 }
 
+#table tbody td{
+	vertical-align: middle;
+}
+
 .card-title{
 	margin-top: 12px;
 }

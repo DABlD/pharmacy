@@ -9,7 +9,7 @@ use DB;
 class DatatableController extends Controller
 {
     public function rhu(Request $req){
-        $array = Rhu::select($req->cols);
+        $array = Rhu::select($req->select);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
@@ -35,17 +35,9 @@ class DatatableController extends Controller
             }
         }
 
-        // $array = [
-        //     {
-        //         id => 
-        //     }
-        // ];
-        // $array = [
-        //     {
-        //         "id" => 1,
-        //     }
-        // ];
-        // dd($array->toArray());
+        foreach($array as $item){
+            $item->actions = $item->actions;
+        }
         echo json_encode($array->toArray());
     }
 }

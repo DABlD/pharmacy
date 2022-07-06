@@ -7,7 +7,7 @@ function ss(title = "", text = ""){
 		title: title,
 		text: text,
 		timer: 1000,
-		showConfirmButtom: false
+		showConfirmButton: false
 	});
 };
 
@@ -17,7 +17,7 @@ function se(title = "", text = ""){
 		title: title,
 		text: text,
 		timer: 1000,
-		showConfirmButtom: false
+		showConfirmButton: false
 	});
 };
 
@@ -45,3 +45,23 @@ function input(name, placeholder, value, c1, c2, type = "text", autocomplete="")
 function reload(){
 	$('#table').DataTable().ajax.reload();
 };
+
+function update(data, callback = null){
+	$.ajax({
+		url: data.url,
+		type: "POST",
+		data: {
+			...data.data,
+			_token: $('meta[name="csrf-token"]').attr('content')
+		},
+		success: () => {
+			if(data.message){
+				ss(data.message);
+			}
+
+			if(typeof callback == "function"){
+				callback();
+			}
+		}
+	});
+}

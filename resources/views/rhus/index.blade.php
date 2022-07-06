@@ -63,7 +63,7 @@
                 	dataSrc: "",
 					data: {
 						table: 'Rhu',
-						cols: "*",
+						select: "*",
 						load: ['user']
 					}
 				},
@@ -76,7 +76,7 @@
 					{data: 'user.contact'},
 					{data: 'user.email'},
 					{data: 'user.address'},
-					{data: 'id'},
+					{data: 'actions'},
 				],
 				drawCallback: function(){
 					init();
@@ -86,99 +86,260 @@
 
 		function init(){
 			$("[title='Add RHU']").on('click', () => {
-				Swal.fire({
-					html: `
-		                ${input("name", "Name", null, 3, 9)}
-		                ${input("company_name", "Company Name", null, 3, 9)}
-		                ${input("contact_personnel", "Contact Person", null, 3, 9)}
-		                ${input("contact", "Contact #", null, 3, 9, "number")}
-						${input("email", "Email", null, 3, 9, 'email')}
-		                ${input("address", "Address", null, 3, 9)}
-		                </br>
-		                ${input("username", "Username", null, 3, 9, 'text', 'autocomplete="new-password"')}
-	                    ${input("password", "Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
-	                    ${input("password_confirmation", "Confirm Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
-					`,
-					width: '800px',
-					confirmButtonText: 'Add',
-					showCancelButton: true,
-					cancelButtonColor: errorColor,
-					cancelButtonText: 'Cancel',
-					preConfirm: () => {
-					    swal.showLoading();
-					    return new Promise(resolve => {
-					    	let bool = true;
+				create();
+			});
+		}
 
-				            if($('.swal2-container input:placeholder-shown').length){
-				                Swal.showValidationMessage('Fill all fields');
-				            }
-				            else if($("[name='password']").val().length < 8){
-				                Swal.showValidationMessage('Password must at least be 8 characters');
-				            }
-				            else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
-				                Swal.showValidationMessage('Password do not match');
-				            }
-				            else{
-				            	let bool = false;
-				            	$.ajax({
-				            		url: "{{ route('user.get') }}",
-				            		data: {
-				            			cols: "id",
-				            			where: ["username", $("[name='username']").val()]
-				            		},
-				            		success: result => {
-				            			result = JSON.parse(result);
-				            			if(result.length){
-				                			Swal.showValidationMessage('Username already exists');
-				                			setTimeout(() => {resolve()}, 500);
-				            			}
-				            			else{
-				            				$.ajax({
-				            					url: "{{ route('user.get') }}",
-				            					data: {
-				            						cols: "id",
-				            						where: ["email", $("[name='email']").val()]
-				            					},
-				            					success: result => {
-				            						result = JSON.parse(result);
-				            						if(result.length){
-				            			    			Swal.showValidationMessage('Email already used');
-					            						setTimeout(() => {resolve()}, 500);
-				            						}
-				            					}
-				            				});
-				            			}
+		function view(id){
+			$.ajax({
+				url: "{{ route('rhu.get') }}",
+				data: {
+					select: '*',
+					where: ['id', id],
+					load: ['user']
+				},
+				success: rhu => {
+					rhu = JSON.parse(rhu)[0];
+					showDetails(rhu);
+				}
+			})
+		}
 
-				            		}
-				            	});
-				            }
+		function create(){
+			Swal.fire({
+				html: `
+	                ${input("name", "Name", null, 3, 9)}
+	                ${input("company_name", "Company Name", null, 3, 9)}
+	                ${input("contact_personnel", "Contact Person", null, 3, 9)}
+	                ${input("contact", "Contact #", null, 3, 9, "number")}
+					${input("email", "Email", null, 3, 9, 'email')}
+	                ${input("address", "Address", null, 3, 9)}
+	                </br>
+	                ${input("username", "Username", null, 3, 9, 'text', 'autocomplete="new-password"')}
+                    ${input("password", "Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
+                    ${input("password_confirmation", "Confirm Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
+				`,
+				width: '800px',
+				confirmButtonText: 'Add',
+				showCancelButton: true,
+				cancelButtonColor: errorColor,
+				cancelButtonText: 'Cancel',
+				preConfirm: () => {
+				    swal.showLoading();
+				    return new Promise(resolve => {
+				    	let bool = true;
 
-				            bool ? setTimeout(() => {resolve()}, 500) : "";
-					    });
-					},
-				}).then(result => {
-					if(result.value){
-						$.ajax({
-							url: "{{ route('rhu.store') }}",
-							type: "POST",
-							data: {
-								name: $("[name='name']").val(),
-								company_name: $("[name='company_name']").val(),
-								contact_personnel: $("[name='contact_personnel']").val(),
-								contact: $("[name='contact']").val(),
-								email: $("[name='email']").val(),
-								address: $("[name='address']").val(),
-								username: $("[name='username']").val(),
-								password: $("[name='password']").val(),
-								_token: $('meta[name="csrf-token"]').attr('content')
-							},
-							success: () => {
-								ss("Success");
+			            if($('.swal2-container input:placeholder-shown').length){
+			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else if($("[name='password']").val().length < 8){
+			                Swal.showValidationMessage('Password must at least be 8 characters');
+			            }
+			            else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
+			                Swal.showValidationMessage('Password do not match');
+			            }
+			            else{
+			            	let bool = false;
+			            	$.ajax({
+			            		url: "{{ route('user.get') }}",
+			            		data: {
+			            			select: "id",
+			            			where: ["username", $("[name='username']").val()]
+			            		},
+			            		success: result => {
+			            			result = JSON.parse(result);
+			            			if(result.length){
+			                			Swal.showValidationMessage('Username already exists');
+			                			setTimeout(() => {resolve()}, 500);
+			            			}
+			            			else{
+			            				$.ajax({
+			            					url: "{{ route('user.get') }}",
+			            					data: {
+			            						select: "id",
+			            						where: ["email", $("[name='email']").val()]
+			            					},
+			            					success: result => {
+			            						result = JSON.parse(result);
+			            						if(result.length){
+			            			    			Swal.showValidationMessage('Email already used');
+				            						setTimeout(() => {resolve()}, 500);
+			            						}
+			            					}
+			            				});
+			            			}
+
+			            		}
+			            	});
+			            }
+
+			            bool ? setTimeout(() => {resolve()}, 500) : "";
+				    });
+				},
+			}).then(result => {
+				if(result.value){
+					$.ajax({
+						url: "{{ route('rhu.store') }}",
+						type: "POST",
+						data: {
+							name: $("[name='name']").val(),
+							company_name: $("[name='company_name']").val(),
+							contact_personnel: $("[name='contact_personnel']").val(),
+							contact: $("[name='contact']").val(),
+							email: $("[name='email']").val(),
+							address: $("[name='address']").val(),
+							username: $("[name='username']").val(),
+							password: $("[name='password']").val(),
+							_token: $('meta[name="csrf-token"]').attr('content')
+						},
+						success: () => {
+							ss("Success");
+							reload();
+						}
+					})
+				}
+			});
+		}
+
+		function showDetails(rhu){
+			Swal.fire({
+				html: `
+	                ${input("id", "", rhu.user.id, 3, 9, 'hidden')}
+	                ${input("name", "Name", rhu.user.name, 3, 9)}
+	                ${input("company_name", "Company Name", rhu.company_name, 3, 9)}
+	                ${input("contact_personnel", "Contact Person", rhu.contact_personnel, 3, 9)}
+	                ${input("contact", "Contact #", rhu.user.contact, 3, 9, "number")}
+					${input("email", "Email", rhu.user.email, 3, 9, 'email')}
+	                ${input("address", "Address", rhu.user.address, 3, 9)}
+	                </br>
+	                ${input("username", "Username", rhu.user.username, 3, 9, 'text', 'autocomplete="new-password"')}
+				`,
+				width: '800px',
+				confirmButtonText: 'Update',
+				showCancelButton: true,
+				cancelButtonColor: errorColor,
+				cancelButtonText: 'Cancel',
+                showDenyButton: true,
+                denyButtonColor: successColor,
+                denyButtonText: 'Change Password',
+				preConfirm: () => {
+				    swal.showLoading();
+				    return new Promise(resolve => {
+				    	let bool = true;
+
+			            if($('.swal2-container input:placeholder-shown').length){
+			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else{
+			            	let bool = false;
+			            	$.ajax({
+			            		url: "{{ route('user.get') }}",
+			            		data: {
+			            			select: "id",
+			            			where: ["username", $("[name='username']").val()]
+			            		},
+			            		success: result => {
+			            			result = JSON.parse(result);
+			            			if(result.length && result[0].id != rhu.user.id){
+			                			Swal.showValidationMessage('Username already exists');
+			                			setTimeout(() => {resolve()}, 500);
+			            			}
+			            			else{
+			            				$.ajax({
+			            					url: "{{ route('user.get') }}",
+			            					data: {
+			            						select: "id",
+			            						where: ["email", $("[name='email']").val()]
+			            					},
+			            					success: result => {
+			            						result = JSON.parse(result);
+			            						if(result.length && result[0].id != rhu.user.id){
+			            			    			Swal.showValidationMessage('Email already used');
+				            						setTimeout(() => {resolve()}, 500);
+			            						}
+			            					}
+			            				});
+			            			}
+
+			            		}
+			            	});
+			            }
+
+			            bool ? setTimeout(() => {resolve()}, 500) : "";
+				    });
+				},
+			}).then(result => {
+				if(result.value){
+					update({
+						url: "{{ route('user.update') }}",
+						data: {
+							id: $("[name='id']").val(),
+							name: $("[name='name']").val(),
+							contact: $("[name='contact']").val(),
+							email: $("[name='email']").val(),
+							address: $("[name='address']").val(),
+							username: $("[name='username']").val(),
+						},
+						message: false
+					},	() => {
+							update({
+								url: "{{ route('rhu.update') }}",
+								data: {
+									company_name: $("[name='company_name']").val(),
+									contact_personnel: $("[name='contact_personnel']").val(),
+								},
+								message: "Success"
+							}, () => {
 								reload();
-							}
-						})
-					}
-				});
+							})
+						}
+					);
+				}
+				else if(result.isDenied){
+					changePassword($("[name='id']").val());
+				}
+			});
+		}
+
+		function changePassword(id){
+			Swal.fire({
+			    html: `
+			        ${input("password", "Password", null, 5, 7, 'password')}
+			        ${input("password_confirmation", "Confirm Password", null, 5, 7, 'password')}
+			    `,
+			    confirmButtonText: 'Update',
+			    showCancelButton: true,
+			    cancelButtonColor: errorColor,
+			    cancelButtonText: 'Exit',
+			    width: "500px",
+			    preConfirm: () => {
+			        swal.showLoading();
+			        return new Promise(resolve => {
+			            setTimeout(() => {
+			                if($('.swal2-container input:placeholder-shown').length){
+			                    Swal.showValidationMessage('Fill all fields');
+			                }
+			                else if($("[name='password']").val().length < 8){
+			                    Swal.showValidationMessage('Password must at least be 8 characters');
+			                }
+			                else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
+			                    Swal.showValidationMessage('Password do not match');
+			                }
+			            resolve()}, 500);
+			        });
+			    },
+			}).then(result => {
+				if(result.value){
+					update({
+						url: "{{ route('user.updatePassword') }}",
+						data: {
+							id: id,
+							password: $("[name='password']").val(),
+						}
+					}, () => {
+						ss("Success");
+					});
+				}
 			});
 		}
 	</script>
