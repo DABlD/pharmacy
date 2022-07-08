@@ -88,6 +88,30 @@ Route::group([
             }
         );
 
+        // SKU ROUTES
+        $cname = "medicine";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-capsules")
+                    ->defaults("name", "SKU")
+                    ->defaults("roles", array("Admin", "RHU"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("storeCategory/", ucfirst($cname) . "Controller@storeCategory")->name('storeCategory');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+                Route::post("deleteCategory/", ucfirst($cname) . "Controller@deleteCategory")->name('deleteCategory');
+            }
+        );
+
         // DATATABLES
         $cname = "datatable";
         Route::group([
@@ -97,6 +121,7 @@ Route::group([
 
                 Route::get("rhu", ucfirst($cname) . "Controller@rhu")->name('rhu');
                 Route::get("bhc", ucfirst($cname) . "Controller@bhc")->name('bhc');
+                Route::get("medicine", ucfirst($cname) . "Controller@bhc")->name('medicine');
             }
         );
     }

@@ -25,7 +25,7 @@ class Rhu extends Model
         $this->attributes['company_code'] = $num;
     }
 
-    public function  user(){
+    public function user(){
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 }
