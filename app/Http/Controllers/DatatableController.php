@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{User, Rhu, Bhc};
+use App\Models\{User, Rhu, Bhc, Medicine, Category};
 use DB;
 
 class DatatableController extends Controller
@@ -71,7 +71,27 @@ class DatatableController extends Controller
         foreach($array as $item){
             $item->actions = $item->actions;
         }
+        $array = $this->addRhus($array);
         echo json_encode($array->toArray());
+    }
+
+    private function addRhus($array){
+        $rhus = Rhu::all();
+
+        foreach($rhus as $rhu){
+            $temp = new Rhu();
+            $temp->id = null;
+            $temp->rhu = $rhu;
+            $temp->name = null;
+            $temp->code = null;
+            $temp->region = null;
+            $temp->municipality = null;
+            $temp->actions = null;
+
+            $array->push($temp);
+        }
+
+        return $array;
     }
 
     public function medicine(Request $req){
@@ -81,14 +101,13 @@ class DatatableController extends Controller
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
         }
-
+        
         // IF HAS WHERE
         if($req->where){
             $array = $array->where($req->where[0], $req->where[1]);
         }
 
         $array = $array->get();
-
         // IF HAS GROUP
         if($req->group){
             $array = $array->groupBy($req->group);
@@ -104,6 +123,32 @@ class DatatableController extends Controller
         foreach($array as $item){
             $item->actions = $item->actions;
         }
+
+        $array = $this->addCategories($array);
         echo json_encode($array->toArray());
+    }
+
+    private function addCategories($array){
+        $categories = Category::all();
+
+        foreach($categories as $category){
+
+            $temp = new Medicine();
+            $temp->id = null;
+            $temp->category = $category;
+            $temp->image = null;
+            $temp->brand = null;
+            $temp->name = null;
+            $temp->packaging = null;
+            $temp->unit_price = null;
+            $temp->cost_price = null;
+            $temp->reorder = (object)["point" => null];
+            $temp->stock = null;
+            $temp->actions = null;
+
+            $array->push($temp);
+        }
+
+        return $array;
     }
 }

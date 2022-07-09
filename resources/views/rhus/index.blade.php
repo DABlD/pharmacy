@@ -78,6 +78,7 @@
 					{data: 'user.address'},
 					{data: 'actions'},
 				],
+        		pageLength: 25,
 				// drawCallback: function(){
 				// 	init();
 				// }
@@ -172,6 +173,7 @@
 				},
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					$.ajax({
 						url: "{{ route('rhu.store') }}",
 						type: "POST",
@@ -264,6 +266,7 @@
 				},
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					update({
 						url: "{{ route('user.update') }}",
 						data: {
@@ -282,6 +285,7 @@
 									id: $("[name='id']").val(),
 									company_name: $("[name='company_name']").val(),
 									contact_personnel: $("[name='contact_personnel']").val(),
+									where: ['user_id', $("[name='id']").val()]
 								},
 								message: "Success"
 							}, () => {
@@ -325,6 +329,7 @@
 			    },
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					update({
 						url: "{{ route('user.updatePassword') }}",
 						data: {
@@ -341,6 +346,7 @@
 		function del(id){
 			sc("Confirmation", "Are you sure you want to delete?", result => {
 				if(result.value){
+					swal.showLoading();
 					update({
 						url: "{{ route('rhu.delete') }}",
 						data: {id: id},

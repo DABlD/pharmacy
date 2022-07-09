@@ -15,16 +15,17 @@ class CreateMedicinesTable extends Migration
     {
         Schema::create('medicines', function (Blueprint $table) {
             $table->id();
+            $table->unsignedSmallInteger("user_id");
             $table->unsignedSmallInteger("category_id");
 
-            $table->string("image");
+            $table->string("image")->default('images/default_medicine_avatar');
             $table->string("code");
             $table->string("brand");
             $table->string("name");
             $table->string("packaging");
             $table->float("unit_price", 8, 2);
             $table->float("cost_price", 8, 2);
-            $table->unsignedSmallInteger("reorder_point");
+            $table->unsignedSmallInteger("stock")->default(0);
 
             $table->timestamps();
             $table->softDeletes();

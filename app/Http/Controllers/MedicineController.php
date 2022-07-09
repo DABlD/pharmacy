@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Category, Medicine};
+use App\Models\{Category, Medicine, Reorder};
 use DB;
 
 class MedicineController extends Controller
@@ -48,7 +48,7 @@ class MedicineController extends Controller
         echo json_encode($array);
     }
 
-    public function getCategory(Request $req){
+    public function getCategories(Request $req){
         $array = Category::select($req->select);
 
         // IF HAS SORT PARAMETER $ORDER
@@ -80,16 +80,21 @@ class MedicineController extends Controller
 
     public function store(Request $req){
         $entry = new Medicine();
+        $entry->user_id = $req->user_id ?? auth()->user()->id;
         $entry->category_id = $req->category_id;
-        $entry->image = $req->image;
         $entry->code = $req->code;
         $entry->brand = $req->brand;
-        $entry->name= $req->mname;
-        $entry->packaging= $req->mpackaging;
-        $entry->unit_price= $req->munit_price;
-        $entry->cost_price= $req->mcost_price;
-        $entry->reorder_point= $req->mreorder_point;
+        $entry->name= $req->name;
+        $entry->packaging= $req->packaging;
+        $entry->unit_price= $req->unit_price;
+        $entry->cost_price= $req->cost_price;
         $entry->save();
+
+        $reorder = new Reorder();
+        $reorder->user_id = $entry->user_id;
+        $reorder->medicine_id = $req->medicine_id;
+        $reorder->point = $req->reorder_point;
+        $reorder->save();
     }
 
     public function storeCategory(Request $req){

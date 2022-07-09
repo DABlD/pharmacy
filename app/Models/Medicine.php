@@ -5,23 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\MedicineAttribute;
-use App\Models\Category;
+use App\Models\{Category, Reorder};
 
 class Medicine extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'category_id', 'image', 'code', 'brand',
-        'name', 'packaging', 'unit_price', 'cost_price',
-        'reorder_point'
+        'user_id', 'category_id', 'image', 'code', 'brand',
+        'name', 'packaging', 'unit_price', 'cost_price', 'stock'
     ];
 
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    public function medicines(){
-        return $this->hasOne(Category::class);
+    public function category(){
+        return $this->hasOne(Category::class, 'id', 'category_id');
+    }
+
+    public function reorder(){
+        return $this->hasOne(Reorder::class);
     }
 }

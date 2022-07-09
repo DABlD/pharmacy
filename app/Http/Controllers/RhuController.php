@@ -68,7 +68,14 @@ class RhuController extends Controller
     }
 
     public function update(Request $req){
-        DB::table($this->table)->where('id', $req->id)->update($req->except(['id', '_token']));
+        $query = DB::table($this->table);
+
+        if($req->where){
+            $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
+        }
+        else{
+            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));;
+        }
     }
 
     public function delete(Request $req){

@@ -29,7 +29,7 @@ class MedicineSeeder extends Seeder
         $medicine->name = "Medicine$i";
         $medicine->packaging = rand(1, 20) . "/PC";
         $medicine->unit_price = rand(1, 5) * 50;
-        $medicine->cost_price = $medicine->unit_price - 50;
+        $medicine->cost_price = $medicine->unit_price - 25;
         $medicine->save();
 
         $reorder = new Reorder();

@@ -49,7 +49,7 @@
 	z-index: 1060 !important;
 }
 
-#table .group{
+#table .group td{
 	background-color: #66b966;
 	color: white;
 	font-weight: bold;

@@ -67,7 +67,7 @@
 				},
 				columns: [
 					{data: 'id'},
-					{data: 'rhu.company_name'},
+					{data: 'rhu.company_name', visible: false},
 					{data: 'code'},
 					{data: 'name'},
 					{data: 'region'},
@@ -75,6 +75,12 @@
 					{data: 'actions'},
 				],
         		order: [[1, 'asc']],
+        		pageLength: 25,
+        		rowCallback: function( row, data, index ) {
+				    if (data['id'] == null) {
+				        $(row).hide();
+				    }
+				},
 		        drawCallback: function (settings) {
 		            let api = this.api();
 		            let rows = api.rows({ page: 'current' }).nodes();
@@ -88,10 +94,8 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="6">
+		                            		<td colspan="5">
 		                            			${company}
-		                            		</td>
-		                            		<td>
 		                            		</td>
 		                            	</tr>
 		                            `);
@@ -100,10 +104,26 @@
 		                    }
 		                });
 		        },
+		        initComplete: () => {
+		        	let groups = $('tr.group td');
+
+		        	if(groups.length){
+		        		groups.each((index, row) => {
+		        			let rhu = row.innerText;
+		        			$(row).after(`
+		        				<td>
+		        					<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Bhc' onclick='create("${rhu}")'>
+		        					    <i class='fas fa-plus fa-2xl'></i>
+		        					</a>
+		        				</td>
+		        			`);
+		        		});
+		        	}
+		        }
 			});
 		});
 
-		function create(){
+		function create(selectedRhu = null){
 			Swal.fire({
 				html: `
 					<div class="row iRow">
@@ -146,6 +166,10 @@
 							$("[name='rhu_id']").select2({
 								placeholder: "Select RHU"
 							});
+
+							if(selectedRhu){
+								$("[name='rhu_id']").select2("val", $(`[name='rhu_id'] option:contains('${selectedRhu}')`).val());
+							}
 						}
 					})
 				},
@@ -168,6 +192,7 @@
 				},
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					$.ajax({
 						url: "{{ route('bhc.store') }}",
 						type: "POST",
@@ -243,6 +268,7 @@
 				},
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					$.ajax({
 						url: "{{ route('bhc.store') }}",
 						type: "POST",
@@ -310,6 +336,7 @@
 				},
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
 					update({
 						url: "{{ route('bhc.update') }}",
 						data: {
@@ -333,6 +360,7 @@
 		function del(id){
 			sc("Confirmation", "Are you sure you want to delete?", result => {
 				if(result.value){
+					swal.showLoading();
 					update({
 						url: "{{ route('bhc.delete') }}",
 						data: {id: id},

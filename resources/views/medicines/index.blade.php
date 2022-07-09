@@ -23,17 +23,16 @@
                     				<th>#</th>
                     				<th>Category</th>
                     				<th>Image</th>
-                    				<th>Code</th>
                     				<th>Brand</th>
                     				<th>Name</th>
                     				<th>Packaging</th>
                     				<th>Unit Price</th>
                     				<th>Cost Price</th>
                     				<th>Reorder Point</th>
+                    				<th>Stock</th>
                     				<th>Actions</th>
                     			</tr>
                     		</thead>
-
                     		<tbody>
                     		</tbody>
                     	</table>
@@ -62,26 +61,40 @@
 				ajax: {
 					url: "{{ route('datatable.medicine') }}",
                 	dataType: "json",
-                	dataSrc: "",
+                	dataSrc:'',
 					data: {
 						select: "*",
-						load: ['category']
+						load: ['category', 'reorder']
 					}
 				},
 				columns: [
 					{data: 'id'},
-					{data: 'category.name'},
-					{data: 'image'},
-					{data: 'code'},
+					{data: 'category.name', visible: false},
+					{data: 'image', visible: false},
 					{data: 'brand'},
 					{data: 'name'},
 					{data: 'packaging'},
 					{data: 'unit_price'},
 					{data: 'cost_price'},
-					{data: 'reorder_point'},
+					{data: 'reorder.point'},
+					{data: 'stock'},
 					{data: 'actions'},
 				],
         		order: [[1, 'asc']],
+        		pageLength: 25,
+        		rowCallback: function( row, data, index ) {
+				    if (data['id'] == null) {
+				        $(row).hide();
+				    }
+				},
+				columnDefs: [
+					{
+						targets: [6,7],
+						render: (value, display, row) =>{;
+							return "₱" + parseFloat(value).toFixed(2);
+						}
+					}
+				],
 		        drawCallback: function (settings) {
 		            let api = this.api();
 		            let rows = api.rows({ page: 'current' }).nodes();
@@ -89,16 +102,14 @@
 		 
 		            api.column(1, { page: 'current' })
 		                .data()
-		                .each(function (medicine, i, row) {
+		                .each(function (medicine, i) {
 		                    if (last !== medicine) {
 		                        $(rows)
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="10">
+		                            		<td colspan="8">
 		                            			${medicine}
-		                            		</td>
-		                            		<td>
 		                            		</td>
 		                            	</tr>
 		                            `);
@@ -107,10 +118,26 @@
 		                    }
 		                });
 		        },
+		        initComplete: () => {
+		        	let groups = $('tr.group td');
+
+		        	if(groups.length){
+		        		groups.each((index, row) => {
+		        			let category = row.innerText;
+		        			$(row).after(`
+		        				<td>
+		        					<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Item' onclick='create("${category}")'>
+		        					    <i class='fas fa-plus fa-2xl'></i>
+		        					</a>
+		        				</td>
+		        			`);
+		        		});
+		        	}
+		        }
 			});
 		});
 
-		function create(){
+		function create(selectedCategory = null){
 			Swal.fire({
 				html: `
 					<div class="row iRow">
@@ -123,14 +150,13 @@
 					        </select>
 					    </div>
 					</div>
-	                ${input("image", "image", null, 3, 9)}
-	                ${input("code", "code", null, 3, 9)}
-	                ${input("brand", "brand", null, 3, 9)}
-	                ${input("name", "name", null, 3, 9)}
-	                ${input("packaging", "packaging", null, 3, 9)}
-	                ${input("unit_price", "unit_price", null, 3, 9)}
-	                ${input("cost_price", "cost_price", null, 3, 9)}
-	                ${input("reorder_point", "reorder_point", null, 3, 9)}
+	                ${input("code", "Code", null, 3, 9)}
+	                ${input("brand", "Brand", null, 3, 9)}
+	                ${input("name", "Generic Name", null, 3, 9)}
+	                ${input("packaging", "Packaging", null, 3, 9)}
+	                ${input("unit_price", "Unit Price", null, 3, 9, 'number')}
+	                ${input("cost_price", "Cost Price", null, 3, 9, 'number')}
+	                ${input("reorder_point", "Reorder Point", null, 3, 9)}
 				`,
 				width: '800px',
 				confirmButtonText: 'Add',
@@ -139,13 +165,13 @@
 				cancelButtonText: 'Cancel',
 				didOpen: () => {
 					$.ajax({
-						url: "{{ route('medicine.getCategory') }}",
+						url: "{{ route('medicine.getCategories') }}",
 						data: {
 							select: "*",
 						},
-						success: rhus => {
+						success: categories => {
 							categories = JSON.parse(categories);
-							categoryiString = "";
+							categoryString = "";
 
 							categories.forEach(category => {
 								categoryString += `
@@ -155,8 +181,12 @@
 
 							$("[name='category_id']").append(categoryString);
 							$("[name='category_id']").select2({
-								placeholder: "Select Category"
+								placeholder: "Select category"
 							});
+
+							if(selectedCategory){
+								$("[name='category_id']").select2("val", $(`[name='category_id'] option:contains('${selectedCategory}')`).val());
+							}
 						}
 					})
 				},
@@ -167,6 +197,15 @@
 
 			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
 			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else if($('[name="unit_price"]').val() <= 0){
+			                Swal.showValidationMessage('Unit Price must be greater than 0');
+			            }
+			            else if($('[name="cost_price"]').val() <= 0){
+			                Swal.showValidationMessage('Cost Price must be greater than 0');
+			            }
+			            else if($('[name="reorder_point"]').val() < 0){
+			                Swal.showValidationMessage('Cost Price must not be less than 0');
 			            }
 			            else{
 			            	let bool = false;
@@ -180,14 +219,17 @@
 			}).then(result => {
 				if(result.value){
 					$.ajax({
-						url: "{{ route('bhc.store') }}",
+						url: "{{ route('medicine.store') }}",
 						type: "POST",
 						data: {
-							rhu_id: $("[name='rhu_id']").val(),
+							category_id: $("[name='category_id']").val(),
 							code: $("[name='code']").val(),
+							brand: $("[name='brand']").val(),
 							name: $("[name='name']").val(),
-							region: $("[name='region']").val(),
-							municipality: $("[name='municipality']").val(),
+							packaging: $("[name='packaging']").val(),
+							unit_price: $("[name='unit_price']").val(),
+							cost_price: $("[name='cost_price']").val(),
+							reorder_point: $("[name='reorder_point']").val(),
 							_token: $('meta[name="csrf-token"]').attr('content')
 						},
 						success: () => {
@@ -213,11 +255,9 @@
 				    swal.showLoading();
 				    return new Promise(resolve => {
 				    	let bool = true;
-
 			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
 			                Swal.showValidationMessage('Fill all fields');
 			            }
-
 			            bool ? setTimeout(() => {resolve()}, 500) : "";
 				    });
 				},
@@ -234,87 +274,6 @@
 							ss("Success");
 							reload();
 						}
-					})
-				}
-			});
-		}
-
-		function view(id){
-			$.ajax({
-				url: "{{ route('bhc.get') }}",
-				data: {
-					select: '*',
-					where: ['id', id],
-				},
-				success: bhc => {
-					bhc = JSON.parse(bhc)[0];
-					showDetails(bhc);
-				}
-			})
-		}
-
-		function showDetails(bhc){
-			Swal.fire({
-				html: `
-	                ${input("id", "", bhc.id, 3, 9, 'hidden')}
-	                ${input("code", "Code", bhc.code, 3, 9)}
-	                ${input("name", "Name", bhc.name, 3, 9)}
-	                ${input("region", "Region", bhc.region, 3, 9)}
-	                ${input("municipality", "Municipality", bhc.municipality, 3, 9)}
-				`,
-				width: '800px',
-				confirmButtonText: 'Update',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
-
-			            if($('.swal2-container input:placeholder-shown').length){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else{
-			            	let bool = false;
-			            	// Insert ajax validation
-				            setTimeout(() => {resolve()}, 500);
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
-				if(result.value){
-					update({
-						url: "{{ route('bhc.update') }}",
-						data: {
-							id: $("[name='id']").val(),
-							code: $("[name='code']").val(),
-							name: $("[name='name']").val(),
-							region: $("[name='region']").val(),
-							municipality: $("[name='municipality']").val(),
-						},
-						message: "Success"
-					}, () => {
-						reload();
-					})
-				}
-				else if(result.isDenied){
-					changePassword($("[name='id']").val());
-				}
-			});
-		}
-
-		function del(id){
-			sc("Confirmation", "Are you sure you want to delete?", result => {
-				if(result.value){
-					update({
-						url: "{{ route('bhc.delete') }}",
-						data: {id: id},
-						message: "Success"
-					}, () => {
-						reload();
 					})
 				}
 			});

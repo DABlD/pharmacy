@@ -104,6 +104,7 @@ Route::group([
                     ->defaults("href", "/$cname");
 
                 Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::get("getCategories/", ucfirst($cname) . "Controller@getCategories")->name('getCategories');
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("storeCategory/", ucfirst($cname) . "Controller@storeCategory")->name('storeCategory');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
@@ -121,7 +122,7 @@ Route::group([
 
                 Route::get("rhu", ucfirst($cname) . "Controller@rhu")->name('rhu');
                 Route::get("bhc", ucfirst($cname) . "Controller@bhc")->name('bhc');
-                Route::get("medicine", ucfirst($cname) . "Controller@bhc")->name('medicine');
+                Route::get("medicine", ucfirst($cname) . "Controller@medicine")->name('medicine');
             }
         );
     }
