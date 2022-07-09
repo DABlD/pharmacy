@@ -11,7 +11,7 @@ class Reorder extends Model
     use SoftDeletes;
     
     protected $fillable = [
-        'user_id', 'medicine_id', 'point'
+        'user_id', 'medicine_id', 'point', 'stock'
     ];
 
     protected $dates = [

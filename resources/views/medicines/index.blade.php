@@ -65,7 +65,7 @@
                 	dataSrc:'',
 					data: {
 						select: "*",
-						load: ['category', 'reorder']
+						load: ['category', 'reorder'],
 					}
 				},
 				columns: [
@@ -79,7 +79,7 @@
 					{data: 'unit_price'},
 					{data: 'cost_price'},
 					{data: 'reorder.point'},
-					{data: 'stock'},
+					{data: 'reorder.stock'},
 					{data: 'actions'},
 				],
         		order: [[1, 'asc']],
@@ -490,11 +490,16 @@
 				if(result.value){
 					swal.showLoading();
 					update({
-						url: "{{ route('bhc.delete') }}",
+						url: "{{ route('medicine.delete') }}",
 						data: {id: id},
-						message: "Success"
 					}, () => {
-						reload();
+						update({
+							url: "{{ route('medicine.deleteReorder') }}",
+							data: {id: id},
+							message: "Success"
+						}, () => {
+							reload();
+						})
 					})
 				}
 			});

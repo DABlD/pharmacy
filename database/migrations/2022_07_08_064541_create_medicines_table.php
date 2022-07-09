@@ -28,7 +28,6 @@ class CreateMedicinesTable extends Migration
             $table->string("packaging");
             $table->float("unit_price", 8, 2);
             $table->float("cost_price", 8, 2);
-            $table->unsignedSmallInteger("stock")->default(0);
 
             $table->timestamps();
             $table->softDeletes();

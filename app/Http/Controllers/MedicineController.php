@@ -136,6 +136,10 @@ class MedicineController extends Controller
         Medicine::find($req->id)->delete();
     }
 
+    public function deleteReorder(Request $req){
+        Reorder::where("medicine_id", $req->id)->delete();
+    }
+
     public function deleteCategory(Request $req){
         Category::find($req->id)->delete();
     }

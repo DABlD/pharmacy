@@ -13,7 +13,7 @@ class Medicine extends Model
 
     protected $fillable = [
         'user_id', 'category_id', 'image', 'code', 'brand',
-        'name', 'packaging', 'unit_price', 'cost_price', 'stock'
+        'name', 'packaging', 'unit_price', 'cost_price'
     ];
 
     protected $dates = [
