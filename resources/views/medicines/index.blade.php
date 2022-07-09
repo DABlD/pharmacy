@@ -263,6 +263,27 @@
 			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
 			                Swal.showValidationMessage('Fill all fields');
 			            }
+			            else{
+			            	let bool = false;
+			            	// Insert ajax validation
+            				$.ajax({
+            					url: "{{ route('medicine.getCategories') }}",
+            					data: {
+            						select: "id",
+            						where: ["name", $("[name='name']").val()]
+            					},
+            					success: result => {
+            						result = JSON.parse(result);
+            						if(result.length){
+            			    			Swal.showValidationMessage('Category already exists');
+	            						setTimeout(() => {resolve()}, 500);
+            						}
+            					}
+            				});
+
+				            setTimeout(() => {resolve()}, 500);
+			            }
+
 			            bool ? setTimeout(() => {resolve()}, 500) : "";
 				    });
 				},
