@@ -117,22 +117,27 @@
 		                        last = medicine;
 		                    }
 		                });
-		        },
-		        initComplete: () => {
-		        	let groups = $('tr.group td');
 
-		        	if(groups.length){
-		        		groups.each((index, row) => {
-		        			let category = row.innerText;
-		        			$(row).after(`
-		        				<td>
-		        					<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Item' onclick='create("${category}")'>
-		        					    <i class='fas fa-plus fa-2xl'></i>
-		        					</a>
-		        				</td>
-		        			`);
-		        		});
-		        	}
+
+					let groups = $('tr.group td');
+
+					if(groups.length){
+						groups.each((index, row) => {
+							let category = row.innerText;
+							$(row).after(`
+								<td>
+									<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Item' onclick='create("${category}")'>
+										<i class='fas fa-plus fa-2xl'></i>
+									</a>
+									<a class='btn btn-warning btn-sm' data-toggle='tooltip' title='Edit Category' onclick='editCategory("${category}")'>
+										<i class='fas fa-pencil'></i>
+									</a>
+								</td>
+							`);
+						});
+					}
+				},
+		        initComplete: () => {
 		        }
 			});
 		});
@@ -267,6 +272,66 @@
 						url: "{{ route('medicine.storeCategory') }}",
 						type: "POST",
 						data: {
+							name: $("[name='name']").val(),
+							_token: $('meta[name="csrf-token"]').attr('content')
+						},
+						success: () => {
+							ss("Success");
+							reload();
+						}
+					})
+				}
+			});
+		}
+
+		function editCategory(category){
+			Swal.fire({
+				html: `
+	                ${input("name", "Name", category, 3, 9)}
+				`,
+				width: '400px',
+				confirmButtonText: 'Update',
+				showCancelButton: true,
+				cancelButtonColor: errorColor,
+				cancelButtonText: 'Cancel',
+				preConfirm: () => {
+				    swal.showLoading();
+				    return new Promise(resolve => {
+				    	let bool = true;
+			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
+			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else{
+			            	let bool = false;
+			            	// Insert ajax validation
+            				$.ajax({
+            					url: "{{ route('medicine.getCategories') }}",
+            					data: {
+            						select: "id",
+            						where: ["name", $("[name='name']").val()]
+            					},
+            					success: result => {
+            						result = JSON.parse(result);
+            						if(result.length){
+            			    			Swal.showValidationMessage('Category already exists');
+	            						setTimeout(() => {resolve()}, 500);
+            						}
+            					}
+            				});
+
+				            setTimeout(() => {resolve()}, 500);
+			            }
+
+			            bool ? setTimeout(() => {resolve()}, 500) : "";
+				    });
+				},
+			}).then(result => {
+				if(result.value){
+					$.ajax({
+						url: "{{ route('medicine.updateCategory') }}",
+						type: "POST",
+						data: {
+							where: ["name", category],
 							name: $("[name='name']").val(),
 							_token: $('meta[name="csrf-token"]').attr('content')
 						},
