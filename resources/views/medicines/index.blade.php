@@ -23,6 +23,7 @@
                     				<th>#</th>
                     				<th>Category</th>
                     				<th>Image</th>
+                    				<th>Code</th>
                     				<th>Brand</th>
                     				<th>Name</th>
                     				<th>Packaging</th>
@@ -71,6 +72,7 @@
 					{data: 'id'},
 					{data: 'category.name', visible: false},
 					{data: 'image', visible: false},
+					{data: 'code'},
 					{data: 'brand'},
 					{data: 'name'},
 					{data: 'packaging'},
@@ -89,7 +91,7 @@
 				},
 				columnDefs: [
 					{
-						targets: [6,7],
+						targets: [7,8],
 						render: (value, display, row) =>{;
 							return "₱" + parseFloat(value).toFixed(2);
 						}
@@ -108,7 +110,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="8">
+		                            		<td colspan="9">
 		                            			${medicine}
 		                            		</td>
 		                            	</tr>
@@ -360,6 +362,139 @@
 							ss("Success");
 							reload();
 						}
+					})
+				}
+			});
+		}
+
+		function view(id){
+			$.ajax({
+				url: "{{ route('medicine.get') }}",
+				data: {
+					select: '*',
+					where: ['id', id],
+					load: ["category", 'reorder']
+				},
+				success: medicine => {
+					medicine = JSON.parse(medicine)[0];
+					showDetails(medicine);
+				}
+			})
+		}
+
+		function showDetails(medicine){
+			Swal.fire({
+				html: `
+					<div class="row iRow">
+					    <div class="col-md-3 iLabel">
+					        Category
+					    </div>
+					    <div class="col-md-9 iInput">
+					        <select name="category_id" class="form-control">
+					        	<option value=""></option>
+					        </select>
+					    </div>
+					</div>
+	                ${input("code", "Code", medicine.code, 3, 9)}
+	                ${input("brand", "Brand", medicine.brand, 3, 9)}
+	                ${input("name", "Generic Name", medicine.name, 3, 9)}
+	                ${input("packaging", "Packaging", medicine.packaging, 3, 9)}
+	                ${input("unit_price", "Unit Price", medicine.unit_price, 3, 9, 'number')}
+	                ${input("cost_price", "Cost Price", medicine.cost_price, 3, 9, 'number')}
+	                ${input("reorder_point", "Reorder Point", medicine.reorder.point, 3, 9)}
+				`,
+				width: '800px',
+				confirmButtonText: 'Update',
+				showCancelButton: true,
+				cancelButtonColor: errorColor,
+				cancelButtonText: 'Cancel',
+				didOpen: () => {
+					$.ajax({
+						url: "{{ route('medicine.getCategories') }}",
+						data: {
+							select: "*",
+						},
+						success: categories => {
+							categories = JSON.parse(categories);
+							categoryString = "";
+
+							categories.forEach(category => {
+								categoryString += `
+									<option value="${category.id}">${category.name}</option>
+								`;
+							});
+
+							$("[name='category_id']").append(categoryString);
+							$("[name='category_id']").select2({
+								placeholder: "Select category"
+							});
+
+							$("[name='category_id']").val(medicine.category_id).trigger('change');
+						}
+					})
+				},
+				preConfirm: () => {
+				    swal.showLoading();
+				    return new Promise(resolve => {
+				    	let bool = true;
+
+			            if($('.swal2-container input:placeholder-shown').length){
+			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else{
+			            	let bool = false;
+			            	// Insert ajax validation
+
+				            setTimeout(() => {resolve()}, 500);
+			            }
+
+			            bool ? setTimeout(() => {resolve()}, 500) : "";
+				    });
+				},
+			}).then(result => {
+				if(result.value){
+					swal.showLoading();
+					update({
+						url: "{{ route('medicine.update') }}",
+						data: {
+							id: medicine.id,
+							category_id: $("[name='category_id']").val(),
+							code: $("[name='code']").val(),
+							brand: $("[name='brand']").val(),
+							name: $("[name='name']").val(),
+							packaging: $("[name='packaging']").val(),
+							unit_price: $("[name='unit_price']").val(),
+							cost_price: $("[name='cost_price']").val(),
+						},
+					}, () => {
+						update({
+							url: "{{ route('medicine.updateReorder') }}",
+							data: {
+								where: [
+									"medicine_id", medicine.id,
+									"user_id", medicine.user_id
+								],
+								point: $("[name='reorder_point']").val(),
+							},
+							message: "Success"
+						}, () => {
+							reload();
+						})
+					})
+				}
+			});
+		}
+
+		function del(id){
+			sc("Confirmation", "Are you sure you want to delete?", result => {
+				if(result.value){
+					swal.showLoading();
+					update({
+						url: "{{ route('bhc.delete') }}",
+						data: {id: id},
+						message: "Success"
+					}, () => {
+						reload();
 					})
 				}
 			});

@@ -351,9 +351,6 @@
 						reload();
 					})
 				}
-				else if(result.isDenied){
-					changePassword($("[name='id']").val());
-				}
 			});
 		}
 

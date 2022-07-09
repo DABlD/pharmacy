@@ -74,7 +74,7 @@ class RhuController extends Controller
             $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
         }
         else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));;
+            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
         }
     }
 

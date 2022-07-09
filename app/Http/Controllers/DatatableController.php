@@ -137,6 +137,7 @@ class DatatableController extends Controller
             $temp->id = null;
             $temp->category = $category;
             $temp->image = null;
+            $temp->code = null;
             $temp->brand = null;
             $temp->name = null;
             $temp->packaging = null;

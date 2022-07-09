@@ -109,6 +109,7 @@ Route::group([
                 Route::post("storeCategory/", ucfirst($cname) . "Controller@storeCategory")->name('storeCategory');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("updateCategory/", ucfirst($cname) . "Controller@updateCategory")->name('updateCategory');
+                Route::post("updateReorder/", ucfirst($cname) . "Controller@updateReorder")->name('updateReorder');
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
                 Route::post("deleteCategory/", ucfirst($cname) . "Controller@deleteCategory")->name('deleteCategory');
             }

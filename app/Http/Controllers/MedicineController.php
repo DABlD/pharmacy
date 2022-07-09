@@ -92,7 +92,7 @@ class MedicineController extends Controller
 
         $reorder = new Reorder();
         $reorder->user_id = $entry->user_id;
-        $reorder->medicine_id = $req->medicine_id;
+        $reorder->medicine_id = $entry->id;
         $reorder->point = $req->reorder_point;
         $reorder->save();
     }
@@ -110,7 +110,7 @@ class MedicineController extends Controller
             $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
         }
         else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));;
+            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
         }
     }
 
@@ -121,8 +121,15 @@ class MedicineController extends Controller
             $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
         }
         else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));;
+            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
         }
+    }
+
+    public function updateReorder(Request $req){
+        $query = DB::table("reorders");
+
+        $query = $query->where($req->where[0], $req->where[1]);
+        $query = $query->where($req->where[2], $req->where[3])->update($req->except(['id', '_token', 'where']));
     }
 
     public function delete(Request $req){

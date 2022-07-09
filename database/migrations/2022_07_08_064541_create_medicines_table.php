@@ -4,8 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Traits\MedicineAttribute;
+
 class CreateMedicinesTable extends Migration
 {
+    use MedicineAttribute;
     /**
      * Run the migrations.
      *

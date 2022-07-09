@@ -9,7 +9,7 @@ use App\Models\{Category, Reorder};
 
 class Medicine extends Model
 {
-    use SoftDeletes;
+    use MedicineAttribute, SoftDeletes;
 
     protected $fillable = [
         'user_id', 'category_id', 'image', 'code', 'brand',
