@@ -19,7 +19,7 @@ class CreateTransactionTypesTable extends Migration
             $table->string('type');
             $table->enum("operator", ["+", "-"])->nullable();
             $table->boolean('inDashboard')->default(false);
-            $table->boolean('canDelete')->default(false);
+            $table->boolean('canDelete')->default(true);
 
             $table->timestamps();
             $table->softDeletes();

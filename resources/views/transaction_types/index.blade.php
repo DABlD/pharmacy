@@ -43,11 +43,13 @@
 
 @push('styles')
 	<link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
+	<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
 	{{-- <link rel="stylesheet" href="{{ asset('css/datatables-jquery.min.css') }}"> --}}
 @endpush
 
 @push('scripts')
 	<script src="{{ asset('js/datatables.min.js') }}"></script>
+	<script src="{{ asset('js/select2.min.js') }}"></script>
 	{{-- <script src="{{ asset('js/datatables-jquery.min.js') }}"></script> --}}
 
 	<script>
@@ -78,12 +80,12 @@
         			{
         				targets: 3,
         				render: (value, display, row) => {
-        					let title = value ? "Turn off" : "Turn On";
-        					let btn = value ? "danger" : "success";
+        					let btn = value ? "success" : "danger";
+        					let slash = value ? "" : "-slash";
 
         					return `
-        						<a class="btn btn-${btn} btn-sm" data-toggle="tooltip" title="${title}" onclick="create()">
-        						    <i class="fa-solid fa-power-off"></i>
+        						<a class="btn btn-${btn} btn-sm" data-toggle="tooltip" title="Toggle" onclick="updateVisibility(${row.id},${value})">
+        						    <i class="fa-solid fa-eye${slash}"></i>
         						</a>
         					`;
         				}
@@ -113,13 +115,29 @@
 			Swal.fire({
 				html: `
 	                ${input("type", "Type", null, 3, 9)}
-	                ${input("operator", "Operator", null, 3, 9)}
+	                <div class="row iRow">
+	                    <div class="col-md-3 iLabel">
+	                        Operator
+	                    </div>
+	                    <div class="col-md-9 iInput">
+	                        <select name="operator" class="form-control">
+	                        	<option value=""></option>
+	                        	<option value="+">+</option>
+	                        	<option value="-">-</option>
+	                        </select>
+	                    </div>
+	                </div>
 				`,
 				width: '600px',
 				confirmButtonText: 'Add',
 				showCancelButton: true,
 				cancelButtonColor: errorColor,
 				cancelButtonText: 'Cancel',
+				didOpen: () => {
+					$("[name='operator']").select2({
+						placeholder: "Select Operator"
+					});
+				},
 				preConfirm: () => {
 				    swal.showLoading();
 				    return new Promise(resolve => {
@@ -174,13 +192,31 @@
 				html: `
 	                ${input("id", "", transactionType.id, 3, 9, 'hidden')}
 	                ${input("type", "Type", transactionType.type, 3, 9)}
-	                ${input("operator", "Type", transactionType.operator, 3, 9)}
+	                <div class="row iRow">
+	                    <div class="col-md-3 iLabel">
+	                        Operator
+	                    </div>
+	                    <div class="col-md-9 iInput">
+	                        <select name="operator" class="form-control">
+	                        	<option value=""></option>
+	                        	<option value="+">+</option>
+	                        	<option value="-">-</option>
+	                        </select>
+	                    </div>
+	                </div>
 				`,
 				width: '800px',
 				confirmButtonText: 'Update',
 				showCancelButton: true,
 				cancelButtonColor: errorColor,
 				cancelButtonText: 'Cancel',
+				didOpen: () => {
+					$("[name='operator']").select2({
+						placeholder: "Select Operator"
+					});
+
+					$("[name='operator']").val(transactionType.operator).trigger('change');
+				},
 				preConfirm: () => {
 				    swal.showLoading();
 				    return new Promise(resolve => {
@@ -199,7 +235,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length){
+            						if(result.length && transactionType.id != result[0].id){
             			    			Swal.showValidationMessage('Transaction Type Already Exists');
 	            						setTimeout(() => {resolve()}, 500);
             						}
@@ -228,6 +264,20 @@
 				else if(result.isDenied){
 					changePassword($("[name='id']").val());
 				}
+			});
+		}
+
+		function updateVisibility(id, inDashboard){
+			swal.showLoading();
+			update({
+				url: "{{ route('transactionType.update') }}",
+				data: {
+					id: id,
+					inDashboard: inDashboard ? 0 : 1
+				},
+				message: "Success"
+			},	() => {
+				reload();
 			});
 		}
 
