@@ -137,6 +137,27 @@ Route::group([
             }
         );
 
+        // TRANSACTION TYPE ROUTES
+        $cname = "data";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-keyboard")
+                    ->defaults("name", "Data Entry")
+                    ->defaults("roles", array("Admin", "RHU"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+            }
+        );
+
         // DATATABLES
         $cname = "datatable";
         Route::group([
@@ -147,6 +168,7 @@ Route::group([
                 Route::get("rhu", ucfirst($cname) . "Controller@rhu")->name('rhu');
                 Route::get("bhc", ucfirst($cname) . "Controller@bhc")->name('bhc');
                 Route::get("medicine", ucfirst($cname) . "Controller@medicine")->name('medicine');
+                Route::get("medicine2", ucfirst($cname) . "Controller@medicine2")->name('medicine2');
                 Route::get("transactionType", ucfirst($cname) . "Controller@transactionType")->name('transactionType');
             }
         );
