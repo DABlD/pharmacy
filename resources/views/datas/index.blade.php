@@ -17,7 +17,7 @@
                     	<table id="table" class="table table-hover">
                     		<thead>
                     			<tr>
-                    				<th>ID</th>
+                    				<th>CATEGORY</th>
                     			</tr>
                     		</thead>
 
@@ -97,8 +97,31 @@
                     		</div>
                     	</div>
 
+                    	<br>
+                    	<div class="row">
+                    		<div class="col-md-12">
+                    			<table id="table2" class="table table-hover">
+                    				<thead>
+                    					<tr>
+                    						<th>Item</th>
+                    						<th>Lot Number</th>
+                    						<th>Expiry Date</th>
+                    						<th>Qty</th>
+                    						<th>Price</th>
+                    						<th>Amount</th>
+                    						<th>Actions</th>
+                    					</tr>
+                    				</thead>
+
+                    				<tbody>
+                    				</tbody>
+                    			</table>
+                    		</div>
+                    	</div>
+
                     </div>
                 </div>
+
             </section>
 
         </div>
@@ -136,26 +159,33 @@
 	{{-- <script src="{{ asset('js/datatables-jquery.min.js') }}"></script> --}}
 
 	<script>
+		var category = 0;
+
 		$(document).ready(()=> {
+
 			var table = $('#table').DataTable({
 				ajax: {
 					url: "{{ route('datatable.medicine2') }}",
                 	dataType: "json",
                 	dataSrc: "",
-					data: {
-						table: 'medicines',
-						select: "*",
+					data: d => {
+					   d.table = 'medicines';
+					   d.select = '*';
+					   d.where = ["category_id", category];
 					}
 				},
 				columns: [
-					{data: 'id'},
+					{
+						data: 'id'
+					},
 				],
         		pageLength: 1000,
         		lengthChange: false,
         		paging: false,
         		info: false,
         		language: {
-        			search: ""
+        			search: "",
+        			emptyTable: "No Selected Category"
         		},
 				drawCallback: () => {
 					//150 = height elements above it
@@ -167,6 +197,8 @@
 			initStyles();
 			initTransactionType();
 			initTransactionDate();
+			addFooter();
+			computeTotal();
 		});
 
 		function initStyles(){
@@ -205,6 +237,47 @@
 				defaultDate: moment().format("YYYY-MM-DD")
 			})
 		}
+
+		let footer = `
+			<tr style="text-align: right; font-weight: bold;">
+				<td colspan="6">
+					Total
+				</td>
+				<td id="total" class="center">
+					0
+				</td>
+			</tr>
+			<tr style="text-align: right;">
+				<td colspan="7">
+					<a class="btn btn-success" data-toggle="tooltip" onclick="submit()">
+					    SUBMIT
+					</a>
+				</td>
+			</tr>
+		`;
+
+		function addFooter(){
+			$("#table2 tbody").append(footer);
+		};
+
+		function computeTotal(){
+			let items = $('.item');
+			let total = 0;
+
+			if(items.length){
+				items.forEach(item => {
+					let price = item.data("price"); 
+					total += price;
+				});
+			}
+			
+			$('#total').html(parseFloat(total).toFixed(2));
+		}
+
+		// ACTIONS
+		// ACTIONS
+		// ACTIONS
+		// ACTIONS
 
 		function view(id){
 			$.ajax({

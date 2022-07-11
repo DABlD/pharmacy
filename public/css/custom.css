@@ -26,7 +26,7 @@
 	margin-top: 5px;
 }
 
-#table thead tr{
+.table thead tr{
 	color: white;
 	background-color: #b96666;
 }
