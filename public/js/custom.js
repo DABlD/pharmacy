@@ -71,3 +71,7 @@ function update(data, callback = null){
 		}
 	});
 }
+
+function toFloat(value, decimals = 2){
+	return parseFloat(value).toFixed(decimals);
+}

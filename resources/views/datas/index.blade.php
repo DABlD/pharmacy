@@ -5,7 +5,7 @@
     <div class="container-fluid">
 
         <div class="row">
-            <section class="col-lg-3 connectedSortable">
+            <section class="col-lg-4 connectedSortable">
                 <div class="card">
                     <div class="card-header center">
                         <h3 class="card-title">
@@ -14,21 +14,34 @@
                     </div>
 
                     <div class="card-body table-responsive selection">
-                    	<table id="table" class="table table-hover">
-                    		<thead>
-                    			<tr>
-                    				<th>CATEGORY</th>
-                    			</tr>
-                    		</thead>
+                    	<div class="row">
+	        			    <div class="col-md-4 iLabel">
+	        			        Category
+	        			    </div>
+				            <div class="col-md-8 iInput">
+				                <select name="category" class="form-control">
+				                	<option value=""></option>
+				                </select>
+				            </div>
+                    	</div>
+                    	<br>
+                    	<div class="row">
+                    		<table id="table" class="table table-hover">
+                    			<thead>
+                    				<tr>
+                    					<th>CATEGORY</th>
+                    				</tr>
+                    			</thead>
 
-                    		<tbody>
-                    		</tbody>
-                    	</table>
+                    			<tbody>
+                    			</tbody>
+                    		</table>
+                    	</div>
                     </div>
                 </div>
             </section>
 
-            <section class="col-lg-9 connectedSortable">
+            <section class="col-lg-8 connectedSortable">
                 <div class="card">
                     <div class="card-header center">
                         <h3 class="card-title">
@@ -148,6 +161,18 @@
 		.row .col-md-6, .iLabel, .iInput{
 			margin: auto;
 		}
+		#table_wrapper, #table_filter, #table_filter label, [type|="search"] {
+			width: 100%;
+		}
+		[type|="search"]{
+			margin-left: 0 !important;
+		}
+		#table2 tbody td{
+			vertical-align: middle;
+		}
+		#table2 thead th{
+			text-align: center;
+		}
 	</style>
 	{{-- <link rel="stylesheet" href="{{ asset('css/datatables-jquery.min.css') }}"> --}}
 @endpush
@@ -160,6 +185,7 @@
 
 	<script>
 		var category = 0;
+		var medicines = [];
 
 		$(document).ready(()=> {
 
@@ -176,7 +202,33 @@
 				},
 				columns: [
 					{
-						data: 'id'
+						render: (id, display, row) => {
+							return `
+								<div class="row">
+									<div class="col-md-8" style="font-weight: bold;">
+										${row.code}
+									</div>
+									<div class="col-md-4" style="text-align: right;">
+										<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Add" onclick="add(${row.id})">
+										    <i class="fas fa-plus fa-2xl"></i>
+										</a>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-12">
+										${row.name} ${row.packaging}
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8">
+										${row.brand}
+									</div>
+									<div class="col-md-4" style="text-align: right;">
+										₱${toFloat(row.unit_price)}
+									</div>
+								</div>
+							`;
+						}
 					},
 				],
         		pageLength: 1000,
@@ -195,6 +247,7 @@
 			});
 
 			initStyles();
+			initCategories();
 			initTransactionType();
 			initTransactionDate();
 			addFooter();
@@ -229,6 +282,34 @@
 			})
 		}
 
+		function initCategories(){
+			$.ajax({
+				url: "{{ route('medicine.getCategories') }}",
+				data: {
+					select: "*",
+				},
+				success: categories => {
+					categories = JSON.parse(categories);
+					let categoryString = "";
+
+					categories.forEach(temp => {
+						categoryString += `
+							<option value="${temp.id}">${temp.name}</option>
+						`;
+					});
+
+					$('[name="category"]').append(categoryString);
+					$('[name="category"]').select2({
+						placeholder: "Select Category"
+					});
+					$('[name="category"]').on('change', temp => {
+						category = temp.target.value;
+						reload();
+					});
+				}
+			});
+		}
+
 		function initTransactionDate(){
 			$("[name='transaction_date']").flatpickr({
 				altInput: true,
@@ -239,20 +320,22 @@
 		}
 
 		let footer = `
-			<tr style="text-align: right; font-weight: bold;">
-				<td colspan="6">
+			<tr style="text-align: right; font-weight: bold;" class="footer">
+				<td colspan="5">
 					Total
 				</td>
 				<td id="total" class="center">
 					0
 				</td>
+				<td></td>
 			</tr>
-			<tr style="text-align: right;">
-				<td colspan="7">
+			<tr style="text-align: right;" class="footer">
+				<td colspan="6">
 					<a class="btn btn-success" data-toggle="tooltip" onclick="submit()">
 					    SUBMIT
 					</a>
 				</td>
+				<td></td>
 			</tr>
 		`;
 
@@ -261,17 +344,19 @@
 		};
 
 		function computeTotal(){
-			let items = $('.item');
+			let items = $('.total');
 			let total = 0;
 
-			if(items.length){
-				items.forEach(item => {
-					let price = item.data("price"); 
-					total += price;
-				});
-			}
+			items.each((index, item) => {
+				let parent = $(item).parent().parent();
+				let price = parent.find(".price")[0].innerText;
+				let qty = parent.find(".qty")[0].value;
+
+				item.value = toFloat(price * qty);
+				total += price * qty;
+			});
 			
-			$('#total').html(parseFloat(total).toFixed(2));
+			$('#total').html(toFloat(total));
 		}
 
 		// ACTIONS
@@ -279,277 +364,69 @@
 		// ACTIONS
 		// ACTIONS
 
-		function view(id){
-			$.ajax({
-				url: "{{ route('rhu.get') }}",
-				data: {
-					select: '*',
-					where: ['id', id],
-					load: ['user']
-				},
-				success: rhu => {
-					rhu = JSON.parse(rhu)[0];
-					showDetails(rhu);
+		function add(id){
+			if(medicines[id]){
+				medicines[id]++;
+				$(`[name="qty${id}"]`).val(medicines[id]);
+				computeTotal();
+			}
+			else{
+				$.ajax({
+					url: "{{ route('medicine.get') }}",
+					data: {
+						select: "*",
+						where: ["id", id]
+					},
+					success: medicine => {
+						medicine = JSON.parse(medicine)[0];
+						medicines[id] = 1;
+						$('.footer').remove();
+						$("#table2 tbody").append(`
+							<tr>
+								<td>${medicine.name}</td>
+								<td>
+									<input type="text" class="form-control lot_number">
+								</td>
+								<td>
+									<input type="text" class="form-control exp">
+								</td>
+								<td>
+									<input type="number" name="qty${id}" class="form-control qty" value="1" data-id=${id}>
+								</td>
+								<td class="price">
+									${toFloat(medicine.unit_price)}
+								</td>
+								<td>
+									<input type="number" class="form-control total" readonly>
+								</td>
+							</tr>
+						`);
+						addFooter();
+						initListener();
+						computeTotal();
+					}
+				})
+			}
+		}
+
+		function initListener(){
+			$('.qty').unbind('change');
+			$('.qty').on("change", qty => {
+				qty = $(qty.target);
+				medicines[qty.data("id")] = qty.val();
+
+				if(qty.val() == 0){
+					$(qty).parent().parent().remove();
+					delete medicines[qty.data("id")];
 				}
+				computeTotal();
+			});
+
+			$(".exp").flatpickr({
+				altInput: true,
+				altFormat: "F j, Y",
+				dateFormat: "Y-m-d",
 			})
-		}
-
-		function create(){
-			Swal.fire({
-				html: `
-	                ${input("name", "Name", null, 3, 9)}
-	                ${input("company_name", "Company Name", null, 3, 9)}
-	                ${input("contact_personnel", "Contact Person", null, 3, 9)}
-	                ${input("contact", "Contact #", null, 3, 9, "number")}
-					${input("email", "Email", null, 3, 9, 'email')}
-	                ${input("address", "Address", null, 3, 9)}
-	                </br>
-	                ${input("username", "Username", null, 3, 9, 'text', 'autocomplete="new-password"')}
-                    ${input("password", "Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
-                    ${input("password_confirmation", "Confirm Password", null, 3, 9, 'password', 'autocomplete="new-password"')}
-				`,
-				width: '800px',
-				confirmButtonText: 'Add',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
-
-			            if($('.swal2-container input:placeholder-shown').length){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else if($("[name='password']").val().length < 8){
-			                Swal.showValidationMessage('Password must at least be 8 characters');
-			            }
-			            else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
-			                Swal.showValidationMessage('Password do not match');
-			            }
-			            else{
-			            	let bool = false;
-			            	$.ajax({
-			            		url: "{{ route('user.get') }}",
-			            		data: {
-			            			select: "id",
-			            			where: ["username", $("[name='username']").val()]
-			            		},
-			            		success: result => {
-			            			result = JSON.parse(result);
-			            			if(result.length){
-			                			Swal.showValidationMessage('Username already exists');
-			                			setTimeout(() => {resolve()}, 500);
-			            			}
-			            			else{
-			            				$.ajax({
-			            					url: "{{ route('user.get') }}",
-			            					data: {
-			            						select: "id",
-			            						where: ["email", $("[name='email']").val()]
-			            					},
-			            					success: result => {
-			            						result = JSON.parse(result);
-			            						if(result.length){
-			            			    			Swal.showValidationMessage('Email already used');
-				            						setTimeout(() => {resolve()}, 500);
-			            						}
-			            					}
-			            				});
-			            			}
-
-			            		}
-			            	});
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
-				if(result.value){
-					swal.showLoading();
-					$.ajax({
-						url: "{{ route('rhu.store') }}",
-						type: "POST",
-						data: {
-							name: $("[name='name']").val(),
-							company_name: $("[name='company_name']").val(),
-							contact_personnel: $("[name='contact_personnel']").val(),
-							contact: $("[name='contact']").val(),
-							email: $("[name='email']").val(),
-							address: $("[name='address']").val(),
-							username: $("[name='username']").val(),
-							password: $("[name='password']").val(),
-							_token: $('meta[name="csrf-token"]').attr('content')
-						},
-						success: () => {
-							ss("Success");
-							reload();
-						}
-					})
-				}
-			});
-		}
-
-		function showDetails(rhu){
-			Swal.fire({
-				html: `
-	                ${input("id", "", rhu.user.id, 3, 9, 'hidden')}
-	                ${input("name", "Name", rhu.user.name, 3, 9)}
-	                ${input("company_name", "Company Name", rhu.company_name, 3, 9)}
-	                ${input("contact_personnel", "Contact Person", rhu.contact_personnel, 3, 9)}
-	                ${input("contact", "Contact #", rhu.user.contact, 3, 9, "number")}
-					${input("email", "Email", rhu.user.email, 3, 9, 'email')}
-	                ${input("address", "Address", rhu.user.address, 3, 9)}
-	                </br>
-	                ${input("username", "Username", rhu.user.username, 3, 9, 'text', 'autocomplete="new-password"')}
-				`,
-				width: '800px',
-				confirmButtonText: 'Update',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-                showDenyButton: true,
-                denyButtonColor: successColor,
-                denyButtonText: 'Change Password',
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
-
-			            if($('.swal2-container input:placeholder-shown').length){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else{
-			            	let bool = false;
-			            	$.ajax({
-			            		url: "{{ route('user.get') }}",
-			            		data: {
-			            			select: "id",
-			            			where: ["username", $("[name='username']").val()]
-			            		},
-			            		success: result => {
-			            			result = JSON.parse(result);
-			            			if(result.length && result[0].id != rhu.user.id){
-			                			Swal.showValidationMessage('Username already exists');
-			                			setTimeout(() => {resolve()}, 500);
-			            			}
-			            			else{
-			            				$.ajax({
-			            					url: "{{ route('user.get') }}",
-			            					data: {
-			            						select: "id",
-			            						where: ["email", $("[name='email']").val()]
-			            					},
-			            					success: result => {
-			            						result = JSON.parse(result);
-			            						if(result.length && result[0].id != rhu.user.id){
-			            			    			Swal.showValidationMessage('Email already used');
-				            						setTimeout(() => {resolve()}, 500);
-			            						}
-			            					}
-			            				});
-			            			}
-
-			            		}
-			            	});
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
-				if(result.value){
-					swal.showLoading();
-					update({
-						url: "{{ route('user.update') }}",
-						data: {
-							id: $("[name='id']").val(),
-							name: $("[name='name']").val(),
-							contact: $("[name='contact']").val(),
-							email: $("[name='email']").val(),
-							address: $("[name='address']").val(),
-							username: $("[name='username']").val(),
-						},
-						message: false
-					},	() => {
-							update({
-								url: "{{ route('rhu.update') }}",
-								data: {
-									id: $("[name='id']").val(),
-									company_name: $("[name='company_name']").val(),
-									contact_personnel: $("[name='contact_personnel']").val(),
-									where: ['user_id', $("[name='id']").val()]
-								},
-								message: "Success"
-							}, () => {
-								reload();
-							})
-						}
-					);
-				}
-				else if(result.isDenied){
-					changePassword($("[name='id']").val());
-				}
-			});
-		}
-
-		function changePassword(id){
-			Swal.fire({
-			    html: `
-			        ${input("password", "Password", null, 5, 7, 'password')}
-			        ${input("password_confirmation", "Confirm Password", null, 5, 7, 'password')}
-			    `,
-			    confirmButtonText: 'Update',
-			    showCancelButton: true,
-			    cancelButtonColor: errorColor,
-			    cancelButtonText: 'Exit',
-			    width: "500px",
-			    preConfirm: () => {
-			        swal.showLoading();
-			        return new Promise(resolve => {
-			            setTimeout(() => {
-			                if($('.swal2-container input:placeholder-shown').length){
-			                    Swal.showValidationMessage('Fill all fields');
-			                }
-			                else if($("[name='password']").val().length < 8){
-			                    Swal.showValidationMessage('Password must at least be 8 characters');
-			                }
-			                else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
-			                    Swal.showValidationMessage('Password do not match');
-			                }
-			            resolve()}, 500);
-			        });
-			    },
-			}).then(result => {
-				if(result.value){
-					swal.showLoading();
-					update({
-						url: "{{ route('user.updatePassword') }}",
-						data: {
-							id: id,
-							password: $("[name='password']").val(),
-						}
-					}, () => {
-						ss("Success");
-					});
-				}
-			});
-		}
-
-		function del(id){
-			sc("Confirmation", "Are you sure you want to delete?", result => {
-				if(result.value){
-					swal.showLoading();
-					update({
-						url: "{{ route('rhu.delete') }}",
-						data: {id: id},
-						message: "Success"
-					}, () => {
-						reload();
-					})
-				}
-			});
 		}
 	</script>
 @endpush
