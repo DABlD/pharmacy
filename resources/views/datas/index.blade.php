@@ -382,7 +382,7 @@
 						medicines[id] = 1;
 						$('.footer').remove();
 						$("#table2 tbody").append(`
-							<tr>
+							<tr class="item" data-id="${id}">
 								<td>${medicine.name}</td>
 								<td>
 									<input type="text" class="form-control lot_number">
@@ -398,6 +398,11 @@
 								</td>
 								<td>
 									<input type="number" class="form-control total" readonly>
+								</td>
+								<td>
+									<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" onclick="remove(${id})">
+									    <i class="fas fa-trash"></i>
+									</a>
 								</td>
 							</tr>
 						`);
@@ -427,6 +432,76 @@
 				altFormat: "F j, Y",
 				dateFormat: "Y-m-d",
 			})
+		}
+
+		function remove(id){
+			$(`[name="qty${id}"]`).val(0);
+			$(`[name="qty${id}"]`).trigger('change');
+		}
+
+		function submit(){
+			let items = $('.item');
+
+			if(items.length){
+				let data = [];
+				let bool = false;
+
+				items.each((index, item) => {
+					let id = $(item).data('id');
+
+					let temp = {
+						medicine_id: id,
+						transaction_types_id: $("[name='type']").val(),
+						reference: $("[name='reference']").val(),
+						particulars: $("[name='particulars']").val(),
+						lot_number: $(item).find(".lot_number").val(),
+						expiry_date: $(item).find(".exp").val(),
+						qty: $(item).find(".qty").val(),
+						unit_price: $(item).find(".price")[0].innerText,
+						amount: $(item).find(".total").val(),
+						transaction_date: $("[name='transaction_date']").val()
+					};
+
+					console.log($(item).find('.price'));
+
+					Object.keys(temp).forEach(key => {
+					    if(temp[key] == null || temp[key] == ""){
+					    	bool = true;
+					    	return true;
+					    }
+					})
+
+					data.push(temp);
+				});
+
+				if(bool){
+					se("Fill all fields");
+				}
+				else{
+					$.ajax({
+						url: "{{ route('data.store') }}",
+						data: {
+							data: data,
+							_token: $('meta[name="csrf-token"]').attr('content')
+						},
+						type: "POST",
+						success: () => {
+							ss("Success");
+							medicines = [];
+							$('#table2 tbody').html("");
+							$('#table2 tbody').append(footer);
+							$("[name='type']").val(null).trigger('change');
+							$("[name='reference']").val(null).trigger('change');
+							$("[name='particulars']").val(null).trigger('change');
+							$("[name='transaction_date']").val(null).trigger('change');
+							reload();
+						}
+					});
+				}
+			}
+			else{
+				se("No item selected");
+			}
 		}
 	</script>
 @endpush

@@ -13,7 +13,7 @@ function ss(title = "", text = ""){
 
 function se(title = "", text = ""){
 	Swal.fire({
-		icon: "danger",
+		icon: "error",
 		title: title,
 		text: text,
 		timer: 1000,

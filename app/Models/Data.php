@@ -11,7 +11,8 @@ class Data extends Model
     protected $fillable = [
         'medicine_id', 'transaction_types_id', 'reference', 
         'particulars', 'lot_number', 'qty', 
-        'unit_price', 'amount', 'transaction_date', 'expiry_date'
+        'unit_price', 'amount', 'transaction_date', 
+        'expiry_date', 'user_id'
     ];
 
     protected $dates = [

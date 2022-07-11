@@ -49,17 +49,23 @@ class DataController extends Controller
     }
 
     public function store(Request $req){
-        $data = new Data();
-        $data->medicine_id = $req->medicine_id;
-        $data->transaction_types_id = $req->transaction_types_id;
-        $data->reference = $req->reference;
-        $data->particulars = $req->particulars;
-        $data->lot_number = $req->lot_number;
-        $data->expiry_date = $req->expiry_date;
-        $data->qty = $req->qty;
-        $data->unit_price = $req->unit_price;
-        $data->amount = $req->amount;
-        $data->save();
+        foreach($req->data as $temp){
+            $temp = (object)$temp;
+
+            $data = new Data();
+            $data->medicine_id = $temp->medicine_id;
+            $data->transaction_types_id = $temp->transaction_types_id;
+            $data->reference = $temp->reference;
+            $data->particulars = $temp->particulars;
+            $data->lot_number = $temp->lot_number;
+            $data->expiry_date = $temp->expiry_date;
+            $data->qty = $temp->qty;
+            $data->unit_price = $temp->unit_price;
+            $data->amount = $temp->amount;
+            $data->transaction_date = $temp->transaction_date;
+            $data->user_id = auth()->user()->id;
+            $data->save();
+        }
     }
 
     public function update(Request $req){
