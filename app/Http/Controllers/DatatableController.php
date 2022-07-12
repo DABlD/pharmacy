@@ -95,7 +95,8 @@ class DatatableController extends Controller
     }
 
     public function medicine(Request $req){
-        $array = Medicine::select($req->select);
+        $array = Medicine::select($req->select)
+                    ->join("reorders as r", "r.medicine_id", '=', 'medicines.id');
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
@@ -115,17 +116,13 @@ class DatatableController extends Controller
 
         // IF HAS LOAD
         if($array->count() && $req->load){
-            foreach($req->load as $table){
+            foreach($req->load as $key => $table){
                 $array->load($table);
             }
         }
 
         foreach($array as $key => $item){
             $item->actions = $item->actions;
-
-            if($item->reorder->user_id != auth()->user()->id){
-                $array->forget($key);
-            }
         }
 
         $array = $this->addCategories($array)->values();

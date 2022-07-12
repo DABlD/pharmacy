@@ -66,8 +66,9 @@
                 	dataType: "json",
                 	dataSrc:'',
 					data: {
-						select: "*",
+						select: "medicines.*",
 						load: ['category', 'reorder'],
+						where: ['r.user_id', "{{ auth()->user()->id }}"]
 					}
 				},
 				columns: [
@@ -387,8 +388,10 @@
 		}
 
 		function showDetails(medicine){
+			console.log(medicine);
 			Swal.fire({
 				html: `
+					@if(auth()->user()->role == "Admin")
 					<div class="row iRow">
 					    <div class="col-md-3 iLabel">
 					        Category
@@ -405,6 +408,7 @@
 	                ${input("packaging", "Packaging", medicine.packaging, 3, 9)}
 	                ${input("unit_price", "Unit Price", medicine.unit_price, 3, 9, 'number')}
 	                ${input("cost_price", "Cost Price", medicine.cost_price, 3, 9, 'number')}
+	                @endif
 	                ${input("reorder_point", "Reorder Point", medicine.reorder.point, 3, 9)}
 				`,
 				width: '800px',
@@ -412,6 +416,7 @@
 				showCancelButton: true,
 				cancelButtonColor: errorColor,
 				cancelButtonText: 'Cancel',
+				@if(auth()->user()->role == "Admin")
 				didOpen: () => {
 					$.ajax({
 						url: "{{ route('medicine.getCategories') }}",
@@ -437,6 +442,7 @@
 						}
 					})
 				},
+				@endif
 				preConfirm: () => {
 				    swal.showLoading();
 				    return new Promise(resolve => {
@@ -458,6 +464,7 @@
 			}).then(result => {
 				if(result.value){
 					swal.showLoading();
+					@if(auth()->user()->role == "Admin")
 					update({
 						url: "{{ route('medicine.update') }}",
 						data: {
@@ -485,6 +492,21 @@
 							reload();
 						})
 					})
+					@else
+						update({
+							url: "{{ route('medicine.updateReorder') }}",
+							data: {
+								where: [
+									"medicine_id", medicine.id,
+									"user_id", medicine.user_id
+								],
+								point: $("[name='reorder_point']").val(),
+							},
+							message: "Success"
+						}, () => {
+							reload();
+						})
+					@endif
 				}
 			});
 		}
