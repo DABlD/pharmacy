@@ -13,7 +13,9 @@
                             List
                         </h3>
 
-                        @include('medicines.includes.toolbar')
+                        @if(auth()->user()->role == "Admin")
+                        	@include('medicines.includes.toolbar')
+                        @endif
                     </div>
 
                     <div class="card-body table-responsive">
@@ -128,12 +130,14 @@
 							let category = row.innerText;
 							$(row).after(`
 								<td>
+									@if(auth()->user()->role == "Admin")
 									<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Item' onclick='create("${category}")'>
 										<i class='fas fa-plus fa-2xl'></i>
 									</a>
 									<a class='btn btn-warning btn-sm' data-toggle='tooltip' title='Edit Category' onclick='editCategory("${category}")'>
 										<i class='fas fa-pencil'></i>
 									</a>
+									@endif
 								</td>
 							`);
 						});

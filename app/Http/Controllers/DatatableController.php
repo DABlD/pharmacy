@@ -120,11 +120,15 @@ class DatatableController extends Controller
             }
         }
 
-        foreach($array as $item){
+        foreach($array as $key => $item){
             $item->actions = $item->actions;
+
+            if($item->reorder->user_id != auth()->user()->id){
+                $array->forget($key);
+            }
         }
 
-        $array = $this->addCategories($array);
+        $array = $this->addCategories($array)->values();
         echo json_encode($array->toArray());
     }
 
