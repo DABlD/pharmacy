@@ -37,7 +37,12 @@ class UserController extends Controller
     }
 
     public function store(Request $req){
-
+        $user = new User();
+        $user->name = $req->name;
+        $user->contact = $req->contact;
+        $user->email = $req->email;
+        $user->role = $req->role;
+        $user->save();
     }
 
     public function update(Request $req){
@@ -48,6 +53,10 @@ class UserController extends Controller
         $user = User::find(auth()->user()->id);
         $user->password = $req->password;
         $user->save();
+    }
+
+    public function delete(Request $req){
+        User::find($req->id)->delete();
     }
 
     private function _view($view, $data = array()){

@@ -65,9 +65,9 @@
 				},
 				columns: [
 					{data: 'id'},
-					{data: 'user.name'},
-					{data: 'user.email'},
-					{data: 'user.contact'},
+					{data: 'name'},
+					{data: 'email'},
+					{data: 'contact'},
 					{data: 'actions'},
 				],
         		pageLength: 25,
@@ -96,7 +96,7 @@
 				html: `
 	                ${input("name", "Name", null, 3, 9)}
 					${input("email", "Email", null, 3, 9, 'email')}
-	                ${input("contact", "Contact #", null, 3, 9, "number")}
+	                ${input("contact", "Contact #", null, 3, 9)}
 				`,
 				width: '800px',
 				confirmButtonText: 'Add',
@@ -142,6 +142,7 @@
 							name: $("[name='name']").val(),
 							email: $("[name='email']").val(),
 							contact: $("[name='contact']").val(),
+							role: "approver",
 							_token: $('meta[name="csrf-token"]').attr('content')
 						},
 						success: () => {
@@ -156,10 +157,10 @@
 		function showDetails(approver){
 			Swal.fire({
 				html: `
-	                ${input("id", "", approver.user.id, 3, 9, 'hidden')}
-	                ${input("name", "Name", approver.user.name, 3, 9)}
-					${input("email", "Email", approver.user.email, 3, 9, 'email')}
-	                ${input("contact", "Contact #", approver.user.contact, 3, 9, "number")}
+	                ${input("id", "", approver.id, 3, 9, 'hidden')}
+	                ${input("name", "Name", approver.name, 3, 9)}
+					${input("email", "Email", approver.email, 3, 9, 'email')}
+	                ${input("contact", "Contact #", approver.contact, 3, 9)}
 				`,
 				width: '800px',
 				confirmButtonText: 'Update',
@@ -184,7 +185,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length && result[0].id != approver.user.id){
+            						if(result.length && result[0].id != approver.id){
             			    			Swal.showValidationMessage('Email already used');
 	            						setTimeout(() => {resolve()}, 500);
             						}
@@ -206,7 +207,7 @@
 							email: $("[name='email']").val(),
 							contact: $("[name='contact']").val(),
 						},
-						message: false
+						message: "Success"
 					},	() => {
 						reload();
 					});
