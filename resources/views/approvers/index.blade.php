@@ -13,7 +13,7 @@
                             List
                         </h3>
 
-                        @include('approver.includes.toolbar')
+                        @include('approvers.includes.toolbar')
                     </div>
 
                     <div class="card-body table-responsive">
