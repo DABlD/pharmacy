@@ -158,6 +158,27 @@ Route::group([
             }
         );
 
+        // APPROVER ROUTES
+        $cname = "approver";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-user-group")
+                    ->defaults("name", "Approver")
+                    ->defaults("roles", array("Admin"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+            }
+        );
+
         // DATATABLES
         $cname = "datatable";
         Route::group([
@@ -170,6 +191,7 @@ Route::group([
                 Route::get("medicine", ucfirst($cname) . "Controller@medicine")->name('medicine');
                 Route::get("medicine2", ucfirst($cname) . "Controller@medicine2")->name('medicine2');
                 Route::get("transactionType", ucfirst($cname) . "Controller@transactionType")->name('transactionType');
+                Route::get("approver", ucfirst($cname) . "Controller@approver")->name('approver');
             }
         );
     }
