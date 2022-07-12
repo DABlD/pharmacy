@@ -13,7 +13,9 @@
                             List
                         </h3>
 
-                        @include('bhcs.includes.toolbar')
+                        @if(auth()->user()->role == "Admin")
+                        	@include('bhcs.includes.toolbar')
+                        @endif
                     </div>
 
                     <div class="card-body table-responsive">
@@ -62,7 +64,8 @@
 					data: {
 						table: 'Rhu',
 						select: "*",
-						load: ['rhu']
+						load: ['rhu'],
+						where: ["rhu_id", {{ auth()->user()->id }}]
 					}
 				},
 				columns: [
@@ -103,8 +106,8 @@
 		                        last = company;
 		                    }
 		                });
-		        },
-		        initComplete: () => {
+
+		            
 		        	let groups = $('tr.group td');
 
 		        	if(groups.length){
@@ -112,14 +115,16 @@
 		        			let rhu = row.innerText;
 		        			$(row).after(`
 		        				<td>
+                        			@if(auth()->user()->role == "Admin")
 		        					<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Bhc' onclick='create("${rhu}")'>
 		        					    <i class='fas fa-plus fa-2xl'></i>
 		        					</a>
+		        					@endif
 		        				</td>
 		        			`);
 		        		});
 		        	}
-		        }
+		        },
 			});
 		});
 

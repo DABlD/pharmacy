@@ -19,7 +19,7 @@ class Bhc extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    public function  rhu(){
-        return $this->hasOne(Rhu::class, 'id', 'rhu_id');
+    public function rhu(){
+        return $this->hasOne(Rhu::class, 'user_id', 'rhu_id');
     }
 }
