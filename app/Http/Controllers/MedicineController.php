@@ -78,6 +78,37 @@ class MedicineController extends Controller
         echo json_encode($array);
     }
 
+    public function getReorder(Request $req){
+        $array = Medicine::select($req->select)
+                    ->join("reorders as r", "r.medicine_id", '=', 'medicines.id');
+
+        // IF HAS SORT PARAMETER $ORDER
+        if($req->order){
+            $array = $array->orderBy($req->order[0], $req->order[1]);
+        }
+
+        // IF HAS WHERE
+        if($req->where){
+            $array = $array->where($req->where[0], $req->where[1]);
+        }
+
+        $array = $array->get();
+
+        // IF HAS LOAD
+        if($array->count() && $req->load){
+            foreach($req->load as $table){
+                $array->load($table);
+            }
+        }
+
+        // IF HAS GROUP
+        if($req->group){
+            $array = $array->groupBy($req->group);
+        }
+
+        echo json_encode($array);
+    }
+
     public function store(Request $req){
         $entry = new Medicine();
         $entry->user_id = $req->user_id ?? auth()->user()->id;

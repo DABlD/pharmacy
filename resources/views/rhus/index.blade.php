@@ -357,5 +357,20 @@
 				}
 			});
 		}
+
+		function assign(id){
+			$.ajax({
+				url: "{{ route('medicine.getReorder') }}",
+				data: {
+					select: "medicines.*",
+					where: ["r.user_id", id],
+					load: ["category", "reorder"],
+				},
+				success: medicines => {
+					medicines = JSON.parse(medicines);
+					console.log(medicines);
+				}
+			})
+		}
 	</script>
 @endpush

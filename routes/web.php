@@ -106,6 +106,7 @@ Route::group([
 
                 Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
                 Route::get("getCategories/", ucfirst($cname) . "Controller@getCategories")->name('getCategories');
+                Route::get("getReorder/", ucfirst($cname) . "Controller@getReorder")->name('getReorder');
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("storeCategory/", ucfirst($cname) . "Controller@storeCategory")->name('storeCategory');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
