@@ -368,9 +368,49 @@
 				},
 				success: medicines => {
 					medicines = JSON.parse(medicines);
-					console.log(medicines);
+					
+					Swal.fire({
+						title: "Assign Products",
+						width: "80%",
+						html: `
+							<div class="row">
+								<div class="col-md-6">
+									Available
+								</div>
+								<div class="col-md-6">
+									Assigned
+								</div>
+							</div>
+							${generateAssignTable()}
+						`
+					});
 				}
 			})
+		}
+
+		function generateAssignTable(){
+			return `
+				<div class="row">
+					<div class="col-md-6">
+						<table id="table2" class="table table-hover">
+							<thead>
+								<tr>
+									<th>Category</th>
+									<th>Size</th>
+									<th>Company</th>
+									<th>Code</th>
+								</tr>
+							</thead>
+
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+					<div class="col-md-6">
+						Assigned
+					</div>
+				</div>
+			`;
 		}
 	</script>
 @endpush
