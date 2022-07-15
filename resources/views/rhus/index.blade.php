@@ -360,35 +360,86 @@
 
 		function assign(id){
 			$.ajax({
-				url: "{{ route('medicine.getReorder') }}",
+				url: "{{ route('medicine.get') }}",
 				data: {
 					select: "medicines.*",
-					where: ["r.user_id", id],
-					load: ["category", "reorder"],
+					load: ["reorder", "category"],
 				},
-				success: medicines => {
-					medicines = JSON.parse(medicines);
-					
-					Swal.fire({
-						title: "Assign Products",
-						width: "80%",
-						html: `
-							<div class="row">
-								<div class="col-md-6">
-									Available
-								</div>
-								<div class="col-md-6">
-									Assigned
-								</div>
-							</div>
-							${generateAssignTable()}
-						`
+				success: allMedicines => {
+					allMedicines = JSON.parse(allMedicines);
+
+					$.ajax({
+						url: "{{ route('medicine.getReorder') }}",
+						data: {
+							select: "medicines.*",
+							where: ["r.user_id", id],
+							load: ["category", "reorder"],
+						},
+						success: medicines => {
+							medicines = JSON.parse(medicines);
+							
+							Swal.fire({
+								title: "Assign Products",
+								width: "80%",
+								html: `
+									<div class="row">
+										<div class="col-md-6 title">
+											Available
+										</div>
+										<div class="col-md-6 title">
+											Assigned
+										</div>
+									</div>
+									${generateAssignTable(allMedicines, medicines)}
+								`,
+								didOpen: () => {
+									$(".swal2-container .title").css({
+										"font-weight": "bold",
+										"font-size": "25px"
+									})
+								}
+							});
+						}
 					});
 				}
-			})
+			});
 		}
 
-		function generateAssignTable(){
+		function generateAssignTable(allMedicines, medicines){
+			let amString = "";
+			let mString = "";
+			let assigned = [];
+
+			medicines.forEach(medicine => {
+				console.log("pass", medicines.length);
+				
+				mString += `
+					<tr>
+						<td>${medicine.category.name}</td>
+						<td>${medicine.name}</td>
+						<td>${medicine.brand}</td>
+						<td>${medicine.packaging}</td>
+					</tr>
+				`;
+				assigned[`x${medicine.id}`] = true;
+			});
+
+			allMedicines.forEach(medicine => {
+				if(assigned[`x${medicine.id}`] == undefined){
+					console.log(medicine);
+					amString += `
+						<tr>
+							<td>${medicine.category.name}</td>
+							<td>${medicine.name}</td>
+							<td>${medicine.brand}</td>
+							<td>${medicine.packaging}</td>
+						</tr>
+					`;
+				}
+			});
+
+			// "<tr><td colspan='4'>No Available Item</td></tr>"
+
 			return `
 				<div class="row">
 					<div class="col-md-6">
@@ -396,18 +447,32 @@
 							<thead>
 								<tr>
 									<th>Category</th>
+									<th>SKU</th>
+									<th>Brand</th>
 									<th>Size</th>
-									<th>Company</th>
-									<th>Code</th>
 								</tr>
 							</thead>
 
 							<tbody>
+								${amString}
 							</tbody>
 						</table>
 					</div>
-					<div class="col-md-6">
-						Assigned
+					<div class="col-md-6">	
+						<table id="table3" class="table table-hover">
+							<thead>
+								<tr>
+									<th>Category</th>
+									<th>SKU</th>
+									<th>Brand</th>
+									<th>Size</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								${mString}
+							</tbody>
+						</table>
 					</div>
 				</div>
 			`;
