@@ -20,6 +20,6 @@ class Bhc extends Model
     ];
 
     public function rhu(){
-        return $this->hasOne(Rhu::class, 'user_id', 'rhu_id');
+        return $this->hasOne(Rhu::class, 'id', 'rhu_id');
     }
 }

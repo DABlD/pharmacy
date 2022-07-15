@@ -63,9 +63,12 @@
                 	dataSrc: "",
 					data: {
 						table: 'Rhu',
-						select: "*",
+						select: ['bhcs.*', 'r.id as rid'],
 						load: ['rhu'],
-						where: ["rhu_id", {{ auth()->user()->id }}]
+						join: true,
+						@if(auth()->user()->role != "Admin")
+							where: ["r.user_id", {{ auth()->user()->id }}]
+						@endif
 					}
 				},
 				columns: [

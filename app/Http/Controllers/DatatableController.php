@@ -44,6 +44,11 @@ class DatatableController extends Controller
     public function bhc(Request $req){
         $array = Bhc::select($req->select);
 
+        // IF HAS JOIN //CUSTOM
+        if($req->join){
+            $array = $array->join('rhus as r', 'r.id', '=', "bhcs.rhu_id");
+        }
+
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
