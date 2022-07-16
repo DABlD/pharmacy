@@ -390,18 +390,80 @@
 											Assigned
 										</div>
 									</div>
+									</br>
+									</br>
 									${generateAssignTable(allMedicines, medicines)}
 								`,
 								didOpen: () => {
 									$(".swal2-container .title").css({
 										"font-weight": "bold",
 										"font-size": "25px"
-									})
+									});
+
+									let t2 = $('#table2').DataTable({
+										lengthChange: false,
+										info: false,
+									});
+
+									let t3 = $('#table3').DataTable({
+										lengthChange: false,
+										info: false,
+									});
+
+									initListener();
 								}
 							});
 						}
 					});
 				}
+			});
+		}
+
+		function initListener(){
+			$('[title="Remove"]').on('click', e => {
+				let element = $(e.target).find("i").parent().parent().parent();
+				let temp = element.html().replace("Remove", "Add");
+				temp = temp.replace("danger", 'success');
+				temp = temp.replace("times", "plus");
+				temp = temp.replace("fa-plus", "fa-plus fa-2xl");
+				destroy();
+				$("#table2 tbody").append(`<tr>${temp}</tr>`);
+				element.remove();
+				draw();
+				initListener();
+			});
+
+			$('[title="Add"]').on('click', e => {
+				console.log($(e.target), $(e.target).find('i'));
+				let element = $(e.target).find("i").parent().parent().parent();
+				let temp = element.html().replace("Add", "Remove");
+				temp = temp.replace("success", 'danger');
+				temp = temp.replace("plus", "times")
+				temp = temp.replace(" fa-2xl", "");
+				destroy();
+				$("#table3 tbody").append(`<tr>${temp}</tr>`);
+				element.remove();
+				draw();
+				initListener();	
+			});
+		}
+
+		function destroy(){
+			$('#table2').DataTable().destroy();
+			$('#table3').DataTable().destroy();
+
+			$('[title="Add"]').unbind("click");
+			$('[title="Remove"]').unbind("click");
+		}
+
+		function draw(){
+			$('#table2').DataTable({
+				lengthChange: false,
+				info: false,
+			});
+			$('#table3').DataTable({
+				lengthChange: false,
+				info: false,
 			});
 		}
 
@@ -411,14 +473,17 @@
 			let assigned = [];
 
 			medicines.forEach(medicine => {
-				console.log("pass", medicines.length);
-				
 				mString += `
 					<tr>
 						<td>${medicine.category.name}</td>
 						<td>${medicine.name}</td>
 						<td>${medicine.brand}</td>
 						<td>${medicine.packaging}</td>
+						<td>
+							<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" data-id=${medicine.id}">
+							    <i class="fas fa-times"></i>
+							</a>
+						</td>
 					</tr>
 				`;
 				assigned[`x${medicine.id}`] = true;
@@ -426,19 +491,25 @@
 
 			allMedicines.forEach(medicine => {
 				if(assigned[`x${medicine.id}`] == undefined){
-					console.log(medicine);
 					amString += `
 						<tr>
 							<td>${medicine.category.name}</td>
 							<td>${medicine.name}</td>
 							<td>${medicine.brand}</td>
 							<td>${medicine.packaging}</td>
+							<td>
+								<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Add" data-id=${medicine.id}">
+								    <i class="fas fa-plus fa-2xl"></i>
+								</a>
+							</td>
 						</tr>
 					`;
 				}
 			});
 
-			// "<tr><td colspan='4'>No Available Item</td></tr>"
+			let empty = "<tr><td colspan='4'>No Available Item</td></tr>";
+			mString = mString == "" ? empty : mString;
+			amString = amString == "" ? empty : amString;
 
 			return `
 				<div class="row">
@@ -449,7 +520,8 @@
 									<th>Category</th>
 									<th>SKU</th>
 									<th>Brand</th>
-									<th>Size</th>
+									<th>Packaging</th>
+									<th></th>
 								</tr>
 							</thead>
 
@@ -465,7 +537,8 @@
 									<th>Category</th>
 									<th>SKU</th>
 									<th>Brand</th>
-									<th>Size</th>
+									<th>Packaging</th>
+									<th></th>
 								</tr>
 							</thead>
 
