@@ -115,6 +115,8 @@ Route::group([
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
                 Route::post("deleteReorder/", ucfirst($cname) . "Controller@deleteReorder")->name('deleteReorder');
                 Route::post("deleteCategory/", ucfirst($cname) . "Controller@deleteCategory")->name('deleteCategory');
+
+                Route::get("assign/", ucfirst($cname) . "Controller@assign")->name('assign');
             }
         );
 

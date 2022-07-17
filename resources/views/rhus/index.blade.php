@@ -394,6 +394,10 @@
 									</br>
 									${generateAssignTable(allMedicines, medicines)}
 								`,
+								confirmButtonText: 'Save',
+								showCancelButton: true,
+								cancelButtonColor: errorColor,
+								cancelButtonText: 'Cancel',
 								didOpen: () => {
 									$(".swal2-container .title").css({
 										"font-weight": "bold",
@@ -412,6 +416,32 @@
 
 									initListener();
 								}
+							}).then(result => {
+								if(result.value){
+									let ids = [];
+									$('#table3 [data-id]').each((i, e) => {
+										ids.push($(e).data('id'));
+									});
+
+									swal.showLoading();
+									$.ajax({
+										url: "{{ route('medicine.assign') }}",
+										type: "GET",
+										data: {
+											id: id,
+											ids: ids,
+											_token: $('meta[name="csrf-token"]').attr('content')
+										},
+										success: result => {
+											console.log("Assigning", result);
+											ss("Success");
+
+											setTimeout(() => {
+												$(`[onclick="assign(${id})"]`).click();
+											}, 800);
+										}
+									})
+								}
 							});
 						}
 					});
@@ -421,11 +451,15 @@
 
 		function initListener(){
 			$('[title="Remove"]').on('click', e => {
-				let element = $(e.target).find("i").parent().parent().parent();
+				let element = $(e.target);
+				element = element.is("a") ? element.find("i") : element;
+				element = element.parent().parent().parent();
+
 				let temp = element.html().replace("Remove", "Add");
 				temp = temp.replace("danger", 'success');
 				temp = temp.replace("times", "plus");
 				temp = temp.replace("fa-plus", "fa-plus fa-2xl");
+
 				destroy();
 				$("#table2 tbody").append(`<tr>${temp}</tr>`);
 				element.remove();
@@ -434,12 +468,15 @@
 			});
 
 			$('[title="Add"]').on('click', e => {
-				console.log($(e.target), $(e.target).find('i'));
-				let element = $(e.target).find("i").parent().parent().parent();
+				let element = $(e.target);
+				element = element.is("a") ? element.find("i") : element;
+				element = element.parent().parent().parent();
+
 				let temp = element.html().replace("Add", "Remove");
 				temp = temp.replace("success", 'danger');
 				temp = temp.replace("plus", "times")
 				temp = temp.replace(" fa-2xl", "");
+
 				destroy();
 				$("#table3 tbody").append(`<tr>${temp}</tr>`);
 				element.remove();
@@ -480,7 +517,7 @@
 						<td>${medicine.brand}</td>
 						<td>${medicine.packaging}</td>
 						<td>
-							<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" data-id=${medicine.id}">
+							<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" data-id="${medicine.id}">
 							    <i class="fas fa-times"></i>
 							</a>
 						</td>
@@ -498,7 +535,7 @@
 							<td>${medicine.brand}</td>
 							<td>${medicine.packaging}</td>
 							<td>
-								<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Add" data-id=${medicine.id}">
+								<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Add" data-id="${medicine.id}">
 								    <i class="fas fa-plus fa-2xl"></i>
 								</a>
 							</td>

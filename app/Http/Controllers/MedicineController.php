@@ -80,7 +80,8 @@ class MedicineController extends Controller
 
     public function getReorder(Request $req){
         $array = Medicine::select($req->select)
-                    ->join("reorders as r", "r.medicine_id", '=', 'medicines.id');
+                    ->join("reorders as r", "r.medicine_id", '=', 'medicines.id')
+                    ->where('r.deleted_at', null);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
@@ -173,6 +174,25 @@ class MedicineController extends Controller
 
     public function deleteCategory(Request $req){
         Category::find($req->id)->delete();
+    }
+
+    public function assign(Request $req){
+        // DELETE REORDERS NOT SELECTED NOW
+        Reorder::where('user_id', $req->id)->whereNotIn('medicine_id', $req->ids)->delete();
+        // RESTORE DELETED THAT ARE SELECTED
+        Reorder::where('user_id', $req->id)->whereIn('medicine_id', $req->ids)->whereNotNull('deleted_at')->restore();
+
+        // CREATE REORDER FOR EACH MEDICINE_ID FOR USER THAT IS NOT YET CREATED
+        $reorders = Reorder::where('user_id', $req->id)->whereIn('medicine_id', $req->ids)->pluck('medicine_id');
+        foreach($req->ids as $id){
+            if(!in_array($id, $reorders->toArray())){
+                $reorder = new Reorder();
+                $reorder->user_id = $req->id;
+                $reorder->medicine_id = $id;
+                $reorder->point = 0;
+                $reorder->save();
+            }
+        }
     }
 
     private function _view($view, $data = array()){
