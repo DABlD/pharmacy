@@ -544,10 +544,6 @@
 				}
 			});
 
-			let empty = "<tr><td colspan='4'>No Available Item</td></tr>";
-			mString = mString == "" ? empty : mString;
-			amString = amString == "" ? empty : amString;
-
 			return `
 				<div class="row">
 					<div class="col-md-6">
@@ -567,7 +563,7 @@
 							</tbody>
 						</table>
 					</div>
-					<div class="col-md-6">	
+					<div class="col-md-6">
 						<table id="table3" class="table table-hover">
 							<thead>
 								<tr>
