@@ -127,6 +127,13 @@
 		        			`);
 		        		});
 		        	}
+
+		        	let grps = $('[class="group"]');
+		        	grps.each((index, group) => {
+		        		if(!$(group).next().is(':visible')){
+		        			$(group).remove();
+		        		}
+		        	});
 		        },
 			});
 		});
