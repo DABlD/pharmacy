@@ -162,6 +162,28 @@ Route::group([
             }
         );
 
+        // REQUEST ROUTES
+        $cname = "request";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-light fa-keyboard")
+                    ->defaults("name", "Requesition Entry")
+                    ->defaults("roles", array("RHU"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::get("create/", ucfirst($cname) . "Controller@create")->name('create');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+            }
+        );
+
         // APPROVER ROUTES
         $cname = "approver";
         Route::group([
@@ -196,6 +218,7 @@ Route::group([
                 Route::get("medicine2", ucfirst($cname) . "Controller@medicine2")->name('medicine2');
                 Route::get("transactionType", ucfirst($cname) . "Controller@transactionType")->name('transactionType');
                 Route::get("approver", ucfirst($cname) . "Controller@approver")->name('approver');
+                Route::get("requests", ucfirst($cname) . "Controller@requests")->name('requests');
             }
         );
     }
