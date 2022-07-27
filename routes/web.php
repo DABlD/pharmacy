@@ -172,7 +172,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-light fa-keyboard")
                     ->defaults("name", "Requesition Entry")
-                    ->defaults("roles", array("RHU"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->name($cname)
                     ->defaults("href", "/$cname");
 

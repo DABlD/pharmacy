@@ -69,8 +69,8 @@
 					data: {
 						table: 'requests',
 						select: ['requests.*'],
-						load: ['rhu', 'medicine'],
-						join: true,
+						load: ['rhu', 'medicine.category'],
+						order: ["created_at", "desc"],
 						@if(auth()->user()->role != "Admin")
 							where: ["user_id", {{ auth()->user()->id }}]
 						@endif
@@ -83,15 +83,50 @@
 					{data: 'requested_by'},
 					{data: 'medicine.category.name'},
 					{data: 'medicine.name'},
-					{data: 'stock'},
-					{data: 'request_qty'},
-					{data: 'approved_qty'},
-					{data: 'created_at'},
+					{
+						data: 'stock', 
+						className: 'center',
+						render: (stock, display, row) => {
+							return `
+								<div id="stock${row.id}">
+									${stock}
+								</div>
+							`;
+						}
+					},
+					{data: 'request_qty', className: 'center'},
+					{
+						data: 'approved_qty', 
+						className: 'center',
+						width: "10%",
+						render: (qty, display, row) => {
+							if(row.status == "For Approval"){
+								return `
+									<div id=qty${row.id}>
+										${input("approved_qty", "", row.request_qty, 0, 12, 'number', ` min=1 max="${row.request_qty}"`)}
+									</div>
+								`;
+							}
+							else{
+								if(qty == undefined){
+									return "N/A";
+								}
+								else{
+									return qty;
+								}
+							}
+						}
+					},
+					{
+						data: 'transaction_date',
+						render: date => {
+							return moment(date).format('MMM DD, YYYY');
+						}
+					},
 					{data: 'status'},
 					{data: 'actions'},
 				],
-
-        		order: [[1, 'asc']],
+        		order: [],
         		pageLength: 25,
         		rowCallback: function( row, data, index ) {
 				    if (data['id'] == null) {
@@ -111,7 +146,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="5">
+		                            		<td colspan="11">
 		                            			${company}
 		                            		</td>
 		                            	</tr>
@@ -127,254 +162,60 @@
 		        			$(group).remove();
 		        		}
 		        	});
+
+		        	$('[name="approved_qty"]').css('text-align', 'center');
 		        },
 			});
 		});
 
-		function create(selectedRhu = null){
-			Swal.fire({
-				html: `
-					<div class="row iRow">
-					    <div class="col-md-3 iLabel">
-					        RHU
-					    </div>
-					    <div class="col-md-9 iInput">
-					        <select name="rhu_id" class="form-control">
-					        	<option value=""></option>
-					        </select>
-					    </div>
-					</div>
-	                ${input("code", "Code", null, 3, 9)}
-	                ${input("name", "Name", null, 3, 9)}
-	                ${input("region", "Region", null, 3, 9)}
-	                ${input("municipality", "Municipality", null, 3, 9)}
-				`,
-				width: '800px',
-				confirmButtonText: 'Add',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-				didOpen: () => {
-					$.ajax({
-						url: "{{ route('rhu.get') }}",
-						data: {
-							select: "*",
-						},
-						success: rhus => {
-							rhus = JSON.parse(rhus);
-							rhuString = "";
-
-							rhus.forEach(rhu => {
-								rhuString += `
-									<option value="${rhu.id}">${rhu.company_name} - ${rhu.company_code}</option>
-								`;
-							});
-
-							$("[name='rhu_id']").append(rhuString);
-							$("[name='rhu_id']").select2({
-								placeholder: "Select RHU"
-							});
-
-							if(selectedRhu){
-								$("[name='rhu_id']").select2("val", $(`[name='rhu_id'] option:contains('${selectedRhu}')`).val());
-							}
-						}
-					})
-				},
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
-
-			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else{
-			            	let bool = false;
-			            	// Insert ajax validation
-				            setTimeout(() => {resolve()}, 500);
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
+		function updateStatus(id, action, status){
+			sc("Confirmation", `Are you sure you want to ${action}?`, result => {
 				if(result.value){
 					swal.showLoading();
-					$.ajax({
-						url: "{{ route('bhc.store') }}",
-						type: "POST",
-						data: {
-							rhu_id: $("[name='rhu_id']").val(),
-							code: $("[name='code']").val(),
-							name: $("[name='name']").val(),
-							region: $("[name='region']").val(),
-							municipality: $("[name='municipality']").val(),
-							_token: $('meta[name="csrf-token"]').attr('content')
-						},
-						success: () => {
-							ss("Success");
-							reload();
+
+					if(action == "Approve"){
+						let qty = $(`#qty${id}`).find('input');
+						let stock = $(`#stock${id}`).text().trim();
+
+						if(qty.val() < qty.attr('min') || qty.val() > qty.attr('max')){
+							Swal.fire({
+								icon: "error",
+								title: `Qty must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`,
+							});
 						}
-					})
+						else if(qty.val() > stock){
+							Swal.fire({
+								icon: "error",
+								title: `Qty is greater than stock`,
+							});
+						}
+						else{
+							doUpdate(id, status, qty.val());
+						}
+					}
+					else{
+						doUpdate(id, status);
+					}
 				}
 			});
 		}
 
-		function create2(){
-			Swal.fire({
-				html: `
-	                ${input("code", "Code", null, 3, 9)}
-	                ${input("name", "Name", null, 3, 9)}
-	                ${input("region", "Region", null, 3, 9)}
-	                ${input("municipality", "Municipality", null, 3, 9)}
-				`,
-				width: '800px',
-				confirmButtonText: 'Add',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-				didOpen: () => {
-					$.ajax({
-						url: "{{ route('rhu.get') }}",
-						data: {
-							select: "*",
-						},
-						success: rhus => {
-							rhus = JSON.parse(rhus);
-							rhuString = "";
-
-							rhus.forEach(rhu => {
-								rhuString += `
-									<option value="${rhu.id}">${rhu.company_name} - ${rhu.company_code}</option>
-								`;
-							});
-
-							$("[name='rhu_id']").append(rhuString);
-							$("[name='rhu_id']").select2({
-								placeholder: "Select RHU"
-							});
-						}
-					})
-				},
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
-
-			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else{
-			            	let bool = false;
-			            	// Insert ajax validation
-				            setTimeout(() => {resolve()}, 500);
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
-				if(result.value){
-					swal.showLoading();
-					$.ajax({
-						url: "{{ route('bhc.store') }}",
-						type: "POST",
-						data: {
-							rhu_id: $("[name='rhu_id']").val(),
-							code: $("[name='code']").val(),
-							name: $("[name='name']").val(),
-							region: $("[name='region']").val(),
-							municipality: $("[name='municipality']").val(),
-							_token: $('meta[name="csrf-token"]').attr('content')
-						},
-						success: () => {
-							ss("Success");
-							reload();
-						}
-					})
-				}
-			});
-		}
-
-		function view(id){
-			$.ajax({
-				url: "{{ route('bhc.get') }}",
+		function doUpdate(id, status, qty = 0){
+			update({
+				url: "{{ route('request.update') }}",
 				data: {
-					select: '*',
-					where: ['id', id],
+					id: id,
+					status: status,
+					approved_qty: qty
 				},
-				success: bhc => {
-					bhc = JSON.parse(bhc)[0];
-					showDetails(bhc);
-				}
+				message: "Success"
+			}, () => {
+				reload();
 			})
 		}
 
-		function showDetails(bhc){
-			Swal.fire({
-				html: `
-	                ${input("id", "", bhc.id, 3, 9, 'hidden')}
-	                ${input("code", "Code", bhc.code, 3, 9)}
-	                ${input("name", "Name", bhc.name, 3, 9)}
-	                ${input("region", "Region", bhc.region, 3, 9)}
-	                ${input("municipality", "Municipality", bhc.municipality, 3, 9)}
-				`,
-				width: '800px',
-				confirmButtonText: 'Update',
-				showCancelButton: true,
-				cancelButtonColor: errorColor,
-				cancelButtonText: 'Cancel',
-				preConfirm: () => {
-				    swal.showLoading();
-				    return new Promise(resolve => {
-				    	let bool = true;
+		function inputInfo(id){
 
-			            if($('.swal2-container input:placeholder-shown').length){
-			                Swal.showValidationMessage('Fill all fields');
-			            }
-			            else{
-			            	let bool = false;
-			            	// Insert ajax validation
-				            setTimeout(() => {resolve()}, 500);
-			            }
-
-			            bool ? setTimeout(() => {resolve()}, 500) : "";
-				    });
-				},
-			}).then(result => {
-				if(result.value){
-					swal.showLoading();
-					update({
-						url: "{{ route('bhc.update') }}",
-						data: {
-							id: $("[name='id']").val(),
-							code: $("[name='code']").val(),
-							name: $("[name='name']").val(),
-							region: $("[name='region']").val(),
-							municipality: $("[name='municipality']").val(),
-						},
-						message: "Success"
-					}, () => {
-						reload();
-					})
-				}
-			});
-		}
-
-		function del(id){
-			sc("Confirmation", "Are you sure you want to delete?", result => {
-				if(result.value){
-					swal.showLoading();
-					update({
-						url: "{{ route('bhc.delete') }}",
-						data: {id: id},
-						message: "Success"
-					}, () => {
-						reload();
-					})
-				}
-			});
 		}
 	</script>
 @endpush

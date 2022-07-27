@@ -136,7 +136,8 @@ class DatatableController extends Controller
     }
 
     public function medicine2(Request $req){
-        $array = Medicine::select($req->select);
+        $array = Medicine::select($req->select)
+                    ->join("reorders as r", "r.medicine_id", '=', 'medicines.id');
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
@@ -146,10 +147,11 @@ class DatatableController extends Controller
         // IF HAS WHERE
         if($req->where){
             $array = $array->where($req->where[0], $req->where[1]);
+            $array = $array->where('r.deleted_at', null);
         }
 
         if(auth()->user()->role != "Admin"){
-            $array = $array->where('user_id', auth()->user()->id);
+            $array = $array->where('r.user_id', auth()->user()->id);
         }
 
         $array = $array->get();
@@ -292,6 +294,7 @@ class DatatableController extends Controller
         foreach($array as $item){
             $item->actions = $item->actions;
         }
+
         echo json_encode($array->toArray());
     }
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Request as Req;
 use App\Models\Reorder;
 
+use DB;
+
 class RequestController extends Controller
 {
     public function __construct(){
@@ -58,18 +60,20 @@ class RequestController extends Controller
         foreach($req->data as $temp){
             $temp = (object)$temp;
 
-            $data = new Data();
+            $data = new Req();
 
             $aId = auth()->user()->id;
-            $stock = Reorder::where('user_id', $aId)->where('medicine_id', $temp->medicine_id)->first()->stock();
+            $name = auth()->user()->name;
+            $data->stock = Reorder::where('user_id', 1)->where('medicine_id', $temp->medicine_id)->first()->stock;
 
             $data->user_id = $aId;
             $data->reference = $temp->reference;
-            $data->requested_by = "Request from " . auth()->user()->name . " by " . $temp->requested_by;
+            $data->requested_by = $temp->requested_by . " ($name)";
             $data->medicine_id = $temp->medicine_id;
             $data->request_qty = $temp->request_qty;
             $data->unit_price = $temp->unit_price;
             $data->amount = $temp->amount;
+            $data->transaction_date = $temp->transaction_date;
 
             $data->save();
         }

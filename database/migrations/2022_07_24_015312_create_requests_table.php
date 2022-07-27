@@ -21,12 +21,13 @@ class CreateRequestsTable extends Migration
             $table->string('requested_by')->nullable();
             $table->unsignedInteger('medicine_id')->nullable();
             $table->unsignedInteger('request_qty')->nullable();
-            $table->string('lot_number');
-            $table->datetime('expiry_date');
+            $table->string('lot_number')->nullable();
+            $table->datetime('expiry_date')->nullable();
             $table->unsignedInteger('stock')->nullable();
             $table->float("unit_price", 8, 2)->nullable();
             $table->float("amount", 8, 2)->nullable();
             $table->unsignedInteger('approved_qty')->nullable();
+            $table->datetime('transaction_date')->nullable();
             $table->datetime('date_approved')->nullable();
             $table->string('status')->default("For Approval");
             

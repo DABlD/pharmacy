@@ -82,7 +82,7 @@
                     			        Date
                     			    </div>
             			            <div class="col-md-9 iInput">
-            			                <input type="text" name="created_at" placeholder="Select Transaction Date" class="form-control">
+            			                <input type="text" name="transaction_date" placeholder="Select Transaction Date" class="form-control">
             			            </div>
                     			</div>
 
@@ -114,8 +114,6 @@
                     				<thead>
                     					<tr>
                     						<th>Item</th>
-                    						<th>Lot Number</th>
-                    						<th>Expiry Date</th>
                     						<th>Qty</th>
                     						<th>Price</th>
                     						<th>Amount</th>
@@ -193,7 +191,7 @@
                 	dataSrc: "",
 					data: d => {
 					   d.table = 'medicines';
-					   d.select = '*';
+					   d.select = ['medicines.*'];
 					   d.where = ["category_id", category];
 					}
 				},
@@ -283,19 +281,17 @@
 		}
 
 		function initTransactionDate(){
-			$("[name='created_at']").flatpickr({
+			$("[name='transaction_date']").flatpickr({
 				altInput: true,
 				altFormat: "F j, Y",
 				dateFormat: "Y-m-d",
 				defaultDate: moment().format("YYYY-MM-DD"),
 			});
-
-			$('[readonly="readonly"]').attr('disabled', 'disabled');
 		}
 
 		let footer = `
 			<tr style="text-align: right; font-weight: bold;" class="footer">
-				<td colspan="5">
+				<td colspan="3">
 					Total
 				</td>
 				<td id="total" class="center">
@@ -304,12 +300,11 @@
 				<td></td>
 			</tr>
 			<tr style="text-align: right;" class="footer">
-				<td colspan="6">
+				<td colspan="5">
 					<a class="btn btn-success" data-toggle="tooltip" onclick="submit()">
 					    SUBMIT
 					</a>
 				</td>
-				<td></td>
 			</tr>
 		`;
 
@@ -324,10 +319,10 @@
 			items.each((index, item) => {
 				let parent = $(item).parent().parent();
 				let price = parent.find(".price")[0].innerText;
-				let qty = parent.find(".qty")[0].value;
+				let request_qty = parent.find(".request_qty")[0].value;
 
-				item.value = toFloat(price * qty);
-				total += price * qty;
+				item.value = toFloat(price * request_qty);
+				total += price * request_qty;
 			});
 			
 			$('#total').html(toFloat(total));
@@ -341,7 +336,7 @@
 		function add(id){
 			if(medicines[id]){
 				medicines[id]++;
-				$(`[name="qty${id}"]`).val(medicines[id]);
+				$(`[name="request_qty${id}"]`).val(medicines[id]);
 				computeTotal();
 			}
 			else{
@@ -359,13 +354,7 @@
 							<tr class="item" data-id="${id}">
 								<td>${medicine.name}</td>
 								<td>
-									<input type="text" class="form-control lot_number">
-								</td>
-								<td>
-									<input type="text" class="form-control exp">
-								</td>
-								<td>
-									<input type="number" name="qty${id}" class="form-control qty" value="1" data-id=${id}>
+									<input type="number" name="request_qty${id}" class="form-control request_qty" value="1" data-id=${id}>
 								</td>
 								<td class="price">
 									${toFloat(medicine.unit_price)}
@@ -389,28 +378,22 @@
 		}
 
 		function initListener(){
-			$('.qty').unbind('change');
-			$('.qty').on("change", qty => {
-				qty = $(qty.target);
-				medicines[qty.data("id")] = qty.val();
+			$('.request_qty').unbind('change');
+			$('.request_qty').on("change", request_qty => {
+				request_qty = $(request_qty.target);
+				medicines[request_qty.data("id")] = request_qty.val();
 
-				if(qty.val() == 0){
-					$(qty).parent().parent().remove();
-					delete medicines[qty.data("id")];
+				if(request_qty.val() == 0){
+					$(request_qty).parent().parent().remove();
+					delete medicines[request_qty.data("id")];
 				}
 				computeTotal();
 			});
-
-			$(".exp").flatpickr({
-				altInput: true,
-				altFormat: "F j, Y",
-				dateFormat: "Y-m-d",
-			})
 		}
 
 		function remove(id){
-			$(`[name="qty${id}"]`).val(0);
-			$(`[name="qty${id}"]`).trigger('change');
+			$(`[name="request_qty${id}"]`).val(0);
+			$(`[name="request_qty${id}"]`).trigger('change');
 		}
 
 		function submit(){
@@ -427,15 +410,14 @@
 						medicine_id: id,
 						reference: $("[name='reference']").val(),
 						requested_by: $("[name='requested_by']").val(),
-						lot_number: $(item).find(".lot_number").val(),
-						expiry_date: $(item).find(".exp").val(),
-						qty: $(item).find(".qty").val(),
+						request_qty: $(item).find(".request_qty").val(),
 						unit_price: $(item).find(".price")[0].innerText,
 						amount: $(item).find(".total").val(),
 						transaction_date: $("[name='transaction_date']").val()
 					};
 
 					Object.keys(temp).forEach(key => {
+						console.log(key, temp[key]);
 					    if(temp[key] == null || temp[key] == ""){
 					    	bool = true;
 					    	return true;
@@ -450,7 +432,7 @@
 				}
 				else{
 					$.ajax({
-						url: "{{ route('data.store') }}",
+						url: "{{ route('request.store') }}",
 						data: {
 							data: data,
 							_token: $('meta[name="csrf-token"]').attr('content')
