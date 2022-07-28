@@ -358,6 +358,7 @@
 			});
 		}
 
+		var ids = [];
 		function assign(id){
 			$.ajax({
 				url: "{{ route('medicine.get') }}",
@@ -414,15 +415,19 @@
 										info: false,
 									});
 
+									t2.on('draw', () => {
+										initListener2();
+									});
+
+									t3.on('draw', () => {
+										initListener();
+									});
+									
 									initListener();
+									initListener2();
 								}
 							}).then(result => {
 								if(result.value){
-									let ids = [];
-									$('#table3 [data-id]').each((i, e) => {
-										ids.push($(e).data('id'));
-									});
-
 									swal.showLoading();
 									$.ajax({
 										url: "{{ route('medicine.assign') }}",
@@ -435,6 +440,7 @@
 										success: result => {
 											console.log("Assigning", result);
 											ss("Success");
+											ids = [];
 
 											setTimeout(() => {
 												$(`[onclick="assign(${id})"]`).click();
@@ -452,6 +458,7 @@
 		function initListener(){
 			$('[title="Remove"]').on('click', e => {
 				let element = $(e.target);
+				ids.splice(ids.indexOf($(element).data('id')), 1); //Remove id from ids
 				element = element.is("a") ? element.find("i") : element;
 				element = element.parent().parent().parent();
 
@@ -464,11 +471,13 @@
 				$("#table2 tbody").append(`<tr>${temp}</tr>`);
 				element.remove();
 				draw();
-				initListener();
 			});
+		}
 
+		function initListener2(){
 			$('[title="Add"]').on('click', e => {
 				let element = $(e.target);
+				ids.push($(element).data('id')); //Add id to ids
 				element = element.is("a") ? element.find("i") : element;
 				element = element.parent().parent().parent();
 
@@ -481,7 +490,6 @@
 				$("#table3 tbody").append(`<tr>${temp}</tr>`);
 				element.remove();
 				draw();
-				initListener();	
 			});
 		}
 
@@ -508,8 +516,10 @@
 			let amString = "";
 			let mString = "";
 			let assigned = [];
+			ids = [];
 
 			medicines.forEach(medicine => {
+				ids.push(medicine.id);
 				mString += `
 					<tr>
 						<td>${medicine.category.name}</td>
@@ -518,7 +528,7 @@
 						<td>${medicine.packaging}</td>
 						<td>
 							<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" data-id="${medicine.id}">
-							    <i class="fas fa-times"></i>
+							    <i class="fas fa-times" data-id="${medicine.id}"></i>
 							</a>
 						</td>
 					</tr>
@@ -536,7 +546,7 @@
 							<td>${medicine.packaging}</td>
 							<td>
 								<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Add" data-id="${medicine.id}">
-								    <i class="fas fa-plus fa-2xl"></i>
+								    <i class="fas fa-plus fa-2xl" data-id="${medicine.id}"></i>
 								</a>
 							</td>
 						</tr>
