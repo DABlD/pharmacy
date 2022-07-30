@@ -5,6 +5,7 @@ namespace App\Traits;
 trait RequestAttribute{
 	public function getActionsAttribute(){
 		$id = $this->id;
+		$ref = $this->reference;
 
 		$string = "";
 
@@ -23,8 +24,13 @@ trait RequestAttribute{
 		    "</a>&nbsp;";
 		}
 		elseif($this->status == "Approved"){
-	    	$string .= "<a class='btn btn-info' data-toggle='tooltip' title='Input Info' onClick='inputInfo($id)'>" .
+	    	$string .= "<a class='btn btn-info' data-toggle='tooltip' title='Input Info' onClick='inputInfo($ref)'>" .
 		        "<i class='fas fa-pencil'></i>" .
+		    "</a>&nbsp;";
+		}
+		elseif($this->status == "For Delivery"){
+	    	$string .= "<a class='btn btn-success' data-toggle='tooltip' title='Receive' onClick='receive($id)'>" .
+		        "<i class='fa-light fa-inbox-in'></i>" .
 		    "</a>&nbsp;";
 		}
 

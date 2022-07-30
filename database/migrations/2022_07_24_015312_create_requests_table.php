@@ -26,10 +26,17 @@ class CreateRequestsTable extends Migration
             $table->unsignedInteger('stock')->nullable();
             $table->float("unit_price", 8, 2)->nullable();
             $table->float("amount", 8, 2)->nullable();
-            $table->unsignedInteger('approved_qty')->nullable();
             $table->datetime('transaction_date')->nullable();
+
+            $table->unsignedInteger('approved_qty')->nullable();
             $table->datetime('date_approved')->nullable();
-            $table->string('status')->default("For Approval");
+
+            $table->datetime('date_dispatched')->nullable();
+
+            $table->unsignedInteger('received_qty')->nullable();
+            $table->datetime('received_date')->nullable();
+
+            $table->enum('status', ["For Approval", "Approved", "Cancelled", "Declined", "For Delivery", "Delivered", "Incomplete Qty"])->default("For Approval");
             
             $table->timestamps();
             $table->softDeletes();

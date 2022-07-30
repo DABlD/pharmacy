@@ -181,6 +181,24 @@ Route::group([
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+
+                Route::get("inputInfo", ucfirst($cname) . "Controller@inputInfo")->name('inputInfo');
+            }
+        );
+
+        // REQUEST ROUTES
+        $cname = "request";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("receive/", ucfirst($cname) . "Controller@receive")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-thin fa-keyboard")
+                    ->defaults("name", "Receive")
+                    ->defaults("roles", array("RHU"))
+                    ->name('receive')
+                    ->defaults("href", "/$cname/receive");
             }
         );
 
@@ -219,6 +237,7 @@ Route::group([
                 Route::get("transactionType", ucfirst($cname) . "Controller@transactionType")->name('transactionType');
                 Route::get("approver", ucfirst($cname) . "Controller@approver")->name('approver');
                 Route::get("requests", ucfirst($cname) . "Controller@requests")->name('requests');
+                Route::get("receive", ucfirst($cname) . "Controller@receive")->name('receive');
             }
         );
     }

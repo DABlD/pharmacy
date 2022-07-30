@@ -79,6 +79,17 @@ class DataController extends Controller
         }
     }
 
+    public function updateStock($uid, $mid, $operator, $num){
+        $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $mid);
+
+        if($operator == "+"){
+            $reorder->increment('stock', $num);
+        }
+        elseif($operator == "-"){
+            $reorder->decrement('stock', $num);
+        }
+    }
+
     public function delete(Request $req){
         Data::find($req->id)->delete();
     }

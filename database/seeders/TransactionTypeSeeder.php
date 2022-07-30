@@ -20,6 +20,8 @@ class TransactionTypeSeeder extends Seeder
             ["Sales Return", "+", 0, 0],
             ["Ending Inventory", null, 0, 0],
             ["Purchase Order", "+", 0, 0],
+            ["Issued To", "-", 0, 0],
+            ["Receive", "+", 0, 0],
         ];
 
         foreach($array as $type){

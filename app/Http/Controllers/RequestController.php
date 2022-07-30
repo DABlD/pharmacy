@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Request as Req;
-use App\Models\Reorder;
+use App\Models\{Reorder, Data};
 
 use DB;
 
@@ -23,6 +23,21 @@ class RequestController extends Controller
     public function create(){
         return $this->_view('create', [
             'title' => 'Add Request'
+        ]);
+    }
+
+    public function inputInfo(Request $req){
+        $data = Req::where('reference', $req->ref)->where('status', 'Approved')->get();
+
+        return $this->_view('inputInfo', [
+            'title' => 'Input Info',
+            'data' => $data,
+        ]);
+    }
+
+    public function receive(Request $req){
+        return $this->_view('receive', [
+            'title' => 'Receive'
         ]);
     }
 
@@ -87,6 +102,41 @@ class RequestController extends Controller
         }
         else{
             $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
+        }
+
+        if(isset($req->status) && $req->status == "Approved"){
+            $request = Req::find($req->id);
+
+            $this->updateStock(1, $request->medicine_id, "-", $request->approved_qty);
+            $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
+        }
+        elseif(isset($req->status) && $req->status == "For Delivery"){
+            $request = Req::find($req->id);
+
+            $data = new Data();
+            $data->user_id = $request->user_id;
+            $data->medicine_id = $request->medicine_id;
+            $data->transaction_types_id = 6;
+            $data->reference = $request->reference;
+            $data->particulars = $request->requested_by;
+            $data->lot_number = $request->lot_number;
+            $data->expiry_date = $request->expiry_date;
+            $data->qty = $request->approved_qty;
+            $data->unit_price = $request->unit_price;
+            $data->amount = $request->amount;
+            $data->transaction_date = $request->transaction_date;
+            $data->save();
+        }
+    }
+
+    public function updateStock($uid, $mid, $operator, $num){
+        $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $mid);
+
+        if($operator == "+"){
+            $reorder->increment('stock', $num);
+        }
+        elseif($operator == "-"){
+            $reorder->decrement('stock', $num);
         }
     }
 

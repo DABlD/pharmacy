@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use App\Models\TransactionType;
 
 class Data extends Model
 {
@@ -18,4 +19,8 @@ class Data extends Model
     protected $dates = [
         'expiry_date', 'created_at', 'updated_at', 'deleted_at', 'transaction_date'
     ];
+
+    public function transaction_type(){
+        return $this->hasOne(TransactionType::class, 'id', 'transaction_types_id');
+    }
 }

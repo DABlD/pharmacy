@@ -1,5 +1,8 @@
 let errorColor = "#f76c6b";
 let successColor = "#28a745";
+let dateFormat = "YYYY-MM-DD";
+let dateFormat2 = "MMM DD, YYYY";
+let dateTimeFormat = "YYYY-MM-DD H:m:s";
 
 function ss(title = "", text = ""){
 	Swal.fire({
@@ -74,4 +77,12 @@ function update(data, callback = null){
 
 function toFloat(value, decimals = 2){
 	return parseFloat(value).toFixed(decimals);
+}
+
+function dateNow(){
+	return moment().format(dateFormat);
+}
+
+function dateTimeNow(){
+	return moment().format(dateTimeFormat);
 }

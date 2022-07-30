@@ -15,11 +15,13 @@ class Request extends Model
         'medicine_id','request_qty','unit_price',
         'amount','approved_qty','date_approved',
         'status', 'lot_number', 'expiry_date', 
-        'transaction_date', 'stock'
+        'transaction_date', 'stock',
+        'received_qty', 'received_date',
+        'date_dispatched'
     ];
 
     protected $dates = [
-        'created_at', 'updated_at', 'deleted_at', 'date_approved', 'expiry_date', 'transaction_date'
+        'created_at', 'updated_at', 'deleted_at', 'date_approved', 'expiry_date', 'transaction_date', 'received_date', 'date_dispatched'
     ];
 
     public function rhu(){

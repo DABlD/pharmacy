@@ -190,7 +190,7 @@
 							});
 						}
 						else{
-							doUpdate(id, status, qty.val());
+							doUpdate(id, status, qty.val(), dateTimeNow());
 						}
 					}
 					else{
@@ -200,13 +200,14 @@
 			});
 		}
 
-		function doUpdate(id, status, qty = 0){
+		function doUpdate(id, status, qty = 0, date_approved = null){
 			update({
 				url: "{{ route('request.update') }}",
 				data: {
 					id: id,
 					status: status,
-					approved_qty: qty
+					approved_qty: qty,
+					date_approved: date_approved
 				},
 				message: "Success"
 			}, () => {
@@ -214,8 +215,8 @@
 			})
 		}
 
-		function inputInfo(id){
-
+		function inputInfo(ref){
+			window.location.href = `{{ route('request.inputInfo') }}?ref=${ref}`;
 		}
 	</script>
 @endpush
