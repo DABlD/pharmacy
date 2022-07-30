@@ -48,6 +48,38 @@ class BhcController extends Controller
         echo json_encode($array);
     }
 
+    public function get2(Request $req){
+        $array = Bhc::select($req->select);
+
+        $rid = Rhu::where('user_id', $req->where[1])->first()->id;
+
+        // IF HAS SORT PARAMETER $ORDER
+        if($req->order){
+            $array = $array->orderBy($req->order[0], $rid);
+        }
+
+        // IF HAS WHERE
+        if($req->where){
+            $array = $array->where($req->where[0], $req->where[1]);
+        }
+
+        $array = $array->get();
+
+        // IF HAS LOAD
+        if($array->count() && $req->load){
+            foreach($req->load as $table){
+                $array->load($table);
+            }
+        }
+
+        // IF HAS GROUP
+        if($req->group){
+            $array = $array->groupBy($req->group);
+        }
+
+        echo json_encode($array);
+    }
+
     public function store(Request $req){
         $entry = new Bhc();
         $entry->rhu_id = $req->rhu_id;

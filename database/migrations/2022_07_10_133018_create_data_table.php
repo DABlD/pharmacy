@@ -18,7 +18,8 @@ class CreateDataTable extends Migration
 
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('medicine_id');
-            $table->string('transaction_types_id');
+            $table->unsignedInteger('bhc_id')->nullable();
+            $table->unsignedInteger('transaction_types_id');
             $table->string('reference');
             $table->string('particulars');
             $table->string('lot_number');

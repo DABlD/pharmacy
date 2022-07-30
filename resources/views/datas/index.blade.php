@@ -112,6 +112,26 @@
 
                     	<br>
                     	<div class="row">
+                    		<div class="col-md-6">
+                    			@if(auth()->user()->role != "Admin")
+                    			<div class="row">
+                    			    <div class="col-md-3 iLabel">
+                    			    	Location
+                    			    </div>
+            			            <div class="col-md-9 iInput">
+            			                <select name="location" class="form-control">
+            			                	<option value=""></option>
+            			                </select>
+            			            </div>
+                    			</div>
+                    			@endif
+                    		</div>
+
+                    		<div class="col-md-6"></div>
+                    	</div>
+
+                    	<br>
+                    	<div class="row">
                     		<div class="col-md-12">
                     			<table id="table2" class="table table-hover">
                     				<thead>
@@ -250,6 +270,9 @@
 			initCategories();
 			initTransactionType();
 			initTransactionDate();
+			@if(auth()->user()->role != "Admin")
+			initLocation();
+			@endif
 			addFooter();
 			computeTotal();
 		});
@@ -308,6 +331,32 @@
 					});
 				}
 			});
+		}
+
+		function initLocation(){
+			$.ajax({
+				url: "{{ route('bhc.get2') }}",
+				data: {
+					select: "*",
+					where: ['rhu_id', {{ auth()->user()->id }}]
+				},
+				success: locations => {
+					locations = JSON.parse(locations);
+					console.log(locations);
+					locationString = "";
+
+					locations.forEach(location => {
+						locationString += `
+							<option value="${location.id}">${location.name}</option>
+						`;
+					});
+
+					$("[name='location']").append(locationString);
+					$("[name='location']").select2({
+						placeholder: "Select Location"
+					});
+				}
+			})
 		}
 
 		function initTransactionDate(){
@@ -372,10 +421,10 @@
 			}
 			else{
 				$.ajax({
-					url: "{{ route('medicine.get') }}",
+					url: "{{ route('medicine.getReorder') }}",
 					data: {
-						select: "*",
-						where: ["id", id]
+						select: "medicines.*",
+						where: ["r.id", id]
 					},
 					success: medicine => {
 						medicine = JSON.parse(medicine)[0];
@@ -459,11 +508,13 @@
 						qty: $(item).find(".qty").val(),
 						unit_price: $(item).find(".price")[0].innerText,
 						amount: $(item).find(".total").val(),
-						transaction_date: $("[name='transaction_date']").val()
+						transaction_date: $("[name='transaction_date']").val(),
+						@if(auth()->user()->role != "Admin")
+						bhc_id: $("[name='location']").val()
+						@endif
 					};
 
-					console.log($(item).find('.price'));
-
+					console.log(temp);
 					Object.keys(temp).forEach(key => {
 					    if(temp[key] == null || temp[key] == ""){
 					    	bool = true;
@@ -493,7 +544,10 @@
 							$("[name='type']").val(null).trigger('change');
 							$("[name='reference']").val(null).trigger('change');
 							$("[name='particulars']").val(null).trigger('change');
-							$("[name='transaction_date']").val(null).trigger('change');
+							initTransactionDate();
+							@if(auth()->user()->role != "Admin")
+							$("[name='location']").val(null).trigger('change');
+							@endif
 							reload();
 						}
 					});

@@ -64,6 +64,10 @@ class DataController extends Controller
             $data->amount = $temp->amount;
             $data->transaction_date = $temp->transaction_date;
             $data->user_id = auth()->user()->id;
+
+            if(isset($temp->bhc_id)){
+                $data->bhc_id = $temp->bhc_id;
+            }
             $data->save();
         }
     }

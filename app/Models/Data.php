@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use App\Models\TransactionType;
+use App\Models\{Bhc, TransactionType};
 
 class Data extends Model
 {
@@ -13,7 +13,7 @@ class Data extends Model
         'medicine_id', 'transaction_types_id', 'reference', 
         'particulars', 'lot_number', 'qty', 
         'unit_price', 'amount', 'transaction_date', 
-        'expiry_date', 'user_id'
+        'expiry_date', 'user_id', 'bhc_id'
     ];
 
     protected $dates = [
@@ -22,5 +22,9 @@ class Data extends Model
 
     public function transaction_type(){
         return $this->hasOne(TransactionType::class, 'id', 'transaction_types_id');
+    }
+
+    public function bhc(){
+        return $this->hasOne(Bhc::class, 'id', 'bhc_id');
     }
 }
