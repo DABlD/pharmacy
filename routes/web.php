@@ -223,7 +223,7 @@ Route::group([
             }
         );
 
-        // APPROVER ROUTES
+        // RX ROUTES
         $cname = "rx";
         Route::group([
                 'as' => "$cname.",
@@ -233,6 +233,27 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-light fa-capsules")
                     ->defaults("name", "RX")
+                    ->defaults("roles", array("Admin"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+            }
+        );
+
+        // LOCATION ROUTES
+        $cname = "location";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-light fa-location-dot")
+                    ->defaults("name", "Locations")
                     ->defaults("roles", array("Admin"))
                     ->name($cname)
                     ->defaults("href", "/$cname");
@@ -260,6 +281,7 @@ Route::group([
                 Route::get("requests", ucfirst($cname) . "Controller@requests")->name('requests');
                 Route::get("receive", ucfirst($cname) . "Controller@receive")->name('receive');
                 Route::get("rx", ucfirst($cname) . "Controller@rx")->name('rx');
+                Route::get("location", ucfirst($cname) . "Controller@location")->name('location');
             }
         );
     }
