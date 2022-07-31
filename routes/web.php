@@ -272,15 +272,32 @@ Route::group([
                 'as' => "$cname.",
                 'prefix' => "$cname/"
             ], function () use($cname){
+
+                // INVENTORY REPORT
+                // INVENTORY REPORT
+                // INVENTORY REPORT
                 Route::get("inventory/", ucfirst($cname) . "Controller@inventory")
                     ->defaults("sidebar", 1)
-                    ->defaults("icon", "fa-light fa-file-chart-column")
+                    ->defaults("icon", "fa-solid fa-box-circle-check")
                     ->defaults("name", "Inventory")
                     ->defaults("roles", array("Admin"))
                     ->name('inventory')
                     ->defaults("href", "/$cname/inventory");
 
                 Route::get("getInventory/", ucfirst($cname) . "Controller@getInventory")->name('getInventory');
+
+                // SALES REPORT
+                // SALES REPORT
+                // SALES REPORT
+                Route::get("sales/", ucfirst($cname) . "Controller@sales")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-dollar-sign")
+                    ->defaults("name", "Sales")
+                    ->defaults("roles", array("Admin"))
+                    ->name('sales')
+                    ->defaults("href", "/$cname/sales");
+
+                Route::get("getSales/", ucfirst($cname) . "Controller@getSales")->name('getSales');
             }
         );
         
