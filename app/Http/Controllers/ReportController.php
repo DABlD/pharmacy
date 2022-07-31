@@ -25,6 +25,12 @@ class ReportController extends Controller
         ]);
     }
 
+    public function binCard(){
+        return $this->_view('binCard', [
+            'title' => 'Bin Card Activity',
+        ]);
+    }
+
     public function getInventory(Request $req){
         $temp = Data::where('transaction_types_id', $req->tType)
             ->where('bhc_id', 'like', $req->outlet)
@@ -169,6 +175,49 @@ class ReportController extends Controller
                     ["total" => $grandTotal]
                 )
             );
+        }
+
+        echo json_encode($array);
+    }
+    
+    public function getBinCard(){
+        $data = Data::orderBy('transaction_date', 'desc')->get();
+        // $data = Data::where('user_id', 1)->orderBy('transaction_date', 'desc')->get();
+
+        $data->load('transaction_type');
+        $data->load('reorder.medicine');
+        $data = $data->groupBy('medicine_id');
+
+        $array = [];
+
+        foreach($data as $group){
+            $balance = $group[0]->reorder->stock;
+            $name = $group[0]->reorder->medicine->name;
+
+            foreach($group as $record){
+                $receiving = 0;
+                $issuance = 0;
+
+                $temp = $balance;
+
+                if($record->transaction_type->operator == "+"){
+                    $balance -= $record->qty;
+                    $receiving = $record->qty;
+                }
+                else{
+                    $balance += $record->qty;
+                    $issuance = $record->qty;
+                }
+
+                array_push($array, [
+                    "item" => $name,
+                    "tx" => $record->transaction_type->type,
+                    "rcv" => $receiving,
+                    "issue" => $issuance,
+                    "bal" => $balance,
+                    "date" => $record->transaction_date->toDateString()
+                ]);
+            }
         }
 
         echo json_encode($array);

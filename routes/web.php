@@ -311,6 +311,19 @@ Route::group([
                     ->defaults("href", "/$cname/purchaseOrder");
 
                 Route::get("getPurchaseOrder/", ucfirst($cname) . "Controller@getPurchaseOrder")->name('getPurchaseOrder');
+
+                // BIN CARD REPORT
+                // BIN CARD REPORT
+                // BIN CARD REPORT
+                Route::get("binCard/", ucfirst($cname) . "Controller@binCard")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-cards-blank")
+                    ->defaults("name", "Bin Card")
+                    ->defaults("roles", array("Admin"))
+                    ->name('binCard')
+                    ->defaults("href", "/$cname/binCard");
+
+                Route::get("getBinCard/", ucfirst($cname) . "Controller@getBinCard")->name('getBinCard');
             }
         );
         
