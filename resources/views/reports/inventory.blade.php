@@ -152,7 +152,8 @@
         		pageLength: 25,
         		order: []
 			});
-
+			
+			$('#table_filter').remove();
 			$('#table').css('width', '100%');
 		}
 
