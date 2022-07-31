@@ -77,7 +77,7 @@
 					{data: 'bal'},
 					{data: 'date'},
 				],
-        		pageLength: 25,
+        		pageLength: 4,
 		        drawCallback: function (settings) {
 		            let api = this.api();
 		            let rows = api.rows({ page: 'current' }).nodes();
@@ -106,9 +106,9 @@
 
 		        	if(groups.length){
 		        		groups.each((index, row) => {
-		        			let bal = $(row).parent().next().find('.bal').text();
+		        			let stock = $(row).parent().next().find('.stock').data('stock');
 		        			$(row).after(`
-		        				<td class="rb">${bal}</td>
+		        				<td class="rb">${stock}</td>
 		        				<td></td>
 		        			`);
 		        		});
@@ -129,8 +129,8 @@
 		        columnDefs: [
 		        	{
 		        		targets: 4,
-		        		render: bal =>{;
-		        			return`<span class='bal'>${bal}</span`;
+		        		render: (bal, i, row) =>{;
+		        			return`<span class='stock' data-stock='${row.stock}'>${bal}</span`;
 		        		}
 		        	}
 		        ],

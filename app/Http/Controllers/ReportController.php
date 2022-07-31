@@ -215,7 +215,8 @@ class ReportController extends Controller
                     "rcv" => $receiving,
                     "issue" => $issuance,
                     "bal" => $balance,
-                    "date" => $record->transaction_date->toDateString()
+                    "date" => $record->transaction_date->toDateString(),
+                    'stock' => $record->reorder->stock
                 ]);
             }
         }
