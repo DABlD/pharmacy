@@ -83,6 +83,7 @@ Route::group([
                     ->defaults("href", "/$cname");
 
                 Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::get("get2/", ucfirst($cname) . "Controller@get2")->name('get2');
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
@@ -141,7 +142,7 @@ Route::group([
             }
         );
 
-        // TRANSACTION TYPE ROUTES
+        // DATA ROUTES
         $cname = "data";
         Route::group([
                 'as' => "$cname.",
@@ -186,7 +187,7 @@ Route::group([
             }
         );
 
-        // REQUEST ROUTES
+        // RECEIVE ROUTE
         $cname = "request";
         Route::group([
                 'as' => "$cname.",
@@ -264,6 +265,25 @@ Route::group([
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
             }
         );
+
+        // REPORT ROUTES
+        $cname = "report";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("inventory/", ucfirst($cname) . "Controller@inventory")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-light fa-file-chart-column")
+                    ->defaults("name", "Inventory")
+                    ->defaults("roles", array("Admin"))
+                    ->name('inventory')
+                    ->defaults("href", "/$cname/inventory");
+
+                Route::get("getInventory/", ucfirst($cname) . "Controller@getInventory")->name('getInventory');
+            }
+        );
+        
 
         // DATATABLES
         $cname = "datatable";

@@ -17,4 +17,8 @@ class Reorder extends Model
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at'
     ];
+
+    public function medicine(){
+        return $this->hasOne(Medicine::class, 'id', 'medicine_id');
+    }
 }

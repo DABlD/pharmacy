@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use App\Models\{Bhc, TransactionType};
+use App\Models\{Bhc, TransactionType, Reorder};
 
 class Data extends Model
 {
@@ -16,6 +16,10 @@ class Data extends Model
         'expiry_date', 'user_id', 'bhc_id'
     ];
 
+    //NOTE!!! MEDICINE_ID IS ACTUALLY REORDER ID
+    //NOTE!!! MEDICINE_ID IS ACTUALLY REORDER ID
+    //NOTE!!! MEDICINE_ID IS ACTUALLY REORDER ID
+
     protected $dates = [
         'expiry_date', 'created_at', 'updated_at', 'deleted_at', 'transaction_date'
     ];
@@ -26,5 +30,9 @@ class Data extends Model
 
     public function bhc(){
         return $this->hasOne(Bhc::class, 'id', 'bhc_id');
+    }
+
+    public function reorder(){
+        return $this->hasOne(Reorder::class, 'id', 'medicine_id');
     }
 }

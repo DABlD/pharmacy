@@ -32,9 +32,12 @@
                                 </a>
                             </li>
                         @endif
+
+                        @if($route->defaults['name'] == "Locations")
+                            <hr style="border: 1px solid #b4b4a6; width: 100%; opacity: 0.4;">
+                        @endif
                     @endif
                 @endforeach
-
                 {{-- <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-table"></i>
