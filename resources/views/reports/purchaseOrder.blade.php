@@ -10,13 +10,13 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-table mr-1"></i>
-                            Inventory Report
+                            Purchase Order Report
                         </h3>
                     </div>
 
                     <div class="card-body table-responsive">
                         
-                        @include('reports.toolbars.inventory')
+                        @include('reports.toolbars.purchaseOrder')
 
                         <br>
                     	<table id="table" class="table table-hover">
@@ -49,11 +49,12 @@
 
 	<script>
 		var columns = [];
-		var outlet = "%%";
-		var tType = 3;
 		var from = moment().subtract(10, 'days').format(dateFormat);
 		var to = dateNow();
+
+		var bhc_id = "%%";
 		var view = "qty";
+
 		var table = null;
 
 		$(document).ready(()=> {
@@ -68,42 +69,6 @@
 
 			$("[name='from']").flatpickr(settings);
 			$("[name='to']").flatpickr(settings);
-
-			$("[name='from']").on('change', e => {
-				from = e.target.value;
-			});
-
-			$("[name='to']").on('change', e => {
-				to = e.target.value;
-			});
-
-			$("#view").on('change', e => {
-				view = e.target.value;
-			});
-
-
-			$.ajax({
-				url: "{{ route('transactionType.get') }}",
-				data: {
-					select: '*',
-				},
-				success: types => {
-					types = JSON.parse(types);
-					
-					typeString = "";
-					types.forEach(type => {
-						typeString += `
-							<option value="${type.id}">${type.type}</option>
-						`;
-					});
-
-					$('#trx').append(typeString);
-					$('#trx').select2();
-					$('#trx').change(e => {
-						tType = e.target.value;
-					});
-				}
-			});
 
 			$.ajax({
 				url: "{{ route('bhc.get') }}",
@@ -120,12 +85,28 @@
 						`;
 					});
 
-					$('#outlet').append(bhcString);
-					$('#outlet').select2();
-					$('#outlet').change(e => {
+					$('#bhc_id').append(bhcString);
+					$('#bhc_id').select2();
+					$('#bhc_id').change(e => {
 						outlet = e.target.value;
 					});
 				}
+			});
+
+			$("[name='from']").on('change', e => {
+				from = e.target.value;
+			});
+
+			$("[name='to']").on('change', e => {
+				to = e.target.value;
+			});
+
+			$("#view").on('change', e => {
+				view = e.target.value;
+			});
+
+			$("#bhc_id").on('change', e => {
+				bhc_id = e.target.value;
 			});
 
 			// CREATE TABLE
@@ -136,12 +117,11 @@
 			getColumns();
 			table = $('#table').DataTable({
 				ajax: {
-					url: "{{ route('report.getInventory') }}",
+					url: "{{ route('report.getPurchaseOrder') }}",
                 	dataType: "json",
                 	dataSrc: "",
 					data: f => {
-						f.outlet = outlet;
-						f.tType = tType;
+						f.bhc_id = bhc_id;
 						f.from = from;
 						f.to = to;
 						f.view = view;

@@ -19,9 +19,15 @@ class ReportController extends Controller
         ]);
     }
 
+    public function purchaseOrder(){
+        return $this->_view('purchaseOrder', [
+            'title' => 'Purchase Order Report',
+        ]);
+    }
+
     public function getInventory(Request $req){
         $temp = Data::where('transaction_types_id', $req->tType)
-            ->where('bhc_id', 'like', "%" . $req->outlet . "%")
+            ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
             ->whereBetween('transaction_date', [$req->from, $req->to])
             ->get();
@@ -114,6 +120,50 @@ class ReportController extends Controller
                 array_merge(
                     array_merge(
                         ["item" => $title], 
+                        $tempDates
+                    ),
+                    ["total" => $grandTotal]
+                )
+            );
+        }
+
+        echo json_encode($array);
+    }
+
+    public function getPurchaseOrder(Request $req){
+        $temp = Data::where('bhc_id', 'like', $req->bhc_id)
+                    ->where('transaction_types_id', 5)
+                    ->whereBetween('transaction_date', [$req->from, $req->to])
+                    ->get();
+
+        $temp->load('reorder.medicine');
+        $temp = $temp->groupBy('medicine_id');
+
+        $from = $req->from;
+        $to = $req->to;
+
+        $dates = $this->getDates($from, $to);
+        $array = [];
+
+        foreach($temp as $group){
+            $grandTotal = 0;
+            $tempDates = [];
+            foreach($dates as $date){
+                $total = 0;
+                foreach($group as $data){
+                    if($data->transaction_date == $date){
+                        $total += $data->{$req->view};
+                        $grandTotal += $data->{$req->view};
+                    }
+                }
+
+                $tempDates[now()->parse($date)->format('M d')] = $total;
+            }
+
+            array_push($array, 
+                array_merge(
+                    array_merge(
+                        ["item" => $group[0]->reorder->medicine->name], 
                         $tempDates
                     ),
                     ["total" => $grandTotal]

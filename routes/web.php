@@ -298,6 +298,19 @@ Route::group([
                     ->defaults("href", "/$cname/sales");
 
                 Route::get("getSales/", ucfirst($cname) . "Controller@getSales")->name('getSales');
+
+                // PURCHASE ORDER REPORT
+                // PURCHASE ORDER REPORT
+                // PURCHASE ORDER REPORT
+                Route::get("purchaseOrder/", ucfirst($cname) . "Controller@purchaseOrder")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-hand-holding-dollar")
+                    ->defaults("name", "Purchase Order")
+                    ->defaults("roles", array("Admin"))
+                    ->name('purchaseOrder')
+                    ->defaults("href", "/$cname/purchaseOrder");
+
+                Route::get("getPurchaseOrder/", ucfirst($cname) . "Controller@getPurchaseOrder")->name('getPurchaseOrder');
             }
         );
         
