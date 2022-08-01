@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Request as Req;
-use App\Models\{Reorder, Data};
+use App\Models\{Reorder, Data, Alert};
 
 use DB;
 
@@ -96,12 +96,15 @@ class RequestController extends Controller
 
     public function update(Request $req){
         $query = DB::table($this->table);
+        $id = null;
 
         if($req->where){
-            $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
+            $id = $req->where[1];
+            $query = $query->where($req->where[0], $id)->update($req->except(['id', '_token', 'where']));
         }
         else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
+            $id = $req->id;
+            $query = $query->where('id', $id)->update($req->except(['id', '_token']));
         }
 
         if(isset($req->status) && $req->status == "Approved"){
@@ -127,6 +130,17 @@ class RequestController extends Controller
             $data->transaction_date = $request->transaction_date;
             $data->save();
         }
+        elseif(isset($req->status) && $req->status == "Incomplete Qty"){
+            $request = Req::find($id);
+
+            $data->load('medicine');
+            $item = $request->medicine->name;
+            $ref = $request->reference;
+            $rQty = $request->received_qty;
+            $aQty = $request->approved_qty;
+
+            createAlert("Incomplete Delivery of $item with Reference No. $ref: $rQty/$aQty");
+        }
     }
 
     public function updateStock($uid, $mid, $operator, $num){
@@ -138,6 +152,19 @@ class RequestController extends Controller
         elseif($operator == "-"){
             $reorder->decrement('stock', $num);
         }
+
+        if($reorder->stock <= $reorder->point && $uid == 1){
+            $reorder->load('medicine');
+            $name = $reorder->medicine->name;
+            $point = $reoder->point;
+            createAlert("$name stock is low: $point");
+        }
+    }
+
+    private function createAlert($message){
+        $alert = new Alert();
+        $alert->message = $message;
+        $alert->save();
     }
 
     public function delete(Request $req){

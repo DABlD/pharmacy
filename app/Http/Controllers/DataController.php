@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Data;
+use App\Models\{Data, Reorder, TransactionType};
 use DB;
 
 class DataController extends Controller
@@ -69,6 +69,19 @@ class DataController extends Controller
                 $data->bhc_id = $temp->bhc_id;
             }
             $data->save();
+
+            $operator = TransactionType::find($data->transaction_types_id)->operator;
+
+            if($operator == "+"){
+                Reorder::where('user_id', $data->user_id)
+                    ->where('medicine_id', $data->medicine_id)
+                    ->increment('stock', $data->qty);
+            }
+            else{
+                Reorder::where('user_id', $data->user_id)
+                    ->where('medicine_id', $data->medicine_id)
+                    ->decrement('stock', $data->qty);
+            }
         }
     }
 
@@ -92,6 +105,19 @@ class DataController extends Controller
         elseif($operator == "-"){
             $reorder->decrement('stock', $num);
         }
+
+        if($reorder->stock <= $reorder->point && $uid == 1){
+            $reorder->load('medicine');
+            $name = $reorder->medicine->name;
+            $point = $reoder->point;
+            createAlert("$name stock is low: $point");
+        }
+    }
+
+    private function createAlert($message){
+        $alert = new Alert();
+        $alert->message = $message;
+        $alert->save();
     }
 
     public function delete(Request $req){
