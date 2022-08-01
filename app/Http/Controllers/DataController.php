@@ -71,28 +71,7 @@ class DataController extends Controller
             $data->save();
 
             $operator = TransactionType::find($data->transaction_types_id)->operator;
-
-            if($operator == "+"){
-                Reorder::where('user_id', $data->user_id)
-                    ->where('medicine_id', $data->medicine_id)
-                    ->increment('stock', $data->qty);
-            }
-            else{
-                Reorder::where('user_id', $data->user_id)
-                    ->where('medicine_id', $data->medicine_id)
-                    ->decrement('stock', $data->qty);
-            }
-        }
-    }
-
-    public function update(Request $req){
-        $query = DB::table($this->table);
-
-        if($req->where){
-            $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
-        }
-        else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
+            $this->updateStock($data->user_id, $data->medicine_id, $operator, $data->qty);
         }
     }
 
