@@ -311,6 +311,19 @@ Route::group([
 
                 Route::get("getPurchaseOrder/", ucfirst($cname) . "Controller@getPurchaseOrder")->name('getPurchaseOrder');
 
+                // DAILY SHEETS REPORT
+                // DAILY SHEETS REPORT
+                // DAILY SHEETS REPORT
+                Route::get("dailySheet/", ucfirst($cname) . "Controller@dailySheet")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-files")
+                    ->defaults("name", "Daily Sheets")
+                    ->defaults("roles", array("Admin"))
+                    ->name('dailySheet')
+                    ->defaults("href", "/$cname/dailySheet");
+
+                Route::get("getDailySheet/", ucfirst($cname) . "Controller@getDailySheet")->name('getDailySheet');
+
                 // BIN CARD REPORT
                 // BIN CARD REPORT
                 // BIN CARD REPORT
