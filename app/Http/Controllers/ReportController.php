@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data};
+use App\Models\{Data, Alert};
 
 class ReportController extends Controller
 {
@@ -28,6 +28,12 @@ class ReportController extends Controller
     public function binCard(){
         return $this->_view('binCard', [
             'title' => 'Bin Card Activity',
+        ]);
+    }
+
+    public function alert(){
+        return $this->_view('alert', [
+            'title' => 'Alerts',
         ]);
     }
 
@@ -222,6 +228,11 @@ class ReportController extends Controller
         }
 
         echo json_encode($array);
+    }
+
+    public function getAlert(){
+        $data = Alert::orderBy('created_at', 'desc')->get();
+        echo json_encode($data);
     }
 
     private function getDates($from, $to){

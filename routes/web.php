@@ -323,6 +323,19 @@ Route::group([
                     ->defaults("href", "/$cname/binCard");
 
                 Route::get("getBinCard/", ucfirst($cname) . "Controller@getBinCard")->name('getBinCard');
+
+                // ALERT REPORT
+                // ALERT REPORT
+                // ALERT REPORT
+                Route::get("alert/", ucfirst($cname) . "Controller@alert")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-bell-exclamation")
+                    ->defaults("name", "Alerts")
+                    ->defaults("roles", array("Admin"))
+                    ->name('alert')
+                    ->defaults("href", "/$cname/alert");
+
+                Route::get("getAlert/", ucfirst($cname) . "Controller@getAlert")->name('getAlert');
             }
         );
         
