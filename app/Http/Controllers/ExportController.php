@@ -207,6 +207,51 @@ class ExportController extends Controller
         return Excel::download(new Report($headers, $title, $array), $title);
     }
 
+    public function exportDailySheet(Request $req){
+        $temp = Data::where('bhc_id', 'like', $req->bhc_id)
+                    ->whereBetween('transaction_date', [$req->from, $req->to])
+                    ->get();
+
+        $temp->load('transaction_type');
+        $temp->load('reorder.medicine');
+        $temp = $temp->groupBy('medicine_id');
+
+        $from = $req->from;
+        $to = $req->to;
+
+        $dates = array_reverse($this->getDates($from, $to));
+        $array = [];
+
+        foreach($temp as $group){
+            $total = $group[0]->reorder->stock;
+            $tempDates = [];
+            foreach($dates as $date){
+                foreach($group as $data){
+                    if($data->transaction_date == $date){
+                        if($data->transaction_type->operator == "+"){
+                            $total -= $data->{$req->view};
+                        }
+                        elseif($data->transaction_type->operator == "-"){
+                            $total += $data->{$req->view};
+                        }
+                    }
+                }
+                $tempDates[now()->parse($date)->format('M d')] = $total;
+            }
+
+            array_push($array, 
+                array_merge(
+                    ["Item" => $group[0]->reorder->medicine->name], 
+                    array_reverse($tempDates)
+                ),
+            );
+        }
+
+        $headers = array_keys($array[0]);
+        $title = "Daily Sheet Report - $from to $to.xlsx";
+        return Excel::download(new Report($headers, $title, $array), $title);
+    }
+
     private function getDates($from, $to){
         $dates = [];
 

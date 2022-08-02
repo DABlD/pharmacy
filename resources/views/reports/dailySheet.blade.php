@@ -163,5 +163,16 @@
 			$('#table thead').html('');
 			createTable();
 		}
+
+		function exportReport(){
+			let data = {
+				bhc_id: bhc_id,
+				from: from,
+				to: to,
+				view: view
+			};
+
+			window.open("/export/exportDailySheet?" + $.param(data), "_blank");
+		}
 	</script>
 @endpush
