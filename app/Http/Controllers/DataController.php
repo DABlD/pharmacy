@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data, Reorder, TransactionType};
+use App\Models\{Data, Reorder, TransactionType, Alert};
 use DB;
 
 class DataController extends Controller
@@ -85,11 +85,12 @@ class DataController extends Controller
             $reorder->decrement('stock', $num);
         }
 
+        $reorder = $reorder->first();
         if($reorder->stock <= $reorder->point && $uid == 1){
             $reorder->load('medicine');
             $name = $reorder->medicine->name;
-            $point = $reoder->point;
-            createAlert("$name stock is low: $point");
+            $point = $reorder->point;
+            $this->createAlert("$name stock is low: $point");
         }
     }
 

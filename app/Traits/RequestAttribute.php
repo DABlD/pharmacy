@@ -10,14 +10,14 @@ trait RequestAttribute{
 		$string = "";
 
 		if($this->status == "For Approval"){
-			if(auth()->user()->role == "Admin"){
+			if(in_array(auth()->user()->role, ["Admin", "Approver"])){
 		    	$string .= "<a class='btn btn-success' data-toggle='tooltip' title='Approve' onClick='updateStatus($id, `Approve`, `Approved`)'>" .
 			        "<i class='fas fa-check'></i>" .
 			    "</a>&nbsp;";
 			}
 
-			$action = auth()->user()->role == "Admin" ? "Decline" : "Cancel";
-			$status = auth()->user()->role == "Admin" ? "Declined" : "Cancelled";
+			$action = in_array(auth()->user()->role, ["Admin", "Approver"]) ? "Decline" : "Cancel";
+			$status = in_array(auth()->user()->role, ["Admin", "Approver"]) ? "Declined" : "Cancelled";
 
 	    	$string .= "<a class='btn btn-danger' data-toggle='tooltip' title='$action' onClick='updateStatus($id, `$action`, `$status`)'>" .
 		        "<i class='fas fa-ban'></i>" .

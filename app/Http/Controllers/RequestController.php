@@ -153,11 +153,12 @@ class RequestController extends Controller
             $reorder->decrement('stock', $num);
         }
 
+        $reorder = $reorder->first();
         if($reorder->stock <= $reorder->point && $uid == 1){
             $reorder->load('medicine');
             $name = $reorder->medicine->name;
-            $point = $reoder->point;
-            createAlert("$name stock is low: $point");
+            $point = $reorder->point;
+            $this->createAlert("$name stock is low: $point");
         }
     }
 

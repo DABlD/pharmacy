@@ -75,7 +75,7 @@
 						select: ['requests.*'],
 						load: ['rhu', 'medicine.category'],
 						order: ["created_at", "desc"],
-						@if(auth()->user()->role != "Admin")
+						@if(in_array(auth()->user()->role, ["RHU"]))
 							where: ["user_id", {{ auth()->user()->id }}]
 						@endif
 					}
@@ -104,6 +104,7 @@
 						className: 'center',
 						width: "10%",
 						render: (qty, display, row) => {
+							@if(in_array(auth()->user()->role, ["Admin", "Approver"]))
 							if(row.status == "For Approval"){
 								return `
 									<div id=qty${row.id}>
@@ -111,7 +112,9 @@
 									</div>
 								`;
 							}
-							else{
+							else
+							@endif
+							{
 								if(qty == undefined){
 									return "N/A";
 								}
@@ -181,6 +184,7 @@
 				if(result.value){
 					swal.showLoading();
 
+
 					if(action == "Approve"){
 						let qty = $(`#qty${id}`).find('input');
 						let stock = $(`#stock${id}`).text().trim();
@@ -188,10 +192,10 @@
 						if(qty.val() < qty.attr('min') || qty.val() > qty.attr('max')){
 							Swal.fire({
 								icon: "error",
-								title: `Qty must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`,
+								title: `Qty  must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`,
 							});
 						}
-						else if(qty.val() > stock){
+						else if(parseInt(qty.val()) > parseInt(stock)){
 							Swal.fire({
 								icon: "error",
 								title: `Qty is greater than stock`,
