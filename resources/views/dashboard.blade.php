@@ -7,12 +7,23 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>150</h3>
-                        <p>New Orders</p>
+                        <h3>
+                            <div class="row">
+                                <div class="col-md-4">{{ $rt }}</div>
+                                <div class="col-md-4">{{ $rtm }}</div>
+                            </div>
+                        </h3>
+                        <p>
+                            <div class="row">
+                                <div class="col-md-4">Today</div>
+                                <div class="col-md-4">Month</div>
+                            </div>
+                        </p>
+                        <p style="font-weight: bold;">Requests</p>
                     </div>
 
                     <div class="icon">
-                        <i class="ion ion-bag"></i>
+                        <i class="fa-solid fa-clipboard-list-check"></i>
                     </div>
                 </div>
             </div>
@@ -20,11 +31,22 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
-                        <p>Bounce Rate</p>
+                        <h3>
+                            <div class="row">
+                                <div class="col-md-4">{{ $it }}</div>
+                                <div class="col-md-4">{{ $itm }}</div>
+                            </div>
+                        </h3>
+                        <p>
+                            <div class="row">
+                                <div class="col-md-4">Today</div>
+                                <div class="col-md-4">Month</div>
+                            </div>
+                        </p>
+                        <p style="font-weight: bold;">Issued To</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
+                        <i class="fa-solid fa-clipboard-list-check"></i>
                     </div>
                 </div>
             </div>
@@ -32,12 +54,23 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>150</h3>
-                        <p>New Orders</p>
+                        <h3>
+                            <div class="row">
+                                <div class="col-md-4">{{ $rcvtm }}</div>
+                                <div class="col-md-4">{{ $rcvt }}</div>
+                            </div>
+                        </h3>
+                        <p>
+                            <div class="row">
+                                <div class="col-md-4">Today</div>
+                                <div class="col-md-4">Month</div>
+                            </div>
+                        </p>
+                        <p style="font-weight: bold;">Receive</p>
                     </div>
 
                     <div class="icon">
-                        <i class="ion ion-bag"></i>
+                        <i class="fa-solid fa-clipboard-list-check"></i>
                     </div>
                 </div>
             </div>
@@ -45,11 +78,22 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
-                        <p>Bounce Rate</p>
+                        <h3>
+                            <div class="row">
+                                <div class="col-md-4">{{ $atm }}</div>
+                                <div class="col-md-4">{{ $at }}</div>
+                            </div>
+                        </h3>
+                        <p>
+                            <div class="row">
+                                <div class="col-md-4">Today</div>
+                                <div class="col-md-4">Month</div>
+                            </div>
+                        </p>
+                        <p style="font-weight: bold;">Alerts</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-stats-bars"></i>
+                        <i class="fa-solid fa-bell-exclamation"></i>
                     </div>
                 </div>
             </div>
@@ -60,8 +104,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-chart-pie mr-1"></i>
-                            Sales
+                            {{-- <i class="fas fa-chart-pie mr-1"></i>
+                            Sales --}}
                         </h3>
 
                         <div class="card-tools">
@@ -79,10 +123,10 @@
                     <div class="card-body">
                         <div class="tab-content p-0">
                             <div class="chart tab-pane active" id="tab1" style="position: relative; height: 300px;">
-                                TAB 1
+                                {{-- TAB 1 --}}
                             </div>
                             <div class="chart tab-pane" id="tab2" style="position: relative; height: 300px;">
-                                TAB 2
+                                {{-- TAB 2 --}}
                             </div>
                         </div>
                     </div>
