@@ -21,6 +21,7 @@
                     		<thead>
                     			<tr>
                     				<th>ID</th>
+                    				<th>Username</th>
                     				<th>Name</th>
                     				<th>Email</th>
                     				<th>Contact</th>
@@ -65,6 +66,7 @@
 				},
 				columns: [
 					{data: 'id'},
+					{data: 'username'},
 					{data: 'name'},
 					{data: 'email'},
 					{data: 'contact'},
@@ -97,6 +99,10 @@
 	                ${input("name", "Name", null, 3, 9)}
 					${input("email", "Email", null, 3, 9, 'email')}
 	                ${input("contact", "Contact #", null, 3, 9)}
+	                <br>
+	                ${input("username", "Username", null, 3, 9)}
+	                ${input("password", "Password", null, 3, 9, 'password')}
+	                ${input("password_confirmation", "Confirm Password", null, 3, 9, 'password')}
 				`,
 				width: '800px',
 				confirmButtonText: 'Add',
@@ -111,6 +117,12 @@
 			            if($('.swal2-container input:placeholder-shown').length){
 			                Swal.showValidationMessage('Fill all fields');
 			            }
+			            else if($("[name='password']").val().length < 8){
+			                Swal.showValidationMessage('Password must at least be 8 characters');
+			            }
+			            else if($("[name='password']").val() != $("[name='password_confirmation']").val()){
+			                Swal.showValidationMessage('Password do not match');
+			            }
 			            else{
 			            	let bool = false;
             				$.ajax({
@@ -124,6 +136,22 @@
             						if(result.length){
             			    			Swal.showValidationMessage('Email already used');
 	            						setTimeout(() => {resolve()}, 500);
+            						}
+            						else{
+			            				$.ajax({
+			            					url: "{{ route('user.get') }}",
+			            					data: {
+			            						select: "id",
+			            						where: ["username", $("[name='username']").val()]
+			            					},
+			            					success: result => {
+			            						result = JSON.parse(result);
+			            						if(result.length){
+			            			    			Swal.showValidationMessage('Username already used');
+				            						setTimeout(() => {resolve()}, 500);
+			            						}
+			            					}
+			            				});
             						}
             					}
             				});
@@ -143,6 +171,8 @@
 							email: $("[name='email']").val(),
 							contact: $("[name='contact']").val(),
 							role: "approver",
+							username: $("[name='username']").val(),
+							password: $("[name='password']").val(),
 							_token: $('meta[name="csrf-token"]').attr('content')
 						},
 						success: () => {
@@ -160,7 +190,9 @@
 	                ${input("id", "", approver.id, 3, 9, 'hidden')}
 	                ${input("name", "Name", approver.name, 3, 9)}
 					${input("email", "Email", approver.email, 3, 9, 'email')}
-	                ${input("contact", "Contact #", approver.contact, 3, 9)}
+	                ${input("contact", "Contact #", approver.contact, 3, 9, 'password')}
+	                <br>
+	                ${input("username", "Username", approver.username, 3, 9, 'password')}
 				`,
 				width: '800px',
 				confirmButtonText: 'Update',
@@ -189,6 +221,22 @@
             			    			Swal.showValidationMessage('Email already used');
 	            						setTimeout(() => {resolve()}, 500);
             						}
+			            			else{
+			            				$.ajax({
+			            					url: "{{ route('user.get') }}",
+			            					data: {
+			            						select: "id",
+			            						where: ["username", $("[name='username']").val()]
+			            					},
+			            					success: result => {
+			            						result = JSON.parse(result);
+			            						if(result.length && result[0].id != rhu.user.id){
+			            			    			Swal.showValidationMessage('Username already used');
+				            						setTimeout(() => {resolve()}, 500);
+			            						}
+			            					}
+			            				});
+			            			}
             					}
             				});
 			            }
@@ -206,6 +254,7 @@
 							name: $("[name='name']").val(),
 							email: $("[name='email']").val(),
 							contact: $("[name='contact']").val(),
+							username: $("[name='username']").val(),
 						},
 						message: "Success"
 					},	() => {

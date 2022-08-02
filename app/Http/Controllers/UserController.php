@@ -42,6 +42,8 @@ class UserController extends Controller
         $user->contact = $req->contact;
         $user->email = $req->email;
         $user->role = $req->role;
+        $user->username = $req->username;
+        $user->password = $req->password;
         $user->save();
     }
 
