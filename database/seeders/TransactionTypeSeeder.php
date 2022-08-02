@@ -22,6 +22,8 @@ class TransactionTypeSeeder extends Seeder
             ["Purchase Order", "+", 0, 0],
             ["Issued To", "-", 0, 0],
             ["Receive", "+", 0, 0],
+            ["Adj. Entry Plus", "+", 0, 0],
+            ["Adj. Entry Minus", "-", 0, 0]
         ];
 
         foreach($array as $type){
