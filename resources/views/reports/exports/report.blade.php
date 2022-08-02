@@ -12,6 +12,12 @@
 		@endforeach
 	</tr>
 	@foreach($datas as $record)
+		@if(isset($record['group']))
+			<tr>
+				<td colspan="{{ $record['cols'] }}">{{ $record['group'] }}</td>
+			</tr>
+			@continue;
+		@endif
 		<tr>
 			@foreach($headers as $header)
 				<td style="{{ $center }}">{{ $record[$header] }}</td>

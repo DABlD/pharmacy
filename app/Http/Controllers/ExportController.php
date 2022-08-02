@@ -268,26 +268,31 @@ class ExportController extends Controller
                 $array->load($table);
             }
         }
+        $array = $array->groupBy("user_id");
 
         $headers = ["ID", "Ref No", "Requestor", "Category", "Item", "Stock", "Request Qty", "Approved Qty", "Request Date", "Received Qty", "Received Date", "Status"];
 
         $data = [];
-        foreach($array as $item){
-            $temp = [];
-            $temp["ID"] = $item->id;
-            $temp["Ref No"] = $item->reference;
-            $temp["Requestor"] = $item->requested_by;
-            $temp["Category"] = $item->medicine->category->name;
-            $temp["Item"] = $item->medicine->name;
-            $temp["Stock"] = $item->stock;
-            $temp["Request Qty"] = $item->request_qty;
-            $temp["Approved Qty"] = $item->approved_qty ?? "N/A";
-            $temp["Request Date"] = $item->transaction_date->toDateString();
-            $temp["Received Qty"] = $item->received_qty ?? "N/A";
-            $temp["Received Date"] = $item->received_date ? $item->received_date->toDateString() : "N/A";
-            $temp["Status"] = $item->status;
+        foreach($array as $rhus){
+            array_push($data, ["group" => $rhus[0]->rhu->company_name, "cols" => 12]);
 
-            array_push($data, $temp);
+            foreach($rhus as $item){
+                $temp = [];
+                $temp["ID"] = $item->id;
+                $temp["Ref No"] = $item->reference;
+                $temp["Requestor"] = $item->requested_by;
+                $temp["Category"] = $item->medicine->category->name;
+                $temp["Item"] = $item->medicine->name;
+                $temp["Stock"] = $item->stock;
+                $temp["Request Qty"] = $item->request_qty;
+                $temp["Approved Qty"] = $item->approved_qty ?? "N/A";
+                $temp["Request Date"] = $item->transaction_date->toDateString();
+                $temp["Received Qty"] = $item->received_qty ?? "N/A";
+                $temp["Received Date"] = $item->received_date ? $item->received_date->toDateString() : "N/A";
+                $temp["Status"] = $item->status;
+
+                array_push($data, $temp);
+            }
         }
 
         $array = $data;
