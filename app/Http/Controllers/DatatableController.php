@@ -147,6 +147,7 @@ class DatatableController extends Controller
         // IF HAS WHERE
         if($req->where){
             $array = $array->where($req->where[0], $req->where[1]);
+            $array = $array->where('r.user_id', auth()->user()->id);
             $array = $array->where('r.deleted_at', null);
         }
 
