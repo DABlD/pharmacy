@@ -23,7 +23,7 @@ trait RequestAttribute{
 		        "<i class='fas fa-ban'></i>" .
 		    "</a>&nbsp;";
 		}
-		elseif($this->status == "Approved"){
+		elseif($this->status == "Approved" && auth()->user()->role == "Admins"){
 	    	$string .= "<a class='btn btn-info' data-toggle='tooltip' title='Input Info' onClick='inputInfo($ref)'>" .
 		        "<i class='fas fa-pencil'></i>" .
 		    "</a>&nbsp;";

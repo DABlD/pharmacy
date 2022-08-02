@@ -77,6 +77,8 @@
 						order: ["created_at", "desc"],
 						@if(in_array(auth()->user()->role, ["RHU"]))
 							where: ["user_id", {{ auth()->user()->id }}]
+						@elseif(in_array(auth()->user()->role, ["Approver"]))
+							where: ["status", "For Approval"]
 						@endif
 					}
 				},
@@ -135,6 +137,9 @@
 				],
         		order: [],
         		pageLength: 25,
+        		language: {
+        			emptyTable: "No pending request for approval"
+        		},
         		rowCallback: function( row, data, index ) {
 				    if (data['id'] == null) {
 				        $(row).hide();
