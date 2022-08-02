@@ -161,6 +161,52 @@ class ExportController extends Controller
         return Excel::download(new Report($headers, $title, $array), $title);
     }
 
+    public function exportPurchaseOrder(Request $req){
+        $temp = Data::where('bhc_id', 'like', $req->bhc_id)
+                    ->where('transaction_types_id', 5)
+                    ->whereBetween('transaction_date', [$req->from, $req->to])
+                    ->get();
+
+        $temp->load('reorder.medicine');
+        $temp = $temp->groupBy('medicine_id');
+
+        $from = $req->from;
+        $to = $req->to;
+
+        $dates = $this->getDates($from, $to);
+        $array = [];
+
+        foreach($temp as $group){
+            $grandTotal = 0;
+            $tempDates = [];
+            foreach($dates as $date){
+                $total = 0;
+                foreach($group as $data){
+                    if($data->transaction_date == $date){
+                        $total += $data->{$req->view};
+                        $grandTotal += $data->{$req->view};
+                    }
+                }
+
+                $tempDates[now()->parse($date)->format('M d')] = $total;
+            }
+
+            array_push($array, 
+                array_merge(
+                    array_merge(
+                        ["Item" => $group[0]->reorder->medicine->name], 
+                        $tempDates
+                    ),
+                    ["Total" => $grandTotal]
+                )
+            );
+        }
+
+        $headers = array_keys($array[0]);
+        $title = "Purchase Order Report - $from to $to.xlsx";
+        return Excel::download(new Report($headers, $title, $array), $title);
+    }
+
     private function getDates($from, $to){
         $dates = [];
 
