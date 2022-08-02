@@ -20,10 +20,35 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 @php 
                     $routes = Route::getRoutes();
+                    $group = null;
                 @endphp
 
                 @foreach($routes as $route)
                     @if(isset($route->defaults['sidebar']))
+                        @if(isset($route->defaults['group']))
+                            @if($group != null && $group != $route->defaults['group'])
+                                    </ul>
+                                </li>
+                                @php
+                                    $group = null;
+                                @endphp
+                            @endif
+                            @if($group == null && $group != $route->defaults['group'])
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <p>
+                                            {{ $route->defaults['group'] }}
+                                            @php
+                                                $group = $route->defaults['group'];
+                                            @endphp
+                                            <i class="fas fa-angle-left right"></i>
+                                        </p>
+                                    </a>
+                                    
+                                    <ul class="nav nav-treeview">
+                            @endif
+                        @endif
+
                         @if(in_array(Auth::user()->role, $route->defaults['roles']) || (isset($route->defaults['sped']) && in_array(auth()->user()->id, $route->defaults['sped'])))
                             <li class="nav-item {{ str_contains(request()->path(), $route->uri) ? 'active' : '' }}">
                                 <a class="nav-link" href="{{ url($route->defaults['href']) }}">
@@ -31,10 +56,6 @@
                                     <p>{{ $route->defaults['name'] }}</p>
                                 </a>
                             </li>
-                        @endif
-
-                        @if($route->defaults['name'] == "Locations")
-                            <hr style="border: 1px solid #b4b4a6; width: 100%; opacity: 0.4;">
                         @endif
                     @endif
                 @endforeach
