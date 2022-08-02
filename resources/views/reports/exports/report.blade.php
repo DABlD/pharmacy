@@ -13,13 +13,9 @@
 	</tr>
 	@foreach($datas as $record)
 		<tr>
-			<td style="{{ $center }}">{{ $record["Category"] }}</td>
-			<td style="{{ $center }}">{{ $record["Item"] }}</td>
-			<td style="{{ $center }}">{{ $record["Type"] }}</td>
-			<td style="{{ $center }}">{{ $record["Receiving"] }}</td>
-			<td style="{{ $center }}">{{ $record["Issuance"] }}</td>
-			<td style="{{ $center }}">{{ $record["Running Balance"] }}</td>
-			<td style="{{ $center }}">{{ $record["Date"] }}</td>
+			@foreach($headers as $header)
+				<td style="{{ $center }}">{{ $record[$header] }}</td>
+			@endforeach
 		</tr>
 	@endforeach
 </table>
