@@ -23,7 +23,7 @@ class CreateRequestsTable extends Migration
             $table->unsignedInteger('request_qty')->nullable();
             $table->string('lot_number')->nullable();
             $table->datetime('expiry_date')->nullable();
-            $table->unsignedInteger('stock')->nullable();
+            $table->integer('stock')->nullable();
             $table->float("unit_price", 8, 2)->nullable();
             $table->float("amount", 8, 2)->nullable();
             $table->datetime('transaction_date')->nullable();

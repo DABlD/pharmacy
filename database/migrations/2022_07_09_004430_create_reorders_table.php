@@ -19,7 +19,7 @@ class CreateReordersTable extends Migration
             $table->unsignedSmallInteger("user_id");
             $table->unsignedSmallInteger("medicine_id");
             $table->unsignedSmallInteger("point");
-            $table->unsignedSmallInteger("stock")->default(0);
+            $table->smallInteger("stock")->default(0);
             
             $table->timestamps();
             $table->softDeletes();
