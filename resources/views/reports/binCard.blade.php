@@ -143,11 +143,7 @@
 		});
 
 		function exportReport(){
-			let data = {
-				test: 'test'
-			};
-
-			window.open("/export/exportBinCard?" + $.param(data), "_blank");
+			window.open("/export/exportBinCard", "_blank");
 		}
 	</script>
 @endpush

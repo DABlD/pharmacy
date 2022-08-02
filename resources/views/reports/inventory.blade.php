@@ -188,5 +188,17 @@
 			$('#table thead').html('');
 			createTable();
 		}
+
+		function exportReport(){
+			let data = {
+				outlet: outlet,
+				tType: tType,
+				from: from,
+				to: to,
+				view: view
+			};
+
+			window.open("/export/exportInventory?" + $.param(data), "_blank");
+		}
 	</script>
 @endpush

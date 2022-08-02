@@ -54,4 +54,67 @@ class ExportController extends Controller
         $title = "Bin Report - " . now()->toDateString() . '.xlsx';
         return Excel::download(new Report($headers, $title, $array), $title);
     }
+
+    public function exportInventory(Request $req){
+        $temp = Data::where('transaction_types_id', $req->tType)
+            ->where('bhc_id', 'like', $req->outlet)
+            ->whereNotNull('bhc_id')
+            ->whereBetween('transaction_date', [$req->from, $req->to])
+            ->get();
+
+        $temp->load('reorder.medicine');
+        $temp->load('transaction_type');
+        $temp = $temp->groupBy('medicine_id');
+
+        $from = $req->from;
+        $to = $req->to;
+
+        $dates = $this->getDates($from, $to);
+        $array = [];
+
+        foreach($temp as $medicine){
+            $grandtotal = 0;
+            $tempDates = [];
+            foreach($dates as $date){
+                $total = 0;
+                foreach($medicine as $data){
+                    if($data->transaction_date == $date){
+                        if($data->transaction_type->operator == "+"){
+                            $total += $data->{$req->view};
+                            $grandtotal += $data->{$req->view};
+                        }
+                        else{
+                            $total -= $data->{$req->view};
+                            $grandtotal -= $data->{$req->view};
+                        }
+                    }
+                }
+
+                $tempDates[now()->parse($date)->format('M d')] = $total;
+            }
+
+            array_push($array, 
+                array_merge(
+                    ["Item" => $medicine[0]->reorder->medicine->name], 
+                    $tempDates
+                ),
+            );
+        }
+
+        $headers = array_keys($array[0]);
+        $title = "Inventory Report - $from to $to.xlsx";
+        return Excel::download(new Report($headers, $title, $array), $title);
+    }
+
+    private function getDates($from, $to){
+        $dates = [];
+
+        while($from <= $to){
+            $tempDate = now()->parse($from);
+            array_push($dates, $tempDate->toDateTimeString());
+            $from = $tempDate->addDay()->toDateString();
+        }
+
+        return $dates;
+    }
 }

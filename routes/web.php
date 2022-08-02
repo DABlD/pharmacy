@@ -363,6 +363,7 @@ Route::group([
                 'prefix' => "$cname/"
             ], function () use($cname){
                 Route::get($cname . "BinCard/", ucfirst($cname) . "Controller@$cname" . "BinCard")->name($cname . "BinCard");
+                Route::get($cname . "Inventory/", ucfirst($cname) . "Controller@$cname" . "Inventory")->name($cname . "Inventory");
             }
         );
         

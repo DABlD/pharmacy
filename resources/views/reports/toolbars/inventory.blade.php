@@ -47,7 +47,11 @@
 	    <div class="row iRow float-right">
 	    	<a class="btn btn-success btn-sm" data-toggle="tooltip" title="Filter" onclick="filter()">
 	    	    <i class="fas fa-filter"></i>
-	    	</a>
+	    	</a>&nbsp;
+	    	
+    		<a class="btn btn-info btn-sm" data-toggle="tooltip" title="Export" onclick="exportReport()">
+    		    <i class="fa-solid fa-file-excel"></i>
+    		</a>
 	    </div>
 
 	</div>
