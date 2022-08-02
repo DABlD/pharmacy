@@ -146,5 +146,16 @@
 			$('#table thead').html('');
 			createTable();
 		}
+
+		function exportReport(){
+			let data = {
+				fby: fby,
+				from: from,
+				to: to,
+				view: view
+			};
+
+			window.open("/export/exportSales?" + $.param(data), "_blank");
+		}
 	</script>
 @endpush

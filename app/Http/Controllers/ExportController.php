@@ -106,6 +106,61 @@ class ExportController extends Controller
         return Excel::download(new Report($headers, $title, $array), $title);
     }
 
+    public function exportSales(Request $req){
+        $temp = Data::whereNotNull('bhc_id')
+                    ->whereIn('transaction_types_id', [2,3])
+                    ->whereBetween('transaction_date', [$req->from, $req->to])
+                    ->get();
+
+        $temp->load('bhc');
+        $temp->load('transaction_type');
+        $temp->load('reorder.medicine');
+        $temp = $temp->groupBy($req->fby);
+
+        $from = $req->from;
+        $to = $req->to;
+
+        $dates = $this->getDates($from, $to);
+        $array = [];
+
+        foreach($temp as $group){
+            $grandTotal = 0;
+            $tempDates = [];
+            foreach($dates as $date){
+                $total = 0;
+                foreach($group as $data){
+                    if($data->transaction_date == $date){
+                        if($data->transaction_type->operator == "-"){
+                            $total += $data->{$req->view};
+                            $grandTotal += $data->{$req->view};
+                        }
+                        else{
+                            $total -= $data->{$req->view};
+                            $grandTotal -= $data->{$req->view};
+                        }
+                    }
+                }
+
+                $tempDates[now()->parse($date)->format('M d')] = $total;
+            }
+
+            $title = $req->fby == "bhc_id" ? $group[0]->bhc->name : $group[0]->reorder->medicine->name;
+            array_push($array, 
+                array_merge(
+                    array_merge(
+                        ["Item" => $title], 
+                        $tempDates
+                    ),
+                    ["Total" => $grandTotal]
+                )
+            );
+        }
+
+        $headers = array_keys($array[0]);
+        $title = "Sales Report - $from to $to.xlsx";
+        return Excel::download(new Report($headers, $title, $array), $title);
+    }
+
     private function getDates($from, $to){
         $dates = [];
 

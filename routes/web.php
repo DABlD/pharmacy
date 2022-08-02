@@ -364,6 +364,7 @@ Route::group([
             ], function () use($cname){
                 Route::get($cname . "BinCard/", ucfirst($cname) . "Controller@$cname" . "BinCard")->name($cname . "BinCard");
                 Route::get($cname . "Inventory/", ucfirst($cname) . "Controller@$cname" . "Inventory")->name($cname . "Inventory");
+                Route::get($cname . "Sales/", ucfirst($cname) . "Controller@$cname" . "Sales")->name($cname . "Sales");
             }
         );
         
