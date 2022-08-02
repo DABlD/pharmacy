@@ -25,33 +25,34 @@
 
                 @foreach($routes as $route)
                     @if(isset($route->defaults['sidebar']))
-                        @if(isset($route->defaults['group']))
-                            @if($group != null && $group != $route->defaults['group'])
-                                    </ul>
-                                </li>
-                                @php
-                                    $group = null;
-                                @endphp
-                            @endif
-                            @if($group == null && $group != $route->defaults['group'])
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <p>
-                                            {{ $route->defaults['group'] }}
-                                            @php
-                                                $group = $route->defaults['group'];
-                                            @endphp
-                                            <i class="fas fa-angle-left right"></i>
-                                        </p>
-                                    </a>
-                                    
-                                    <ul class="nav nav-treeview">
-                            @endif
-                        @endif
-
                         @if(in_array(Auth::user()->role, $route->defaults['roles']) || (isset($route->defaults['sped']) && in_array(auth()->user()->id, $route->defaults['sped'])))
-                            <li class="nav-item {{ str_contains(request()->path(), $route->uri) ? 'active' : '' }}">
-                                <a class="nav-link" href="{{ url($route->defaults['href']) }}">
+                            
+                            @if(isset($route->defaults['group']))
+                                @if($group != null && $group != $route->defaults['group'])
+                                        </ul>
+                                    </li>
+                                    @php
+                                        $group = null;
+                                    @endphp
+                                @endif
+                                @if($group == null && $group != $route->defaults['group'])
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link">
+                                            <p>
+                                                {{ $route->defaults['group'] }}
+                                                @php
+                                                    $group = $route->defaults['group'];
+                                                @endphp
+                                                <i class="fas fa-angle-left right"></i>
+                                            </p>
+                                        </a>
+                                        
+                                        <ul class="nav nav-treeview">
+                                @endif
+                            @endif
+
+                            <li class="nav-item">
+                                <a class="nav-link {{ str_contains(request()->path(), $route->uri) ? 'active' : '' }}" href="{{ url($route->defaults['href']) }}">
                                     <i class="nav-icon {{ $route->defaults['icon'] }}"></i> 
                                     <p>{{ $route->defaults['name'] }}</p>
                                 </a>

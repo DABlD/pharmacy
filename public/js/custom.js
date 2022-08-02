@@ -86,3 +86,9 @@ function dateNow(){
 function dateTimeNow(){
 	return moment().format(dateTimeFormat);
 }
+
+// CHECK IF ROUTE IS IN GROUP THEN OPEN GROUP
+if($('.nav-link.active').parent().parent().has('.nav-treeview')){
+	$('.nav-link.active').parent().parent().show();
+	$('.nav-link.active').parent().parent().parent().addClass('menu-is-opening menu-open');
+}
