@@ -239,7 +239,7 @@ class ReportController extends Controller
         $data = Data::orderBy('transaction_date', 'desc')->get();
 
         $data->load('transaction_type');
-        $data->load('reorder.medicine');
+        $data->load('reorder.medicine.category');
         $data = $data->groupBy('medicine_id');
 
         $array = [];
@@ -264,7 +264,8 @@ class ReportController extends Controller
                 }
 
                 array_push($array, [
-                    "item" => $name,
+                    // "category" => $record->reorder->medicine->category->name,
+                    "item" => $name . " (" . $record->reorder->medicine->category->name . ")",
                     "tx" => $record->transaction_type->type,
                     "rcv" => $receiving,
                     "issue" => $issuance,

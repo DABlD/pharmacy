@@ -351,6 +351,20 @@ Route::group([
                 Route::get("getAlert/", ucfirst($cname) . "Controller@getAlert")->name('getAlert');
             }
         );
+
+
+        // EXPORT
+        // EXPORT
+        // EXPORT
+
+        $cname = "export";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get($cname . "BinCard/", ucfirst($cname) . "Controller@$cname" . "BinCard")->name($cname . "BinCard");
+            }
+        );
         
 
         // DATATABLES

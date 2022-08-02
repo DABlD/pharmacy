@@ -62,6 +62,8 @@
 	{{-- <script src="{{ asset('js/datatables-jquery.min.js') }}"></script> --}}
 
 	<script>
+		var tableData = [];
+
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
 				ajax: {
@@ -82,7 +84,7 @@
 		            let api = this.api();
 		            let rows = api.rows({ page: 'current' }).nodes();
 		            let last = null;
-		 
+
 		            api.column(0, { page: 'current' })
 		                .data()
 		                .each(function (item, i, row) {
@@ -101,7 +103,7 @@
 		                    }
 		                });
 
-		            
+		        	tableData = api.rows().data().toArray();
 		        	let groups = $('tr.group td');
 
 		        	if(groups.length){
@@ -139,5 +141,13 @@
 				// }
 			});
 		});
+
+		function exportReport(){
+			let data = {
+				test: 'test'
+			};
+
+			window.open("/export/exportBinCard?" + $.param(data), "_blank");
+		}
 	</script>
 @endpush
