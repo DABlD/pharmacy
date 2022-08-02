@@ -15,6 +15,8 @@
 
                         @if(auth()->user()->role == "RHU")
                         	@include('requests.includes.toolbar')
+                        @elseif(auth()->user()->role == "Admin")
+                        	@include('requests.includes.toolbar2')
                         @endif
                     </div>
 
@@ -60,6 +62,8 @@
 	<script src="{{ asset('js/select2.min.js') }}"></script>
 
 	<script>
+		var search = "%%";
+
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
 				ajax: {
@@ -166,6 +170,10 @@
 		        	$('[name="approved_qty"]').css('text-align', 'center');
 		        },
 			});
+
+			$('[type="search"]').on('keyup', e => {
+				// search = "%" + e.target.value + "%";
+			});
 		});
 
 		function updateStatus(id, action, status){
@@ -217,6 +225,18 @@
 
 		function inputInfo(ref){
 			window.location.href = `{{ route('request.inputInfo') }}?ref=${ref}`;
+		}
+
+		function exportReport(){
+			let data = {
+				search: search,
+				table: 'requests',
+				select: ['requests.*'],
+				load: ['rhu', 'medicine.category'],
+				order: ["created_at", "desc"]
+			};
+
+			window.open("/export/exportRequests?" + $.param(data), "_blank");
 		}
 	</script>
 @endpush

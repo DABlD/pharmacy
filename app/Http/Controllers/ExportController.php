@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Data;
 use App\Exports\Report;
 use Maatwebsite\Excel\Facades\Excel;
-use DOMDocument;
+
+use App\Models\{Data, Request as Req};
 
 class ExportController extends Controller
 {
@@ -51,8 +51,8 @@ class ExportController extends Controller
         }
 
         $headers = array_keys($array[0]);
-        $title = "Bin Report - " . now()->toDateString() . '.xlsx';
-        return Excel::download(new Report($headers, $title, $array), $title);
+        $title = "Bin Report - " . now()->toDateString();
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     public function exportInventory(Request $req){
@@ -102,8 +102,8 @@ class ExportController extends Controller
         }
 
         $headers = array_keys($array[0]);
-        $title = "Inventory Report - $from to $to.xlsx";
-        return Excel::download(new Report($headers, $title, $array), $title);
+        $title = "Inventory Report - $from to $to";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     public function exportSales(Request $req){
@@ -157,8 +157,8 @@ class ExportController extends Controller
         }
 
         $headers = array_keys($array[0]);
-        $title = "Sales Report - $from to $to.xlsx";
-        return Excel::download(new Report($headers, $title, $array), $title);
+        $title = "Sales Report - $from to $to";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     public function exportPurchaseOrder(Request $req){
@@ -203,8 +203,8 @@ class ExportController extends Controller
         }
 
         $headers = array_keys($array[0]);
-        $title = "Purchase Order Report - $from to $to.xlsx";
-        return Excel::download(new Report($headers, $title, $array), $title);
+        $title = "Purchase Order Report - $from to $to";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     public function exportDailySheet(Request $req){
@@ -248,8 +248,52 @@ class ExportController extends Controller
         }
 
         $headers = array_keys($array[0]);
-        $title = "Daily Sheet Report - $from to $to.xlsx";
-        return Excel::download(new Report($headers, $title, $array), $title);
+        $title = "Daily Sheet Report - $from to $to";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
+    }
+
+    public function exportRequests(Request $req){
+        $array = Req::select($req->select);
+
+        // IF HAS SORT PARAMETER $ORDER
+        if($req->order){
+            $array = $array->orderBy($req->order[0], $req->order[1]);
+        }
+
+        $array = $array->get();
+
+        // IF HAS LOAD
+        if($array->count() && $req->load){
+            foreach($req->load as $table){
+                $array->load($table);
+            }
+        }
+
+        $headers = ["ID", "Ref No", "Requestor", "Category", "Item", "Stock", "Request Qty", "Approved Qty", "Request Date", "Received Qty", "Received Date", "Status"];
+
+        $data = [];
+        foreach($array as $item){
+            $temp = [];
+            $temp["ID"] = $item->id;
+            $temp["Ref No"] = $item->reference;
+            $temp["Requestor"] = $item->requested_by;
+            $temp["Category"] = $item->medicine->category->name;
+            $temp["Item"] = $item->medicine->name;
+            $temp["Stock"] = $item->stock;
+            $temp["Request Qty"] = $item->request_qty;
+            $temp["Approved Qty"] = $item->approved_qty ?? "N/A";
+            $temp["Request Date"] = $item->transaction_date->toDateString();
+            $temp["Received Qty"] = $item->received_qty ?? "N/A";
+            $temp["Received Date"] = $item->received_date ? $item->received_date->toDateString() : "N/A";
+            $temp["Status"] = $item->status;
+
+            array_push($data, $temp);
+        }
+
+        $array = $data;
+        $date = now()->toDateString();
+        $title = "Requests - $date";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     private function getDates($from, $to){

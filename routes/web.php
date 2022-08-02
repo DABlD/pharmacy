@@ -367,6 +367,7 @@ Route::group([
                 Route::get($cname . "Sales/", ucfirst($cname) . "Controller@$cname" . "Sales")->name($cname . "Sales");
                 Route::get($cname . "PurchaseOrder/", ucfirst($cname) . "Controller@$cname" . "PurchaseOrder")->name($cname . "PurchaseOrder");
                 Route::get($cname . "DailySheet/", ucfirst($cname) . "Controller@$cname" . "DailySheet")->name($cname . "DailySheet");
+                Route::get($cname . "Requests/", ucfirst($cname) . "Controller@$cname" . "Requests")->name($cname . "Requests");
             }
         );
         
