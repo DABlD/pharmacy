@@ -177,14 +177,13 @@
 		        	});
 
 		        	$('[name="approved_qty"]').css('text-align', 'center');
-
-		        	$('#search').on('change', e => {
-		        		console.log('asd');
-		        		search = e.target.value;
-		        		reload();
-		        	});
 		        },
 			});
+			
+        	$('#search').on('change', e => {
+        		search = e.target.value;
+        		reload();
+        	});
 		});
 
 		function updateStatus(id, action, status){
