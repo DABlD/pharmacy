@@ -11,7 +11,7 @@ use App\Models\{Data, Request as Req};
 class ExportController extends Controller
 {
     public function exportBinCard(Request $req){
-        $data = Data::orderBy('transaction_date', 'desc')->get();
+        $data = Data::where('user_id', 'like', $req->user_id)->orderBy('transaction_date', 'desc')->get();
 
         $data->load('transaction_type');
         $data->load('reorder.medicine.category');
