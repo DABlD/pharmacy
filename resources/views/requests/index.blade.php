@@ -70,15 +70,16 @@
 					url: "{{ route('datatable.requests') }}",
                 	dataType: "json",
                 	dataSrc: "",
-					data: {
-						table: 'requests',
-						select: ['requests.*'],
-						load: ['rhu', 'medicine.category'],
-						order: ["created_at", "desc"],
+					data: f => {
+						f.table = 'requests';
+						f.select = ['requests.*'];
+						f.load = ['rhu', 'medicine.category'];
+						f.order = ["created_at", "desc"];
+						f.status = search;
 						@if(in_array(auth()->user()->role, ["RHU"]))
-							where: ["user_id", {{ auth()->user()->id }}]
+							f.where = ["user_id", {{ auth()->user()->id }}];
 						@elseif(in_array(auth()->user()->role, ["Approver"]))
-							where: ["status", "For Approval"]
+							f.where = ["status", "For Approval"];
 						@endif
 					}
 				},
@@ -176,11 +177,13 @@
 		        	});
 
 		        	$('[name="approved_qty"]').css('text-align', 'center');
-		        },
-			});
 
-			$('[type="search"]').on('keyup', e => {
-				// search = "%" + e.target.value + "%";
+		        	$('#search').on('change', e => {
+		        		console.log('asd');
+		        		search = e.target.value;
+		        		reload();
+		        	});
+		        },
 			});
 		});
 

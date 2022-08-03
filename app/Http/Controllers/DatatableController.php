@@ -267,6 +267,7 @@ class DatatableController extends Controller
 
     public function requests(Request $req){
         $array = Req::select($req->select);
+        $array = $array->where('status', 'like', $req->status);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){

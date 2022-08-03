@@ -254,6 +254,7 @@ class ExportController extends Controller
 
     public function exportRequests(Request $req){
         $array = Req::select($req->select);
+        $array = $array->where('status', 'like', $req->search);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
