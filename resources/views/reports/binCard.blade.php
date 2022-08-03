@@ -63,6 +63,7 @@
 
 	<script>
 		var tableData = [];
+		var user_id = "%%";
 
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
@@ -70,6 +71,9 @@
 					url: "{{ route('report.getBinCard') }}",
                 	dataType: "json",
                 	dataSrc: "",
+                	data: f => {
+                		f.user_id = user_id;
+                	}
 				},
 				columns: [
 					{data: 'item', width: "50%"},
@@ -140,10 +144,40 @@
 				// 	init();
 				// }
 			});
+
+			initRhu();
 		});
 
+		function initRhu(){
+			$.ajax({
+				url: "{{ route('rhu.get') }}",
+				data: {
+					select: ['company_name', 'user_id'],
+				},
+				success: rhus => {
+					rhus = JSON.parse(rhus);
+
+					let rhuString = "";
+					rhus.forEach(rhu => {
+						rhuString += `
+							<option value="${rhu.user_id}">${rhu.company_name}</option>
+						`;
+					});
+
+					$('#user_id').append(rhuString);
+					$('#user_id').on('change', e => {
+						user_id = e.target.value;
+						reload();
+					});
+				}
+			});
+		}
+
 		function exportReport(){
-			window.open("/export/exportBinCard", "_blank");
+			let data = {
+				user_id: user_id
+			};
+			window.open("/export/exportBinCard?" + $.param(data), "_blank");
 		}
 	</script>
 @endpush

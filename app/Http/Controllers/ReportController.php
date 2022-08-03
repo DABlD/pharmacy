@@ -235,8 +235,8 @@ class ReportController extends Controller
         echo json_encode($array);
     }
     
-    public function getBinCard(){
-        $data = Data::orderBy('transaction_date', 'desc')->get();
+    public function getBinCard(Request $req){
+        $data = Data::where('user_id', 'like', $req->user_id)->orderBy('transaction_date', 'desc')->get();
 
         $data->load('transaction_type');
         $data->load('reorder.medicine.category');
