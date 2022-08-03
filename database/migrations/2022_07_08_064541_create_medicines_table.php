@@ -21,7 +21,7 @@ class CreateMedicinesTable extends Migration
             $table->unsignedSmallInteger("user_id");
             $table->unsignedSmallInteger("category_id");
 
-            $table->string("image")->default('images/default_medicine_avatar');
+            $table->string("image")->default('images/default_medicine_avatar.png');
             $table->string("code");
             $table->string("brand");
             $table->string("name");

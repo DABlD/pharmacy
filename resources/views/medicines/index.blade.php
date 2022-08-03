@@ -74,7 +74,7 @@
 				columns: [
 					{data: 'id'},
 					{data: 'category.name', visible: false},
-					{data: 'image', visible: false},
+					{data: 'image'},
 					{data: 'code'},
 					{data: 'brand'},
 					{data: 'name'},
@@ -98,6 +98,19 @@
 						render: (value, display, row) =>{;
 							return "₱" + parseFloat(value).toFixed(2);
 						}
+					},
+					{
+						targets: 2,
+						render: img =>{;
+							if(img){
+								return `
+									<img src="{{ asset("/") }}${img}" alt="Product Image" width="115px" height="60px">
+								`;
+							}
+							else{
+								return img;
+							}
+						}
 					}
 				],
 		        drawCallback: function (settings) {
@@ -113,7 +126,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="9">
+		                            		<td colspan="10">
 		                            			${medicine}
 		                            		</td>
 		                            	</tr>
@@ -143,15 +156,20 @@
 							`);
 						});
 					}
-				},
-		        initComplete: () => {
-		        }
+				}
 			});
 		});
 
 		function create(selectedCategory = null){
 			Swal.fire({
 				html: `
+					<div class="row iRow">
+					    <div class="col-md-3 iLabel">
+							<img src="{{ asset('images/default_medicine_avatar.png') }}" alt="Default Image" width="200px;" height="120px;">
+							<span style="center">Image</span>
+						</div>
+					</div>
+
 					<div class="row iRow">
 					    <div class="col-md-3 iLabel">
 					        Category
