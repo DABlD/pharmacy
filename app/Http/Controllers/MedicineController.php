@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{Category, Medicine, Reorder};
+use Image;
 use DB;
 
 class MedicineController extends Controller
@@ -112,6 +113,19 @@ class MedicineController extends Controller
 
     public function store(Request $req){
         $entry = new Medicine();
+
+        if($req->hasFile('image')){
+            $temp = $req->file('image');
+            $image = Image::make($temp);
+
+            $name = $req->name . '-' . time() . "." . $temp->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/');
+
+            $image->resize(250, 250);
+            $image->save($destinationPath . $name);
+            $entry->image = 'uploads/' . $name;
+        }
+
         $entry->user_id = $req->user_id ?? auth()->user()->id;
         $entry->category_id = $req->category_id;
         $entry->code = $req->code;

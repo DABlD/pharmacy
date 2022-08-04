@@ -158,6 +158,7 @@
 					}
 				}
 			});
+			create("Category 1");
 		});
 
 		function create(selectedCategory = null){
@@ -165,9 +166,15 @@
 				html: `
 					<div class="row iRow">
 					    <div class="col-md-3 iLabel">
-							<img src="{{ asset('images/default_medicine_avatar.png') }}" alt="Default Image" width="200px;" height="120px;">
-							<span style="center">Image</span>
+							Image
 						</div>
+					    <div class="col-md-9 iLabel center">
+					    	<img src="{{ asset('images/default_medicine_avatar.png') }}" alt="Default Image" width="200px;" height="120px;" id="preview">
+					    	<br>
+					    	<input type="file" class="swal2-file" placeholder="Upload Image" accept="image/*" name="image">
+					    	<br>
+					    	<br>
+					    </div>
 					</div>
 
 					<div class="row iRow">
@@ -219,6 +226,15 @@
 							}
 						}
 					})
+
+					$('[name="image"]').on('change', e => {
+					    var reader = new FileReader();
+					    reader.onload = function (e) {
+					        $('#preview').attr('src', e.target.result);
+					    }
+
+					    reader.readAsDataURL(e.target.files[0]);
+					});
 				},
 				preConfirm: () => {
 				    swal.showLoading();
@@ -248,27 +264,62 @@
 				},
 			}).then(result => {
 				if(result.value){
-					$.ajax({
-						url: "{{ route('medicine.store') }}",
-						type: "POST",
-						data: {
-							category_id: $("[name='category_id']").val(),
-							code: $("[name='code']").val(),
-							brand: $("[name='brand']").val(),
-							name: $("[name='name']").val(),
-							packaging: $("[name='packaging']").val(),
-							unit_price: $("[name='unit_price']").val(),
-							cost_price: $("[name='cost_price']").val(),
-							reorder_point: $("[name='reorder_point']").val(),
-							_token: $('meta[name="csrf-token"]').attr('content')
-						},
-						success: () => {
-							ss("Success");
-							reload();
-						}
-					})
+					uploadSKU({
+						image: $("[name='image']").prop('files')[0],
+						category_id: $("[name='category_id']").val(),
+						code: $("[name='code']").val(),
+						brand: $("[name='brand']").val(),
+						name: $("[name='name']").val(),
+						packaging: $("[name='packaging']").val(),
+						unit_price: $("[name='unit_price']").val(),
+						cost_price: $("[name='cost_price']").val(),
+						reorder_point: $("[name='reorder_point']").val(),
+						_token: $('meta[name="csrf-token"]').attr('content')
+					});
+
+					// $.ajax({
+					// 	url: "{{ route('medicine.store') }}",
+					// 	type: "POST",
+					// 	data: {
+					// 		category_id: $("[name='category_id']").val(),
+					// 		code: $("[name='code']").val(),
+					// 		brand: $("[name='brand']").val(),
+					// 		name: $("[name='name']").val(),
+					// 		packaging: $("[name='packaging']").val(),
+					// 		unit_price: $("[name='unit_price']").val(),
+					// 		cost_price: $("[name='cost_price']").val(),
+					// 		reorder_point: $("[name='reorder_point']").val(),
+					// 		_token: $('meta[name="csrf-token"]').attr('content')
+					// 	},
+					// 	success: () => {
+					// 		ss("Success");
+					// 		reload();
+					// 	}
+					// })
 				}
 			});
+		}
+
+		async function uploadSKU(data) {
+		    let formData = new FormData();
+		    formData.append('image', data.image);
+		    formData.append('category_id', data.category_id);
+		    formData.append('code', data.code);
+		    formData.append('brand', data.brand);
+		    formData.append('name', data.name);
+		    formData.append('packaging', data.packaging);
+		    formData.append('unit_price', data.unit_price);
+		    formData.append('cost_price', data.cost_price);
+		    formData.append('reorder_point', data.reorder_point);
+		    formData.append('_token', data._token);
+
+		    await fetch('{{ route('medicine.store') }}', {
+				method: "POST", 
+				body: formData
+		    });
+
+		    ss('Success');
+		    reload();
 		}
 
 		function createCategory(){

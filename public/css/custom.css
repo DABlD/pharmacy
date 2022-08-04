@@ -56,7 +56,11 @@
 }
 
 .center{
-	text-align: center;
+	text-align: center !important;
+}
+
+.bold{
+	font-weight: bold;
 }
 
 .nav-link.active{
