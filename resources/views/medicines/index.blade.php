@@ -59,16 +59,18 @@
 	<script src="{{ asset('js/select2.min.js') }}"></script>
 
 	<script>
+		var user_id = 1;
+
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
 				ajax: {
 					url: "{{ route('datatable.medicine') }}",
                 	dataType: "json",
                 	dataSrc:'',
-					data: {
-						select: "medicines.*",
-						load: ['category', 'reorder'],
-						where: ['r.user_id', "{{ auth()->user()->id }}"]
+					data: f => {
+						f.select = "medicines.*";
+						f.load = ['category', 'reorder'];
+						f.where = ['r.user_id', user_id];
 					}
 				},
 				columns: [
@@ -158,6 +160,31 @@
 					}
 				}
 			});
+
+			$.ajax({
+				url: '{{ route('rhu.get') }}',
+				data: {
+					select: ['user_id', 'company_name']
+				},
+				success: rhus => {
+					rhus = JSON.parse(rhus);
+
+					rhuString = "";
+					rhus.forEach(rhu => {
+						rhuString += `
+							<option value="${rhu.user_id}">${rhu.company_name}</option>
+						`;
+					});
+
+					$('#user_id').append(rhuString);
+					$('#user_id').select2();
+
+					$('#user_id').on('change', e => {
+						user_id = e.target.value;
+						reload();
+					});
+				}
+			})
 		});
 
 		function create(selectedCategory = null){
