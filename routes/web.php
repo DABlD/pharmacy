@@ -66,6 +66,7 @@ Route::group([
                     ->defaults("href", "/$cname");
 
                 Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::get("getPendingRequests/", ucfirst($cname) . "Controller@getPendingRequests")->name('getPendingRequests');
                 Route::get("create/", ucfirst($cname) . "Controller@create")->name('create');
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
@@ -83,7 +84,6 @@ Route::group([
             ], function () use($cname){
                 Route::get("receive/", ucfirst($cname) . "Controller@receive")
                     ->defaults("sidebar", 1)
-
                     ->defaults("icon", "fa-solid fa-handshake-simple")
                     ->defaults("name", "Receive")
                     ->defaults("roles", array("RHU"))

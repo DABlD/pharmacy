@@ -3,6 +3,54 @@
 
 <section class="content">
     <div class="container-fluid">
+        <div class="row">
+
+	        <div class="col-lg-3 col-6">
+	            <div class="small-box bg-info">
+	                <div class="inner">
+	                    <h3>
+	                    	For Approval:
+	                    	<span id="fa">0</span>
+	                    </h3>
+	                </div>
+
+	                <div class="icon">
+	                    <i class="fa-solid fa-clipboard-list-check"></i>
+	                </div>
+	            </div>
+	        </div>
+        	
+	        <div class="col-lg-3 col-6">
+	            <div class="small-box bg-warning">
+	                <div class="inner">
+	                    <h3>
+	                    	Approved:
+	                    	<span id="fi">0</span>
+	                    </h3>
+	                </div>
+
+	                <div class="icon">
+	                    <i class="fa-solid fa-check"></i>
+	                </div>
+	            </div>
+	        </div>
+
+	        <div class="col-lg-3 col-6">
+	            <div class="small-box bg-success">
+	                <div class="inner">
+	                    <h3>
+	                    	For Delivery:
+	                    	<span id="fd">0</span>
+	                    </h3>
+	                </div>
+
+	                <div class="icon">
+	                    <i class="fa-solid fa-truck-arrow-right"></i>
+	                </div>
+	            </div>
+	        </div>
+
+        </div>
 
         <div class="row">
             <section class="col-lg-12 connectedSortable">
@@ -55,6 +103,16 @@
 @push('styles')
 	<link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
+
+	<style>
+		.icon i{
+			font-size: 50px !important;
+		}
+
+		.bg-warning .inner{
+			color: white;
+		}
+	</style>
 @endpush
 
 @push('scripts')
@@ -180,11 +238,44 @@
 		        },
 			});
 			
+			initCount();
         	$('#search').on('change', e => {
         		search = e.target.value;
         		reload();
         	});
 		});
+
+		function initCount(){
+			$.ajax({
+				url: '{{ route("request.getPendingRequests") }}',
+				data: {
+					select: ['status'],
+				},
+				success: requests => {
+					requests = JSON.parse(requests);
+					
+					let fa = 0;
+					let fd = 0;
+					let fi = 0;
+
+					requests.forEach(request => {
+						if(request.status == "For Approval"){
+							fa++;
+						}
+						else if(request.status == "Approved"){
+							fi++;
+						}
+						else if(request.status == "For Delivery"){
+							fd++;
+						}
+					});
+
+					$('#fa').html(fa);
+					$('#fd').html(fd);
+					$('#fi').html(fi);
+				}
+			})
+		}
 
 		function updateStatus(id, action, status){
 			sc("Confirmation", `Are you sure you want to ${action}?`, result => {
@@ -249,5 +340,16 @@
 
 			window.open("/export/exportRequests?" + $.param(data), "_blank");
 		}
+
+		// REFRESH EVERY 60 SECONDS
+		function refresh(){
+			setTimeout(() => {
+				reload();
+				initCount();
+				refresh();
+				console.log('Refreshed');
+			}, 60000); //60 SECONDS
+		}
+		refresh();
 	</script>
 @endpush
