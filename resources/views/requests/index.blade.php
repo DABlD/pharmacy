@@ -73,7 +73,7 @@
 					data: f => {
 						f.table = 'requests';
 						f.select = ['requests.*'];
-						f.load = ['rhu', 'medicine.category'];
+						f.load = ['rhu', 'medicine.category', 'reorder'];
 						f.order = ["created_at", "desc"];
 						f.status = search;
 						@if(in_array(auth()->user()->role, ["RHU"]))
@@ -96,7 +96,7 @@
 						render: (stock, display, row) => {
 							return `
 								<div id="stock${row.id}">
-									${stock}
+									${row.reorder.stock}
 								</div>
 							`;
 						}
