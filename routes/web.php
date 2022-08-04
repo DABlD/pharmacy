@@ -83,7 +83,8 @@ Route::group([
             ], function () use($cname){
                 Route::get("receive/", ucfirst($cname) . "Controller@receive")
                     ->defaults("sidebar", 1)
-                    ->defaults("icon", "fa-thin fa-keyboard")
+
+                    ->defaults("icon", "fa-solid fa-handshake-simple")
                     ->defaults("name", "Receive")
                     ->defaults("roles", array("RHU"))
                     ->name('receive')
