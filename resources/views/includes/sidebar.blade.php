@@ -52,7 +52,7 @@
                             @endif
 
                             <li class="nav-item">
-                                <a class="nav-link {{ str_contains(request()->path(), $route->uri) ? 'active' : '' }}" href="{{ url($route->defaults['href']) }}">
+                                <a class="nav-link {{ request()->path() == $route->uri ? 'active' : '' }}" href="{{ url($route->defaults['href']) }}">
                                     <i class="nav-icon {{ $route->defaults['icon'] }}"></i> 
                                     <p>{{ $route->defaults['name'] }}</p>
                                 </a>
