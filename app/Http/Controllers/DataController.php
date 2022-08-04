@@ -49,6 +49,8 @@ class DataController extends Controller
     }
 
     public function store(Request $req){
+        $operator = null;
+
         foreach($req->data as $temp){
             $temp = (object)$temp;
 
@@ -70,7 +72,10 @@ class DataController extends Controller
             }
             $data->save();
 
-            $operator = TransactionType::find($data->transaction_types_id)->operator;
+            if($operator == null){
+                $operator = TransactionType::find($data->transaction_types_id)->operator;
+            }
+
             $this->updateStock($data->user_id, $data->medicine_id, $operator, $data->qty);
         }
     }
