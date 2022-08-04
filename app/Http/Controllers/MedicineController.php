@@ -152,11 +152,23 @@ class MedicineController extends Controller
     public function update(Request $req){
         $query = DB::table($this->table);
 
+        if($req->hasFile('images')){
+            $temp = $req->file('images');
+            $image = Image::make($temp);
+
+            $name = $req->name . '-' . time() . "." . $temp->getClientOriginalExtension();
+            $destinationPath = public_path('uploads/');
+
+            $image->resize(250, 250);
+            $image->save($destinationPath . $name);
+            $req->merge(['image' => 'uploads/' . $name]);
+        }
+
         if($req->where){
-            $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where']));
+            $query = $query->where($req->where[0], $req->where[1])->update($req->except(['id', '_token', 'where', 'images']));
         }
         else{
-            $query = $query->where('id', $req->id)->update($req->except(['id', '_token']));
+            $query = $query->where('id', $req->id)->update($req->except(['id', '_token', 'images']));
         }
     }
 

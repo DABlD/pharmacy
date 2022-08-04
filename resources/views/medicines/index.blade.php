@@ -171,8 +171,10 @@
 					    <div class="col-md-9 iLabel center">
 					    	<img src="{{ asset('images/default_medicine_avatar.png') }}" alt="Default Image" width="200px;" height="120px;" id="preview">
 					    	<br>
-					    	<input type="file" class="swal2-file" placeholder="Upload Image" accept="image/*" name="image">
+					    	<input type="file" id="file" class="d-none" placeholder="Upload Image" accept="image/*" name="image">
 					    	<br>
+							<label for="file">Upload Photo</label>
+							<br>
 					    	<br>
 					    </div>
 					</div>
@@ -276,26 +278,6 @@
 						reorder_point: $("[name='reorder_point']").val(),
 						_token: $('meta[name="csrf-token"]').attr('content')
 					});
-
-					// $.ajax({
-					// 	url: "{{ route('medicine.store') }}",
-					// 	type: "POST",
-					// 	data: {
-					// 		category_id: $("[name='category_id']").val(),
-					// 		code: $("[name='code']").val(),
-					// 		brand: $("[name='brand']").val(),
-					// 		name: $("[name='name']").val(),
-					// 		packaging: $("[name='packaging']").val(),
-					// 		unit_price: $("[name='unit_price']").val(),
-					// 		cost_price: $("[name='cost_price']").val(),
-					// 		reorder_point: $("[name='reorder_point']").val(),
-					// 		_token: $('meta[name="csrf-token"]').attr('content')
-					// 	},
-					// 	success: () => {
-					// 		ss("Success");
-					// 		reload();
-					// 	}
-					// })
 				}
 			});
 		}
@@ -457,10 +439,24 @@
 		}
 
 		function showDetails(medicine){
-			console.log(medicine);
 			Swal.fire({
 				html: `
 					@if(auth()->user()->role == "Admin")
+					<div class="row iRow">
+					    <div class="col-md-3 iLabel">
+							Image
+						</div>
+					    <div class="col-md-9 iLabel center">
+					    	<img src="{{ asset("/") }}${medicine.image}" alt="Default Image" width="200px;" height="120px;" id="preview">
+					    	<br>
+					    	<input type="file" id="file" class="d-none" placeholder="Upload Image" accept="image/*" name="image">
+					    	<br>
+							<label for="file">Update Photo</label>
+					    	<br>
+					    	<br>
+					    </div>
+					</div>
+
 					<div class="row iRow">
 					    <div class="col-md-3 iLabel">
 					        Category
@@ -510,6 +506,15 @@
 							$("[name='category_id']").val(medicine.category_id).trigger('change');
 						}
 					})
+
+					$('[name="image"]').on('change', e => {
+					    var reader = new FileReader();
+					    reader.onload = function (e) {
+					        $('#preview').attr('src', e.target.result);
+					    }
+
+					    reader.readAsDataURL(e.target.files[0]);
+					});
 				},
 				@endif
 				preConfirm: () => {
@@ -534,10 +539,9 @@
 				if(result.value){
 					swal.showLoading();
 					@if(auth()->user()->role == "Admin")
-					update({
-						url: "{{ route('medicine.update') }}",
-						data: {
+						updateSKU({
 							id: medicine.id,
+							image: $("[name='image']").prop('files')[0],
 							category_id: $("[name='category_id']").val(),
 							code: $("[name='code']").val(),
 							brand: $("[name='brand']").val(),
@@ -545,39 +549,49 @@
 							packaging: $("[name='packaging']").val(),
 							unit_price: $("[name='unit_price']").val(),
 							cost_price: $("[name='cost_price']").val(),
-						},
-					}, () => {
-						update({
-							url: "{{ route('medicine.updateReorder') }}",
-							data: {
-								where: [
-									"medicine_id", medicine.id,
-									"user_id", medicine.user_id
-								],
-								point: $("[name='reorder_point']").val(),
-							},
-							message: "Success"
-						}, () => {
-							reload();
-						})
-					})
-					@else
-						update({
-							url: "{{ route('medicine.updateReorder') }}",
-							data: {
-								where: [
-									"medicine_id", medicine.id,
-									"user_id", medicine.user_id
-								],
-								point: $("[name='reorder_point']").val(),
-							},
-							message: "Success"
-						}, () => {
-							reload();
-						})
+							_token: $('meta[name="csrf-token"]').attr('content')
+						});
 					@endif
+
+					update({
+						url: "{{ route('medicine.updateReorder') }}",
+						data: {
+							where: [
+								"medicine_id", medicine.id,
+								"user_id", medicine.user_id
+							],
+							point: $("[name='reorder_point']").val(),
+						},
+					});
 				}
 			});
+		}
+
+		async function updateSKU(data) {
+		    let formData = new FormData();
+		    formData.append('id', data.id);
+		    formData.append('category_id', data.category_id);
+		    formData.append('code', data.code);
+		    formData.append('brand', data.brand);
+		    formData.append('name', data.name);
+		    formData.append('packaging', data.packaging);
+		    formData.append('unit_price', data.unit_price);
+		    formData.append('cost_price', data.cost_price);
+		    formData.append('_token', data._token);
+
+		    if(data.image != undefined){
+		    	formData.append('images', data.image);
+		    }
+
+		    await fetch('{{ route('medicine.update') }}', {
+				method: "POST", 	
+				body: formData
+		    });
+
+		    setTimeout(() => {
+			    ss('Success');
+			    reload();
+		    }, 1000);
 		}
 
 		function del(id){
