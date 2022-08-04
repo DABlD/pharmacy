@@ -8,7 +8,7 @@
 </h3>
 <br><br>
 
-<div class="row">
+<div class="row" id="statusFilter">
     <div class="col-md-3">
         <div class="row iRow">
             <div class="col-md-4 iLabel" style="margin: auto;">

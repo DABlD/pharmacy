@@ -179,6 +179,8 @@
 	{{-- <script src="{{ asset('js/datatables-jquery.min.js') }}"></script> --}}
 
 	<script>
+		$('#statusFilter').remove();
+		
 		var category = 0;
 		var medicines = [];
 
