@@ -74,6 +74,11 @@
             @elseif(session('error'))
                 se({{ session('error') }});
             @endif
+
+            @if(in_array(auth()->user()->role, ['Admin', "Approver"]))
+                $("p:contains(Requesition Entry)").parent().find('i').removeClass('fa-keyboard').addClass('fa-desktop')
+                $("p:contains(Requesition Entry)").html('Request Monitoring');
+            @endif
         </script>
 
         @stack('scripts');
