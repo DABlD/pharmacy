@@ -529,6 +529,7 @@
 					se("Fill all fields");
 				}
 				else{
+					swal.showLoading();
 					$.ajax({
 						url: "{{ route('data.store') }}",
 						data: {
