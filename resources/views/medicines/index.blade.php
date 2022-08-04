@@ -158,7 +158,6 @@
 					}
 				}
 			});
-			create("Category 1");
 		});
 
 		function create(selectedCategory = null){
