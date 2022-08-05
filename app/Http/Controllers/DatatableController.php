@@ -281,11 +281,6 @@ class DatatableController extends Controller
 
         $array = $array->get();
 
-        // IF HAS GROUP
-        if($req->group){
-            $array = $array->groupBy($req->group);
-        }
-
         // IF HAS LOAD
         if($array->count() && $req->load){
             foreach($req->load as $table){
@@ -297,7 +292,31 @@ class DatatableController extends Controller
             $item->actions = $item->actions;
         }
 
-        echo json_encode($array->toArray());
+        // IF HAS GROUP
+        if($req->group){
+            $array = $array->groupBy($req->group);
+        }
+
+        // NEW FORMAT
+        // NEW FORMAT
+        // NEW FORMAT
+        $temp = [];
+        foreach($array as $requests){
+            $req = $requests[0];
+            $arr = [
+                "id" => $req->id,
+                "reference" => $req->reference,
+                "rhu" => ["company_name" => $req->rhu->company_name],
+                "requested_by" => $req->requested_by,
+                "transaction_date" => $req->transaction_date->toDateString(),
+                "status" => '',
+                "actions" => '',
+                "requests" => $requests
+            ];
+
+            array_push($temp, $arr);
+        }
+        echo json_encode($temp);
     }
 
     public function receive(Request $req){

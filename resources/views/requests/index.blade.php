@@ -72,15 +72,9 @@
                     	<table id="table" class="table table-hover">
                     		<thead>
                     			<tr>
-                    				<th>ID</th>
                     				<th>RHU</th>
                     				<th>Ref No</th>
                     				<th>Requestor</th>
-                    				<th>Category</th>
-                    				<th>Item</th>
-                    				<th>Stock</th>
-                    				<th>Request Qty</th>
-                    				<th>Approved Qty</th>
                     				<th>Request Date</th>
                     				<th>Status</th>
                     				<th>Action</th>
@@ -112,6 +106,27 @@
 		.bg-warning .inner{
 			color: white;
 		}
+
+		.reqRow{
+			font-size: 25px;
+			text-align: left;
+		}
+
+		.reqLabel{
+			font-weight: bold;
+		}
+
+		.reqRow:nth-child(2){
+			margin-top: 10px;
+		}
+
+		[name="approved_qty"]{
+			text-align: center;
+		}
+
+		#table2 tbody td{
+			vertical-align: middle;
+		}
 	</style>
 @endpush
 
@@ -121,6 +136,7 @@
 
 	<script>
 		var search = "%%";
+		var reqByRef = [];
 
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
@@ -134,6 +150,7 @@
 						f.load = ['rhu', 'medicine.category', 'reorder'];
 						f.order = ["created_at", "desc"];
 						f.status = search;
+						f.group = "reference";
 						@if(in_array(auth()->user()->role, ["RHU"]))
 							f.where = ["user_id", {{ auth()->user()->id }}];
 						@elseif(in_array(auth()->user()->role, ["Approver"]))
@@ -142,63 +159,38 @@
 					}
 				},
 				columns: [
-					{data: 'id'},
 					{data: 'rhu.company_name', visible: false},
 					{data: 'reference'},
 					{data: 'requested_by'},
-					{data: 'medicine.category.name'},
-					{data: 'medicine.name'},
-					{
-						data: 'stock', 
-						className: 'center',
-						render: (stock, display, row) => {
-							return `
-								<div id="stock${row.id}">
-									${row.reorder.stock}
-								</div>
-							`;
-						}
-					},
-					{data: 'request_qty', className: 'center'},
-					{
-						data: 'approved_qty', 
-						className: 'center',
-						width: "10%",
-						render: (qty, display, row) => {
-							@if(in_array(auth()->user()->role, ["Admin", "Approver"]))
-							if(row.status == "For Approval"){
-								return `
-									<div id=qty${row.id}>
-										${input("approved_qty", "", row.request_qty, 0, 12, 'number', ` min=1 max="${row.request_qty}"`)}
-									</div>
-								`;
-							}
-							else
-							@endif
-							{
-								if(qty == undefined){
-									return "N/A";
-								}
-								else{
-									return qty;
-								}
-							}
-						}
-					},
 					{
 						data: 'transaction_date',
 						render: date => {
 							return moment(date).format('MMM DD, YYYY');
 						}
 					},
-					{data: 'status'},
-					{data: 'actions'},
+					{data: 'status', visible: false},
+					{
+						data: 'actions', 
+						width: "10%",
+						render: (a, d, r) => {
+							let ref = r.reference;
+							reqByRef[ref] = r.requests;
+
+							return `
+								<a class='btn btn-success' data-toggle='tooltip' title='View' onClick="viewRequest('${ref}', false)">
+							        <i class='fas fa-search'></i>
+							    </a>&nbsp;
+							`;
+						}
+					},
 				],
         		order: [],
         		pageLength: 25,
+        		@if(auth()->user()->role == "Approver")
         		language: {
         			emptyTable: "No pending request for approval"
         		},
+        		@endif
         		rowCallback: function( row, data, index ) {
 				    if (data['id'] == null) {
 				        $(row).hide();
@@ -209,7 +201,7 @@
 		            let rows = api.rows({ page: 'current' }).nodes();
 		            let last = null;
 		 
-		            api.column(1, { page: 'current' })
+		            api.column(0, { page: 'current' })
 		                .data()
 		                .each(function (company, i, row) {
 		                    if (last !== company) {
@@ -217,7 +209,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="11">
+		                            		<td colspan="4">
 		                            			${company}
 		                            		</td>
 		                            	</tr>
@@ -277,40 +269,38 @@
 			})
 		}
 
-		function updateStatus(id, action, status){
-			sc("Confirmation", `Are you sure you want to ${action}?`, result => {
-				if(result.value){
-					swal.showLoading();
+		function updateStatus(id, action, status, ref = null){
+			swal.showLoading();
+			if(action == "Approve"){
+				let qty = $(`#qty${id}`).find('input');
+				let stock = $(`#stock${id}`).text().trim();
 
-
-					if(action == "Approve"){
-						let qty = $(`#qty${id}`).find('input');
-						let stock = $(`#stock${id}`).text().trim();
-
-						if(qty.val() < qty.attr('min') || qty.val() > qty.attr('max')){
-							Swal.fire({
-								icon: "error",
-								title: `Qty  must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`,
-							});
-						}
-						else if(parseInt(qty.val()) > parseInt(stock)){
-							Swal.fire({
-								icon: "error",
-								title: `Qty is greater than stock`,
-							});
-						}
-						else{
-							doUpdate(id, status, qty.val(), dateTimeNow());
-						}
-					}
-					else{
-						doUpdate(id, status);
-					}
+				if(qty.val() < qty.attr('min') || qty.val() > qty.attr('max')){
+					Swal.fire({
+						icon: "error",
+						title: `Qty  must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`,
+					}).then(() => {
+						viewRequest(ref, false);
+					});
 				}
-			});
+				else if(parseInt(qty.val()) > parseInt(stock)){
+					Swal.fire({
+						icon: "error",
+						title: `Qty is greater than stock`,
+					}).then(() => {
+						viewRequest(ref, false);
+					});
+				}
+				else{
+					doUpdate(id, status, qty.val(), dateTimeNow(), ref);
+				}
+			}
+			else{
+				doUpdate(id, status, 0, null, ref);
+			}
 		}
 
-		function doUpdate(id, status, qty = 0, date_approved = null){
+		function doUpdate(id, status, qty = 0, date_approved = null, ref){
 			update({
 				url: "{{ route('request.update') }}",
 				data: {
@@ -322,6 +312,7 @@
 				message: "Success"
 			}, () => {
 				reload();
+				viewRequest(ref);
 			})
 		}
 
@@ -339,6 +330,166 @@
 			};
 
 			window.open("/export/exportRequests?" + $.param(data), "_blank");
+		}
+
+		function viewRequest(reference, bool = true){
+			if(bool){
+				setTimeout(() => {
+					doViewRequest(reference);
+				}, 800);
+			}
+			else{
+				doViewRequest(reference);
+			}
+		}
+
+		function doViewRequest(reference){
+			let reqs = reqByRef[reference];
+			let reqString = "";
+			let reqName = null;
+			let reqReference = null;
+			let reqRequested_by = null;
+			let reqDate = null;
+
+			reqs.forEach(req => {
+				reqName = !reqName ? req.rhu.company_name : reqName;
+				reqReference = !reqReference ? req.reference : reqReference;
+				reqRequested_by = !reqRequested_by ? req.requested_by : reqRequested_by;
+				reqDate = !reqDate ? req.transaction_date : reqDate;
+
+				let aQty = req.approved_qty;
+				if(req.status == "For Approval"){
+					aQty = `
+						<div id=qty${req.id}>
+							${input("approved_qty", "", req.request_qty, 0, 12, 'number', ` min=1 max="${req.request_qty}"`)}
+						</div>
+					`;
+				}
+
+				let isChecked = req.status == "For Approval" ? "checked" : "disabled";
+
+				reqString += `
+					<tr>
+						<td>
+							<input type="checkbox" class="cb" data-id="${req.id}" ${isChecked}>
+						</td>
+						<td>${req.id}</td>
+						<td>${req.medicine.name}</td>
+						<td id="stock${req.id}">${req.reorder.stock}</td>
+						<td>${req.request_qty}</td>
+						<td id="qty${req.id}">${aQty}</td>
+						<td>${req.date_approved ? moment(req.date_approved).format(dateFormat2) : "-"}</td>
+						<td>${req.amount}</td>
+						<td>${req.status}</td>
+						<td>${req.actions}</td>
+					</tr>
+				`;
+			});
+
+			Swal.fire({
+				html: `
+					<div class="row reqRow">
+						<div class="col-md-5">
+							<div class="row">
+								<div class="col-md-5 reqLabel">
+									RHU:
+								</div>
+								<div class="col-md-7">
+									${reqName}
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2"></div>
+						<div class="col-md-5">
+							<div class="row">
+								<div class="col-md-5 reqLabel">
+									Reference:
+								</div>
+								<div class="col-md-7">
+									${reqReference}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row reqRow">
+						<div class="col-md-5">
+							<div class="row">
+								<div class="col-md-5 reqLabel">
+									Requestor:
+								</div>
+								<div class="col-md-7">
+									${reqRequested_by}
+								</div>
+							</div>
+						</div>
+						<div class="col-md-2"></div>
+						<div class="col-md-5">
+							<div class="row">
+								<div class="col-md-5 reqLabel">
+									Date:
+								</div>
+								<div class="col-md-7">
+									${moment(reqDate).format(dateFormat2)}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<br><br>
+					<table id="table2" class="table table-hover">
+						<thead>
+							<tr>
+								<th></th>
+								<th>ID</th>
+								<th>Item</th>
+								<th>Stock</th>
+								<th>Request Qty</th>
+								<th>Approved Qty</th>
+								<th>Date Approved</th>
+								<th>Amount</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							${reqString}
+						</tbody>
+					</table>
+				`,
+				didOpen: () => {
+					$('#table2').DataTable();
+				},
+				showClass: {
+					backdrop: 'swal2-noanimation',
+					popup: '',
+				},
+				hideClass: {
+					popup: '',
+				},
+				width: '70%',
+				confirmButtonText: "Approve Selected",
+				confirmButtonColor: successColor,
+				showDenyButton: true,
+				denyButtonText: 'Decline Selected',
+				denyButtonColor: errorColor,
+				showCancelButton: true,
+				cancelButtonText: "Exit"
+			}).then(result => {
+				console.log($('[name="approved_qty"]'));
+				if(result.value){
+					let ids = [];
+					console.log($('[name="approved_qty"]'));
+
+					$('.cb:checked').each((i, e) => {
+						console.log(e.dataset.id);
+					});
+				}
+				else if(result.isDenied){
+
+				}
+			});
 		}
 
 		// REFRESH EVERY 60 SECONDS

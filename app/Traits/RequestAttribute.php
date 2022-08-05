@@ -11,7 +11,7 @@ trait RequestAttribute{
 
 		if($this->status == "For Approval"){
 			if(in_array(auth()->user()->role, ["Admin", "Approver"])){
-		    	$string .= "<a class='btn btn-success' data-toggle='tooltip' title='Approve' onClick='updateStatus($id, `Approve`, `Approved`)'>" .
+		    	$string .= "<a class='btn btn-success' data-toggle='tooltip' title='Approve' onClick='updateStatus($id, `Approve`, `Approved`, `$ref`)'>" .
 			        "<i class='fas fa-check'></i>" .
 			    "</a>&nbsp;";
 			}
@@ -19,7 +19,7 @@ trait RequestAttribute{
 			$action = in_array(auth()->user()->role, ["Admin", "Approver"]) ? "Decline" : "Cancel";
 			$status = in_array(auth()->user()->role, ["Admin", "Approver"]) ? "Declined" : "Cancelled";
 
-	    	$string .= "<a class='btn btn-danger' data-toggle='tooltip' title='$action' onClick='updateStatus($id, `$action`, `$status`)'>" .
+	    	$string .= "<a class='btn btn-danger' data-toggle='tooltip' title='$action' onClick='updateStatus($id, `$action`, `$status`, `$ref`)'>" .
 		        "<i class='fas fa-ban'></i>" .
 		    "</a>&nbsp;";
 		}
