@@ -386,6 +386,9 @@
 				`;
 			});
 
+			let ids = [];
+			let qtys = [];
+
 			Swal.fire({
 				html: `
 					<div class="row reqRow">
@@ -468,6 +471,47 @@
 				hideClass: {
 					popup: '',
 				},
+				preConfirm: () => {
+					swal.showLoading();
+					return new Promise(resolve => {
+						ids = [];
+
+						$('.cb:checked').each((i, e) => {
+							ids.push(e.dataset.id);
+						});
+
+						ids.forEach(id => {
+							let stock = $(`#stock${id}`).text();
+							let qty = $(`#qty${id}`).find('input');
+							qtys[id] = qty.val();
+
+							$(qty).removeClass('glow');
+
+							if(qty.val() < qty.attr('min') || qty.val() > qty.attr('max')){
+								Swal.showValidationMessage(`Qty  must be ≥ ${qty.attr('min')} and ≤ ${qty.attr('max')}`);
+								$(qty).addClass('glow');
+							}
+							else if(parseInt(qty.val()) > parseInt(stock)){
+								Swal.showValidationMessage("Qty is greater than stock");
+								$(qty).addClass('glow');
+							}
+						});
+
+						resolve();
+					});
+				},
+				preDeny: () => {
+					swal.showLoading();
+					return new Promise(resolve => {
+						ids = [];
+
+						$('.cb:checked').each((i, e) => {
+							ids.push(e.dataset.id);
+						});
+
+						resolve();
+					});
+				},
 				width: '70%',
 				confirmButtonText: "Approve Selected",
 				confirmButtonColor: successColor,
@@ -477,17 +521,16 @@
 				showCancelButton: true,
 				cancelButtonText: "Exit"
 			}).then(result => {
-				console.log($('[name="approved_qty"]'));
 				if(result.value){
-					let ids = [];
-					console.log($('[name="approved_qty"]'));
-
-					$('.cb:checked').each((i, e) => {
-						console.log(e.dataset.id);
+					ids.forEach(id => {
+						console.log(qtys[id]);
+						doUpdate(id, "Approved", qtys[id], dateTimeNow(), reference);
 					});
 				}
 				else if(result.isDenied){
-
+					ids.forEach(id => {
+						doUpdate(id, "Declined", 0, null, reference);
+					});
 				}
 			});
 		}

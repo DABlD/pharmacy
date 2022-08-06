@@ -67,3 +67,8 @@
 	color: black !important;
 	background-color: rgba(255,255,255,.9) !important;
 }
+
+.glow{
+	border:  2px solid #f76c6b;
+	border-radius: 7px;
+}
