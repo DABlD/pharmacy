@@ -16,9 +16,9 @@ class ThemeSeeder extends Seeder
     {
         $array = [
             ["app_name", "SEDI"],
-            ["logo", 'images/sedi_banner.png'],
-            ["login_banner", "images/sedi_logo.png"],
-            ["login_bg", null],
+            ["logo_img", 'images/sedi_banner.png'],
+            ["login_banner_img", "images/sedi_logo.png"],
+            ["login_bg_img", null],
             ["sidebar_bg_color", "343a40"],
             ["table_header_color", "b96666"],
             ["table_header_font_color", "ffffff"],

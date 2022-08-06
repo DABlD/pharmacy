@@ -13,9 +13,9 @@
 	<link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css') }}">
 
 	<style>
-	@if(isset($theme['login_bg']))
+	@if(isset($theme['login_bg_img']))
 			.container-login100{
-				background-image: url({{ $theme['login_bg'] }});
+				background-image: url({{ $theme['login_bg_img'] }});
 				background-size: cover;
 				background-repeat: no-repeat;
 				background-position: center center;
@@ -29,7 +29,7 @@
 		<div class="container-login100">
 			<div class="wrap-login100">
 				<div class="login100-pic js-tilt" data-tilt>
-					<img src="{{ asset($theme['login_banner']); }}" width="500" height="300" alt="IMG">
+					<img src="{{ asset($theme['login_banner_img']); }}" width="500" height="300" alt="IMG">
 				</div>
 
 				<form class="login100-form validate-form" method="POST" action="{{ route('login'); }}">

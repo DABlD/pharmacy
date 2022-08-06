@@ -7,6 +7,13 @@
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
+            <a class="nav-link" role="button" onclick="logout()">
+                <i class="fa-solid fa-gear">
+                    Themes
+                </i>
+            </a>
+        </li>
+        <li class="nav-item">
             <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                 @csrf
                 <a class="nav-link" role="button" onclick="logout()">
