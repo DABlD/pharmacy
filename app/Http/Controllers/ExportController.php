@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Exports\Report;
 use Maatwebsite\Excel\Facades\Excel;
 
-use App\Models\{Data, Request as Req};
+use App\Models\{Data, Request as Req, TransactionType};
 
 class ExportController extends Controller
 {
@@ -216,39 +216,45 @@ class ExportController extends Controller
         $temp->load('reorder.medicine');
         $temp = $temp->groupBy('medicine_id');
 
-        $from = $req->from;
-        $to = $req->to;
+        $ttt = TransactionType::pluck('type');
 
-        $dates = array_reverse($this->getDates($from, $to));
         $array = [];
-
         foreach($temp as $group){
-            $total = $group[0]->reorder->stock;
-            $tempDates = [];
-            foreach($dates as $date){
-                foreach($group as $data){
-                    if($data->transaction_date == $date){
-                        if($data->transaction_type->operator == "+"){
-                            $total -= $data->{$req->view};
-                        }
-                        elseif($data->transaction_type->operator == "-"){
-                            $total += $data->{$req->view};
-                        }
+            $ei = 0;
+
+            foreach($ttt as $tt){
+                $tt = str_replace('.', '', $tt);
+                $tTypeTransaction[$tt] = 0;
+            }
+
+            foreach($group as $data){
+                $type = $data->transaction_type->type;
+                $type = str_replace('.', '', $type);
+                if(isset($tTypeTransaction[$type])){
+                    if($data->transaction_type->operator == "+"){
+                        $ei += $data->{$req->view};
+                        $tTypeTransaction[$type] += $data->{$req->view};
+                    }
+                    elseif($data->transaction_type->operator == "-"){
+                        $ei -= $data->{$req->view};
+                        $tTypeTransaction[$type] -= $data->{$req->view};
                     }
                 }
-                $tempDates[now()->parse($date)->format('M d')] = $total;
             }
 
             array_push($array, 
                 array_merge(
-                    ["Item" => $group[0]->reorder->medicine->name], 
-                    array_reverse($tempDates)
+                    array_merge(
+                        ["item" => $group[0]->reorder->medicine->name], 
+                        $tTypeTransaction
+                    ),
+                    ["Ending $req->view" => $ei]
                 ),
             );
         }
 
         $headers = array_keys($array[0]);
-        $title = "Daily Sheet Report - $from to $to";
+        $title = "Daily Sheet Report - $req->from to $req->to";
         return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
