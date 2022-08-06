@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data, Alert};
+use App\Models\{Data, Alert, TransactionType};
 
 class ReportController extends Controller
 {
@@ -201,33 +201,39 @@ class ReportController extends Controller
         $temp->load('reorder.medicine');
         $temp = $temp->groupBy('medicine_id');
 
-        $from = $req->from;
-        $to = $req->to;
+        $ttt = TransactionType::pluck('type');
 
-        $dates = array_reverse($this->getDates($from, $to));
         $array = [];
-
         foreach($temp as $group){
-            $total = $group[0]->reorder->stock;
-            $tempDates = [];
-            foreach($dates as $date){
-                foreach($group as $data){
-                    if($data->transaction_date == $date){
-                        if($data->transaction_type->operator == "+"){
-                            $total -= $data->{$req->view};
-                        }
-                        elseif($data->transaction_type->operator == "-"){
-                            $total += $data->{$req->view};
-                        }
+            $ei = 0;
+
+            foreach($ttt as $tt){
+                $tt = str_replace('.', '', $tt);
+                $tTypeTransaction[$tt] = 0;
+            }
+
+            foreach($group as $data){
+                $type = $data->transaction_type->type;
+                $type = str_replace('.', '', $type);
+                if(isset($tTypeTransaction[$type])){
+                    if($data->transaction_type->operator == "+"){
+                        $ei += $data->{$req->view};
+                        $tTypeTransaction[$type] += $data->{$req->view};
+                    }
+                    elseif($data->transaction_type->operator == "-"){
+                        $ei -= $data->{$req->view};
+                        $tTypeTransaction[$type] -= $data->{$req->view};
                     }
                 }
-                $tempDates[now()->parse($date)->format('M d')] = $total;
             }
 
             array_push($array, 
                 array_merge(
-                    ["item" => $group[0]->reorder->medicine->name], 
-                    $tempDates
+                    array_merge(
+                        ["item" => $group[0]->reorder->medicine->name], 
+                        $tTypeTransaction
+                    ),
+                    ["Ending $req->view" => $ei]
                 ),
             );
         }

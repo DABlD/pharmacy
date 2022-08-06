@@ -40,6 +40,12 @@
 	<link rel="stylesheet" href="{{ asset('css/datatables.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('css/select2.min.css') }}">
 	{{-- <link rel="stylesheet" href="{{ asset('css/datatables-jquery.min.css') }}"> --}}
+
+	<style>
+		table tbody td{
+			text-align: center;
+		}
+	</style>
 @endpush
 
 @push('scripts')
@@ -101,9 +107,9 @@
 				to = e.target.value;
 			});
 
-			// $("#view").on('change', e => {
-			// 	view = e.target.value;
-			// });
+			$("#view").on('change', e => {
+				view = e.target.value;
+			});
 
 			$("#bhc_id").on('change', e => {
 				bhc_id = e.target.value;
@@ -115,26 +121,6 @@
 
 		function createTable(){
 			getColumns();
-			table = $('#table').DataTable({
-				ajax: {
-					url: "{{ route('report.getDailySheet') }}",
-                	dataType: "json",
-                	dataSrc: "",
-					data: f => {
-						f.bhc_id = bhc_id;
-						f.from = from;
-						f.to = to;
-						f.view = view;
-					}
-				},
-        		scrollX: true,
-				columns: columns,
-        		pageLength: 25,
-        		order: []
-			});
-
-			$('#table_filter').remove();
-			$('#table').css('width', '100%');
 		}
 
 		function getColumns(){
@@ -144,18 +130,49 @@
 				title: 'Item'
 			});
 
-			let temp = from;
-			while(temp <= to){
-				let temp2 = moment(temp).format("MMM DD");
-				let temp3 = moment(temp).format("MMM DD (ddd)");
+			$.ajax({
+				url: "{{ route('transactionType.get') }}",
+				data: {
+					select: ["id", "type", "operator"],
+					whereNotNull: 'operator'
+				},
+				success: types => {
+					types = JSON.parse(types);
 
-				columns.push({
-					data: temp2,
-					title: temp3
-				});
+					types.forEach(type => {
+						columns.push({
+							data: type.type.replace('.', ''),
+							title: type.type + ` (${type.operator})`
+						});
+					});
 
-				temp = moment(temp).add('1', 'day').format(dateFormat);
-			}
+					columns.push({
+						data: "Ending " + view,
+						title: "Ending " + view
+					});
+
+					table = $('#table').DataTable({
+						ajax: {
+							url: "{{ route('report.getDailySheet') }}",
+		                	dataType: "json",
+		                	dataSrc: "",
+							data: f => {
+								f.bhc_id = bhc_id;
+								f.from = from;
+								f.to = to;
+								f.view = view;
+							}
+						},
+		        		scrollX: true,
+						columns: columns,
+		        		pageLength: 25,
+		        		order: []
+					});
+
+					$('#table_filter').remove();
+					$('#table').css('width', '100%');
+				}
+			})
 		}
 
 		function filter(){

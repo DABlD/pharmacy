@@ -31,6 +31,11 @@ class TransactionTypeController extends Controller
             $array = $array->where($req->where[0], $req->where[1]);
         }
 
+        // IF HAS WHERENOTNULL
+        if($req->whereNotNull){
+            $array = $array->whereNotNull($req->whereNotNull);
+        }
+
         $array = $array->get();
 
         // IF HAS LOAD

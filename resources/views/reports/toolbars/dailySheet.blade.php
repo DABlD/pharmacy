@@ -15,7 +15,7 @@
 
 	<div class="col-md-3">
 
-	    {{-- <div class="row iRow">
+	    <div class="row iRow">
 	        <div class="col-md-4 iLabel" style="margin: auto;">
 	            View
 	        </div>
@@ -25,7 +25,7 @@
 	        		<option value="amount">Amount</option>
 	        	</select>
 	        </div>
-	    </div> --}}
+	    </div>
 
 	</div>
 
