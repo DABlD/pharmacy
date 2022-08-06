@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <title>{{ "BG Pharmacy | " . $title }}</title>
+        <title>{{ $theme['app_name'] . " | " . $title }}</title>
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
         <link rel="stylesheet" href="{{ asset('fonts/fontawesome.min.css') }}">
@@ -16,6 +16,30 @@
         <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
         <link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css') }}">
         <link rel="stylesheet" href="{{ asset('css/flatpickr.min.css') }}">
+
+        <style>
+            [class*=sidebar-dark-]{
+                background-color: #{{ $theme['sidebar_bg_color'] }} !important;
+            }
+            thead tr{
+                background-color: #{{ $theme['table_header_color'] }} !important;
+            }
+            thead td{
+                color: #{{ $theme['table_header_font_color'] }} !important;
+            }
+            tr.group{
+                background-color: #{{ $theme['table_group_color'] }} !important;
+            }
+            tr.group td{
+                color: #{{ $theme['table_group_font_color'] }} !important;
+            }
+            .sidebar a{
+                color: #{{ $theme['sidebar_text_color'] }} !important;
+            }
+            .sidebar nav-link.active{
+                color: black !important;
+            }
+        </style>
 
         @stack('styles')
 
