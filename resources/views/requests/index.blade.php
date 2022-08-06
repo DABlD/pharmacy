@@ -523,7 +523,6 @@
 			}).then(result => {
 				if(result.value){
 					ids.forEach(id => {
-						console.log(qtys[id]);
 						doUpdate(id, "Approved", qtys[id], dateTimeNow(), reference);
 					});
 				}
