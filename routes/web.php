@@ -383,7 +383,17 @@ Route::group([
                 Route::get($cname . "Requests/", ucfirst($cname) . "Controller@$cname" . "Requests")->name($cname . "Requests");
             }
         );
-        
+
+        // LOCATION ROUTES
+        $cname = "theme";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+            }
+        );
 
         // DATATABLES
         $cname = "datatable";

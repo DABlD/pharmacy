@@ -19,12 +19,12 @@ class ThemeSeeder extends Seeder
             ["logo_img", 'images/sedi_banner.png'],
             ["login_banner_img", "images/sedi_logo.png"],
             ["login_bg_img", null],
-            ["sidebar_bg_color", "343a40"],
-            ["table_header_color", "b96666"],
-            ["table_header_font_color", "ffffff"],
-            ["sidebar_text_color", "c2c7d0"],
-            ["table_group_color", "66b966"],
-            ["table_group_font_color", "ffffff"],
+            ["sidebar_bg_color", "#343a40"],
+            ["sidebar_font_color", "#c2c7d0"],
+            ["table_header_color", "#b96666"],
+            ["table_header_font_color", "#ffffff"],
+            ["table_group_color", "#66b966"],
+            ["table_group_font_color", "#ffffff"],
         ];
 
         foreach($array as $theme){

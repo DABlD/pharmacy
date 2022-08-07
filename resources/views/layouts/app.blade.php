@@ -19,22 +19,22 @@
 
         <style>
             [class*=sidebar-dark-]{
-                background-color: #{{ $theme['sidebar_bg_color'] }} !important;
+                background-color: {{ $theme['sidebar_bg_color'] }} !important;
             }
             thead tr{
-                background-color: #{{ $theme['table_header_color'] }} !important;
+                background-color: {{ $theme['table_header_color'] }} !important;
             }
             thead td{
-                color: #{{ $theme['table_header_font_color'] }} !important;
-            }
-            tr.group{
-                background-color: #{{ $theme['table_group_color'] }} !important;
+                color: {{ $theme['table_header_font_color'] }} !important;
             }
             tr.group td{
-                color: #{{ $theme['table_group_font_color'] }} !important;
+                background-color: {{ $theme['table_group_color'] }} !important;
+            }
+            tr.group td{
+                color: {{ $theme['table_group_font_color'] }} !important;
             }
             .sidebar a{
-                color: #{{ $theme['sidebar_text_color'] }} !important;
+                color: {{ $theme['sidebar_font_color'] }} !important;
             }
             .sidebar nav-link.active{
                 color: black !important;
