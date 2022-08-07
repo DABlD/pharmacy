@@ -296,9 +296,14 @@ class ReportController extends Controller
 
         $dates = $this->getDates($from, $to);
         $data = Data::whereBetween('transaction_date', [$from, $to])
-                        ->whereIn('transaction_types_id', [2,3])
+                        ->whereIn('transaction_types_id', [2,3]);
                         // ->where('user_id', '>', 1)
-                        ->get();
+
+        if(auth()->user()->role == "RHU"){
+            $data->where('user_id', auth()->user()->id);
+        }
+
+        $data = $data->get();
         
         $data->load('rhu');
         $data = $data->groupBy('user_id');
@@ -348,7 +353,12 @@ class ReportController extends Controller
         $to = now()->toDateString();
 
         $dates = $this->getDates($from, $to);
-        $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty'])->get();
+        $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty']);
+
+        if(auth()->user()->role == "RHU"){
+            $data->where('user_id', auth()->user()->id);
+        }
+        $data = $data->get();
 
         $temp = [];
         foreach($dates as $date){
@@ -378,13 +388,6 @@ class ReportController extends Controller
 
         echo json_encode(['labels' => $labels, 'dataset' => $dataset]);
     }
-
-    // labels: ['test1', 'test2', 'test3', 'test4'],
-
-    // label: 'label1',
-    // data: [4, 7, 10],
-    // borderColor: Math.floor(Math.random()*16777215).toString(16),
-    // backgroundColor: Math.floor(Math.random()*16777215).toString(16),
 
     private function getDates($from, $to){
         $dates = [];
