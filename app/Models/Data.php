@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use App\Models\{Bhc, TransactionType, Reorder};
+use App\Models\{Bhc, TransactionType, Reorder, Rhu};
 
 class Data extends Model
 {
@@ -26,6 +26,10 @@ class Data extends Model
 
     public function transaction_type(){
         return $this->hasOne(TransactionType::class, 'id', 'transaction_types_id');
+    }
+
+    public function rhu(){
+        return $this->hasOne(Rhu::class, 'user_id', 'user_id');
     }
 
     public function bhc(){

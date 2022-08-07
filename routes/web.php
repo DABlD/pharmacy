@@ -362,6 +362,10 @@ Route::group([
                     ->defaults("href", "/$cname/alert");
 
                 Route::get("getAlert/", ucfirst($cname) . "Controller@getAlert")->name('getAlert');
+
+                // DASHBOARD CHARTS
+                Route::get("salesPerRhu/", ucfirst($cname) . "Controller@salesPerRhu")->name('salesPerRhu');
+                Route::get("deliveredRequests/", ucfirst($cname) . "Controller@deliveredRequests")->name('deliveredRequests');
             }
         );
 

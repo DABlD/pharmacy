@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data, Alert, TransactionType};
+use App\Models\{Data, Alert, TransactionType, Rhu, Request as Req};
 
 class ReportController extends Controller
 {
@@ -289,6 +289,102 @@ class ReportController extends Controller
         $data = Alert::orderBy('created_at', 'desc')->get();
         echo json_encode($data);
     }
+
+    public function salesPerRhu(){
+        $from = now()->subDays(6)->toDateString();
+        $to = now()->toDateString();
+
+        $dates = $this->getDates($from, $to);
+        $data = Data::whereBetween('transaction_date', [$from, $to])
+                        ->whereIn('transaction_types_id', [2,3])
+                        // ->where('user_id', '>', 1)
+                        ->get();
+        
+        $data->load('rhu');
+        $data = $data->groupBy('user_id');
+        $rhus = Rhu::whereIn('user_id', array_keys($data->toArray()))->pluck('company_name', 'user_id');
+
+        $labels = [];
+        foreach($data as $id => $a){
+            foreach($dates as $date){
+                $date = now()->parse($date)->toDateString();
+                $temp[$id][$date] = 0;
+            }
+        }
+
+        foreach($data as $id => $rhuTransactions){
+            foreach($rhuTransactions as $transaction){
+                if($transaction->transaction_types_id == 2){
+                    $temp[$id][now()->parse($transaction->transaction_date)->toDateString()] += $transaction->amount;
+                }
+                else{
+                    $temp[$id][now()->parse($transaction->transaction_date)->toDateString()] -= $transaction->amount;
+                }
+            }
+        }
+
+        $labels = [];
+        foreach($dates as $date){
+            array_push($labels, now()->parse($date)->format('M d'));
+        }
+
+        $dataset = [];
+        foreach($temp as $id => $data){
+            $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+            array_push($dataset, [
+                'label' => $rhus[$id],
+                'data' => array_values($data),
+                'borderColor' => $color,
+                'backgroundColor' => $color,
+                'hoverRadius' => 10
+            ]);
+        }
+
+        echo json_encode(['labels' => $labels, 'dataset' => $dataset]);
+    }
+
+    public function deliveredRequests(){
+        $from = now()->subDays(6)->toDateString();
+        $to = now()->toDateString();
+
+        $dates = $this->getDates($from, $to);
+        $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty'])->get();
+
+        $temp = [];
+        foreach($dates as $date){
+            $date = now()->parse($date)->toDateString();
+            $temp[$date] = 0;
+        }
+
+        foreach($data as $request){
+            $temp[now()->parse($request->received_date)->toDateString()]++;
+        }
+
+        $labels = [];
+        foreach($dates as $date){
+            array_push($labels, now()->parse($date)->format('M d'));
+        }
+
+        $color = sprintf('#%06X', mt_rand(0, 0xFFFFFF));
+        $dataset = [
+            [
+                'label' => "Delivered Request",
+                'data' => array_values($temp),
+                'borderColor' => $color,
+                'backgroundColor' => $color,
+                'hoverRadius' => 10
+            ]
+        ];
+
+        echo json_encode(['labels' => $labels, 'dataset' => $dataset]);
+    }
+
+    // labels: ['test1', 'test2', 'test3', 'test4'],
+
+    // label: 'label1',
+    // data: [4, 7, 10],
+    // borderColor: Math.floor(Math.random()*16777215).toString(16),
+    // backgroundColor: Math.floor(Math.random()*16777215).toString(16),
 
     private function getDates($from, $to){
         $dates = [];
