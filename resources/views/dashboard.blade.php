@@ -65,10 +65,6 @@
                             datasets: result.dataset
                         }
                     });
-
-                    let height = $('.content-wrapper').height() / 3;
-                    myChart.canvas.parentNode.style.height = height + "px";
-                    $('#sales').parent().height($('#sales').height());
                     swal.close();
                 }
             })
@@ -87,9 +83,6 @@
                         }
                     });
 
-                    let height = $('.content-wrapper').height() / 3;
-                    myChart.canvas.parentNode.style.height = height + "px";
-                    $('#deliveredRequests').parent().height($('#deliveredRequests').height());
                     swal.close();
                 }
             })
