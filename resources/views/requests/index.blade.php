@@ -153,8 +153,8 @@
 						f.group = "reference";
 						@if(in_array(auth()->user()->role, ["RHU"]))
 							f.where = ["user_id", {{ auth()->user()->id }}];
-						@elseif(in_array(auth()->user()->role, ["Approver"]))
-							f.where = ["status", "For Approval"];
+						{{-- @elseif(in_array(auth()->user()->role, ["Approver"])) --}}
+							// f.where = ["status", "For Approval"];
 						@endif
 					}
 				},
@@ -358,6 +358,7 @@
 				reqDate = !reqDate ? req.transaction_date : reqDate;
 
 				let aQty = req.approved_qty;
+				@if(auth()->user()->role != "RHU")
 				if(req.status == "For Approval"){
 					aQty = `
 						<div id=qty${req.id}>
@@ -365,6 +366,7 @@
 						</div>
 					`;
 				}
+				@endif
 
 				let isChecked = req.status == "For Approval" ? "checked" : "disabled";
 
@@ -381,7 +383,7 @@
 						<td>${req.date_approved ? moment(req.date_approved).format(dateFormat2) : "-"}</td>
 						<td>${req.amount}</td>
 						<td>${req.status}</td>
-						<td>${req.actions}</td>
+						<td>${req.status == "For Approval" || req.status == "Approved" ? req.actions : ""}</td>
 					</tr>
 				`;
 			});
@@ -513,11 +515,18 @@
 					});
 				},
 				width: '70%',
-				confirmButtonText: "Approve Selected",
-				confirmButtonColor: successColor,
-				showDenyButton: true,
-				denyButtonText: 'Decline Selected',
-				denyButtonColor: errorColor,
+				@if(auth()->user()->role == "RHU")
+					showDenyButton: true,
+					denyButtonText: 'Cancel Selected',
+					denyButtonColor: errorColor,
+					showConfirmButton: false,
+				@else
+					confirmButtonText: "Approve Selected",
+					confirmButtonColor: successColor,
+					showDenyButton: true,
+					denyButtonText: 'Decline Selected',
+					denyButtonColor: errorColor,
+				@endif
 				showCancelButton: true,
 				cancelButtonText: "Exit"
 			}).then(result => {
@@ -528,7 +537,7 @@
 				}
 				else if(result.isDenied){
 					ids.forEach(id => {
-						doUpdate(id, "Declined", 0, null, reference);
+						doUpdate(id, "{{ auth()->user()->role == "RHU" ? "Cancelled" : "Declined" }}", 0, null, reference);
 					});
 				}
 			});
