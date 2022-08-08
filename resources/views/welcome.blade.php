@@ -57,7 +57,7 @@
         <header class="section-header">
           <h5 style="text-align: center; margin-top: 10px;">
           Pharmaceutical Inventory Management System<br>
-          <a href="/sedi/login.php" style="text-decoration: none;"><button style="margin-top: 10px; background-color: #F25420; color: #FFFFFF;" type="button" class="btn btn-warning">LOGIN</button></a>
+          {{-- <a href="/sedi/login.php" style="text-decoration: none;"><button style="margin-top: 10px; background-color: #F25420; color: #FFFFFF;" type="button" class="btn btn-warning">LOGIN</button></a> --}}
           </h5>
           <div class="intro-info">
         </div>
