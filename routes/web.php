@@ -17,19 +17,19 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
+Route::view('/', 'welcome');
 
 Route::group([
         'middleware' => 'auth',
     ], function() {
-        Route::get('/', "DashboardController@index")->name('dashboard');
 
-        Route::get('/', 'DashboardController@index')
+        Route::get('dashboard', 'DashboardController@index')
             ->defaults('sidebar', 1)
             ->defaults('icon', 'fas fa-list')
             ->defaults('name', 'Dashboard')
             ->defaults('roles', array('Admin', 'RHU'))
             ->name('dashboard')
-            ->defaults('href', '/');
+            ->defaults('href', 'dashboard');
 
         // DATA ROUTES
         $cname = "data";
