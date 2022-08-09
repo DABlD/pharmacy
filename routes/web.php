@@ -31,26 +31,6 @@ Route::group([
             ->name('dashboard')
             ->defaults('href', 'dashboard');
 
-        // DATA ROUTES
-        $cname = "data";
-        Route::group([
-                'as' => "$cname.",
-                'prefix' => "$cname/"
-            ], function () use($cname){
-                Route::get("/", ucfirst($cname) . "Controller@index")
-                    ->defaults("sidebar", 1)
-                    ->defaults("icon", "fa-solid fa-keyboard")
-                    ->defaults("name", "Data Entry")
-                    ->defaults("roles", array("Admin", "RHU"))
-                    ->name($cname)
-                    ->defaults("href", "/$cname");
-
-                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
-                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
-                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
-            }
-        );
-
         // REQUEST ROUTES
         $cname = "request";
         Route::group([
@@ -73,6 +53,26 @@ Route::group([
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
 
                 Route::get("inputInfo", ucfirst($cname) . "Controller@inputInfo")->name('inputInfo');
+            }
+        );
+
+        // DATA ROUTES
+        $cname = "data";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-keyboard")
+                    ->defaults("name", "Data Entry")
+                    ->defaults("roles", array("Admin", "RHU"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
             }
         );
 
