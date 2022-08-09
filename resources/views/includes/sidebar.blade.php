@@ -1,7 +1,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="{{ url("/") }}" class="brand-link">
-        <img src="{{ asset($theme['logo_img']) }}" alt="Pharmacy Logo" class="brand-image elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">ㅤ</span>
+        <center>
+            <img src="{{ asset($theme['logo_img']) }}" alt="Pharmacy Logo" class="brand-image elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">ㅤ</span>
+        </center>
     </a>
 
     <div class="sidebar">

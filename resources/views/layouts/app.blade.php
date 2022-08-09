@@ -39,6 +39,9 @@
             .sidebar nav-link.active{
                 color: black !important;
             }
+            .brand-link .brand-image{
+                float:  none !important;
+            }
         </style>
 
         @stack('styles')
