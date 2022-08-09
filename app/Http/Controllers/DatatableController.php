@@ -191,6 +191,8 @@ class DatatableController extends Controller
             $temp->unit_price = null;
             $temp->cost_price = null;
             $temp->reorder = (object)["point" => null, "stock" => null];
+            $temp->point = null;
+            $temp->rs = null;
             $temp->actions = null;
 
             $array->push($temp);

@@ -68,7 +68,7 @@
                 	dataType: "json",
                 	dataSrc:'',
 					data: f => {
-						f.select = "medicines.*";
+						f.select = ["medicines.*", "r.stock as rs", "r.point"];
 						f.load = ['category', 'reorder'];
 						f.where = ['r.user_id', user_id];
 					}
@@ -83,8 +83,8 @@
 					{data: 'packaging'},
 					{data: 'unit_price'},
 					{data: 'cost_price'},
-					{data: 'reorder.point'},
-					{data: 'reorder.stock'},
+					{data: 'point'},
+					{data: 'rs'},
 					{data: 'actions'},
 				],
         		order: [[1, 'asc']],
