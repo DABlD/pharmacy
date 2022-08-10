@@ -327,6 +327,7 @@
 					date_approved: date_approved
 				}
 			}, () => {
+				console.log(bool);
 				if(bool){
 					ss('Successfully ' + status);
 					reload();
@@ -549,9 +550,9 @@
 				showCancelButton: true,
 				cancelButtonText: "Exit"
 			}).then(result => {
+				let ctr = 0;
 				if(result.value){
 					swal.showLoading();
-					let ctr = 0;
 					ids.forEach(id => {
 						ctr++;
 						doUpdate2(id, "Approved", qtys[id], dateTimeNow(), reference, ctr == ids.length);
@@ -560,7 +561,8 @@
 				else if(result.isDenied){
 					swal.showLoading();
 					ids.forEach(id => {
-						doUpdate2(id, "{{ auth()->user()->role == "RHU" ? "Cancelled" : "Declined" }}", 0, null, reference);
+						ctr++;
+						doUpdate2(id, "{{ auth()->user()->role == "RHU" ? "Cancelled" : "Declined" }}", 0, null, reference, ctr == ids.length);
 					});
 				}
 			});
