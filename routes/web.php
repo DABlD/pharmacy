@@ -286,7 +286,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-solid fa-box-circle-check")
                     ->defaults("name", "Inventory")
-                    ->defaults("roles", array("Admin"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->defaults("group", "Reports")
                     ->name('inventory')
                     ->defaults("href", "/$cname/inventory");
@@ -300,7 +300,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-solid fa-dollar-sign")
                     ->defaults("name", "Sales")
-                    ->defaults("roles", array("Admin"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->defaults("group", "Reports")
                     ->name('sales')
                     ->defaults("href", "/$cname/sales");
@@ -314,7 +314,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-solid fa-hand-holding-dollar")
                     ->defaults("name", "Purchase Order")
-                    ->defaults("roles", array("Admin"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->defaults("group", "Reports")
                     ->name('purchaseOrder')
                     ->defaults("href", "/$cname/purchaseOrder");
@@ -328,7 +328,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-solid fa-files")
                     ->defaults("name", "Daily Sheets")
-                    ->defaults("roles", array("Admin"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->defaults("group", "Reports")
                     ->name('dailySheet')
                     ->defaults("href", "/$cname/dailySheet");
@@ -342,7 +342,7 @@ Route::group([
                     ->defaults("sidebar", 1)
                     ->defaults("icon", "fa-solid fa-cards-blank")
                     ->defaults("name", "Bin Card")
-                    ->defaults("roles", array("Admin"))
+                    ->defaults("roles", array("Admin", "RHU"))
                     ->defaults("group", "Reports")
                     ->name('binCard')
                     ->defaults("href", "/$cname/binCard");
