@@ -6,6 +6,7 @@
     </ul>
 
     <ul class="navbar-nav ml-auto">
+        @if(auth()->user()->role == "Admin")
         <li class="nav-item">
             <a class="nav-link" role="button" onclick="openThemes()">
                 <i class="fa-solid fa-gear">
@@ -13,6 +14,7 @@
                 </i>
             </a>
         </li>
+        @endif
         <li class="nav-item">
             <form action="{{ route('logout') }}" method="POST" id="logoutForm">
                 @csrf
