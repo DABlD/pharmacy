@@ -399,6 +399,7 @@
 		}
 
 		function submit(){
+			swal.showLoading();
 			let items = $('.item');
 
 			if(items.length){

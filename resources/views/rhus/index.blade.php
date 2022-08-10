@@ -427,8 +427,9 @@
 									initListener2();
 								}
 							}).then(result => {
+								console.log('loading');
+								swal.showLoading();
 								if(result.value){
-									swal.showLoading();
 									$.ajax({
 										url: "{{ route('medicine.assign') }}",
 										type: "GET",
