@@ -353,7 +353,8 @@ class ReportController extends Controller
         $to = now()->toDateString();
 
         $dates = $this->getDates($from, $to);
-        $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty']);
+        $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty'])
+                    ->whereBetween('received_date', [$from, $to]);
 
         if(auth()->user()->role == "RHU"){
             $data->where('user_id', auth()->user()->id);
