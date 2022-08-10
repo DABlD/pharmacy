@@ -47,8 +47,13 @@ class ReportController extends Controller
         $temp = Data::where('transaction_types_id', $req->tType)
             ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
-            ->whereBetween('transaction_date', [$req->from, $req->to])
-            ->get();
+            ->whereBetween('transaction_date', [$req->from, $req->to]);
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('reorder.medicine');
         $temp->load('transaction_type');

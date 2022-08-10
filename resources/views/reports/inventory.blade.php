@@ -50,8 +50,8 @@
 	<script>
 		var columns = [];
 		var outlet = "%%";
-		var tType = 3;
-		var from = moment().subtract(10, 'days').format(dateFormat);
+		var tType = 1;
+		var from = moment().subtract(7, 'days').format(dateFormat);
 		var to = dateNow();
 		var view = "qty";
 		var table = null;
@@ -109,6 +109,7 @@
 				url: "{{ route('bhc.get') }}",
 				data: {
 					select: '*',
+					where: ['rhu_id', {{ auth()->user()->id }}]
 				},
 				success: bhcs => {
 					bhcs = JSON.parse(bhcs);
