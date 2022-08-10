@@ -316,6 +316,25 @@
 			})
 		}
 
+		// FOR GROUP UPDATE. NO SUCCESS EACH UPDATE
+		function doUpdate2(id, status, qty = 0, date_approved = null, ref, bool){
+			update({
+				url: "{{ route('request.update') }}",
+				data: {
+					id: id,
+					status: status,
+					approved_qty: qty,
+					date_approved: date_approved
+				}
+			}, () => {
+				if(bool){
+					ss('Successfully ' + status);
+					reload();
+					viewRequest(ref);
+				}
+			})
+		}
+
 		function inputInfo(ref){
 			window.location.href = `{{ route('request.inputInfo') }}?ref=${ref}`;
 		}
@@ -531,13 +550,17 @@
 				cancelButtonText: "Exit"
 			}).then(result => {
 				if(result.value){
+					swal.showLoading();
+					let ctr = 0;
 					ids.forEach(id => {
-						doUpdate(id, "Approved", qtys[id], dateTimeNow(), reference);
+						ctr++;
+						doUpdate2(id, "Approved", qtys[id], dateTimeNow(), reference, ctr == ids.length);
 					});
 				}
 				else if(result.isDenied){
+					swal.showLoading();
 					ids.forEach(id => {
-						doUpdate(id, "{{ auth()->user()->role == "RHU" ? "Cancelled" : "Declined" }}", 0, null, reference);
+						doUpdate2(id, "{{ auth()->user()->role == "RHU" ? "Cancelled" : "Declined" }}", 0, null, reference);
 					});
 				}
 			});
