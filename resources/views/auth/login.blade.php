@@ -15,7 +15,7 @@
 	<style>
 	@if(isset($theme['login_bg_img']))
 			.container-login100{
-				background-image: url({{ $theme['login_bg_img'] }});
+				background-image: url("{{ $theme['login_bg_img'] }}");
 				background-size: cover;
 				background-repeat: no-repeat;
 				background-position: center center;
