@@ -59,7 +59,7 @@ class ExportController extends Controller
         $temp = Data::where('transaction_types_id', $req->tType)
             ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
-            ->whereBetween('transaction_date', [$req->from, $req->to])
+            ->whereBetween('transaction_date', [$req->from, $req->to]);
 
         if(auth()->user()->role != "Admin"){
             $temp = $temp->where('user_id', auth()->user()->id);
@@ -106,7 +106,7 @@ class ExportController extends Controller
             );
         }
 
-        $headers = array_keys($array[0]);
+        $headers = array_keys(sizeof($array) ? $array[0] : []);
         $title = "Inventory Report - $from to $to";
         return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
@@ -114,8 +114,13 @@ class ExportController extends Controller
     public function exportSales(Request $req){
         $temp = Data::whereNotNull('bhc_id')
                     ->whereIn('transaction_types_id', [2,3])
-                    ->whereBetween('transaction_date', [$req->from, $req->to])
-                    ->get();
+                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('bhc');
         $temp->load('transaction_type');

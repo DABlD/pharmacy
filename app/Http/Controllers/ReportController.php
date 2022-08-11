@@ -103,7 +103,7 @@ class ReportController extends Controller
     public function getSales(Request $req){
         $temp = Data::whereNotNull('bhc_id')
                     ->whereIn('transaction_types_id', [2,3])
-                    ->whereBetween('transaction_date', [$req->from, $req->to])
+                    ->whereBetween('transaction_date', [$req->from, $req->to]);
 
         if(auth()->user()->role != "Admin"){
             $temp = $temp->where('user_id', auth()->user()->id);
