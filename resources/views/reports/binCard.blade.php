@@ -13,7 +13,9 @@
                             List
                         </h3>
 
-                        @include('reports.toolbars.binCard')
+                        @if(auth()->user()->role == "Admin")
+                        	@include('reports.toolbars.binCard')
+                        @endif
                     </div>
 
                     <div class="card-body table-responsive">
@@ -145,7 +147,9 @@
 				// }
 			});
 
-			initRhu();
+			@if(auth()->user()->role == "Admin")
+				initRhu();
+			@endif
 		});
 
 		function initRhu(){

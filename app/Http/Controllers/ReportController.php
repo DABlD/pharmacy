@@ -262,7 +262,13 @@ class ReportController extends Controller
     }
     
     public function getBinCard(Request $req){
-        $data = Data::where('user_id', 'like', $req->user_id)->orderBy('transaction_date', 'desc')->get();
+        $data = Data::where('user_id', 'like', $req->user_id);
+
+        if(auth()->user()->role != "Admin"){
+            $data = $data->where('user_id', auth()->user()->id);
+        }
+
+        $data = $data->orderBy('transaction_date', 'desc')->get();
 
         $data->load('transaction_type');
         $data->load('reorder.medicine.category');
