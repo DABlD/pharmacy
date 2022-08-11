@@ -60,7 +60,12 @@ class ExportController extends Controller
             ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
             ->whereBetween('transaction_date', [$req->from, $req->to])
-            ->get();
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('reorder.medicine');
         $temp->load('transaction_type');

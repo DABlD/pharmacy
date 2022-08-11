@@ -104,7 +104,12 @@ class ReportController extends Controller
         $temp = Data::whereNotNull('bhc_id')
                     ->whereIn('transaction_types_id', [2,3])
                     ->whereBetween('transaction_date', [$req->from, $req->to])
-                    ->get();
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('bhc');
         $temp->load('transaction_type');
