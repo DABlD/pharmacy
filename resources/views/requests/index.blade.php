@@ -137,6 +137,7 @@
 	<script>
 		var search = "%%";
 		var reqByRef = [];
+		var user_id = "{{ auth()->user()->role == "RHU" ? auth()->user()->id : "%%" }}"
 
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
@@ -151,11 +152,7 @@
 						f.order = ["created_at", "desc"];
 						f.status = search;
 						f.group = "reference";
-						@if(in_array(auth()->user()->role, ["RHU"]))
-							f.where = ["user_id", {{ auth()->user()->id }}];
-						{{-- @elseif(in_array(auth()->user()->role, ["Approver"])) --}}
-							// f.where = ["status", "For Approval"];
-						@endif
+						f.like = ['user_id', "like", user_id];
 					}
 				},
 				columns: [
@@ -235,7 +232,37 @@
         		search = e.target.value;
         		reload();
         	});
+        	initRhu();
+        	$('#user_id').on('change', e => {
+        		user_id = e.target.value;
+        		reload();
+        	});
 		});
+
+		function initRhu(){
+			$.ajax({
+				url: "{{ route('rhu.get') }}",
+				data: {
+					select: ['company_name', 'user_id'],
+				},
+				success: rhus => {
+					rhus = JSON.parse(rhus);
+
+					let rhuString = "";
+					rhus.forEach(rhu => {
+						rhuString += `
+							<option value="${rhu.user_id}">${rhu.company_name}</option>
+						`;
+					});
+
+					$('#user_id').append(rhuString);
+					$('#user_id').on('change', e => {
+						user_id = e.target.value;
+						reload();
+					});
+				}
+			});
+		}
 
 		function initCount(){
 			$.ajax({

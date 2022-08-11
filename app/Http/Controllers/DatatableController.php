@@ -281,6 +281,10 @@ class DatatableController extends Controller
             $array = $array->where($req->where[0], $req->where[1]);
         }
 
+        if($req->like){
+            $array = $array->where($req->like[0], $req->like[1], $req->like[2]);
+        }
+
         $array = $array->get();
 
         // IF HAS LOAD
