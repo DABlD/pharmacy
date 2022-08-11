@@ -116,7 +116,7 @@
                     			@if(auth()->user()->role != "Admin")
                     			<div class="row">
                     			    <div class="col-md-3 iLabel">
-                    			    	Location
+                    			    	BHC
                     			    </div>
             			            <div class="col-md-9 iInput">
             			                <select name="location" class="form-control">
