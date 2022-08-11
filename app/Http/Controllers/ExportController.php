@@ -166,7 +166,7 @@ class ExportController extends Controller
             );
         }
 
-        $headers = array_keys($array[0]);
+        $headers = array_keys(sizeof($array) ? $array[0] : []);
         $title = "Sales Report - $from to $to";
         return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
@@ -174,8 +174,13 @@ class ExportController extends Controller
     public function exportPurchaseOrder(Request $req){
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
                     ->where('transaction_types_id', 5)
-                    ->whereBetween('transaction_date', [$req->from, $req->to])
-                    ->get();
+                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('reorder.medicine');
         $temp = $temp->groupBy('medicine_id');
@@ -212,7 +217,7 @@ class ExportController extends Controller
             );
         }
 
-        $headers = array_keys($array[0]);
+        $headers = array_keys(sizeof($array) ? $array[0] : []);
         $title = "Purchase Order Report - $from to $to";
         return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }

@@ -161,8 +161,13 @@ class ReportController extends Controller
     public function getPurchaseOrder(Request $req){
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
                     ->where('transaction_types_id', 5)
-                    ->whereBetween('transaction_date', [$req->from, $req->to])
-                    ->get();
+                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('reorder.medicine');
         $temp = $temp->groupBy('medicine_id');
