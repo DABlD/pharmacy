@@ -224,8 +224,13 @@ class ExportController extends Controller
 
     public function exportDailySheet(Request $req){
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
-                    ->whereBetween('transaction_date', [$req->from, $req->to])
-                    ->get();
+                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+
+        if(auth()->user()->role != "Admin"){
+            $temp = $temp->where('user_id', auth()->user()->id);
+        }
+
+        $temp = $temp->get();
 
         $temp->load('transaction_type');
         $temp->load('reorder.medicine');
