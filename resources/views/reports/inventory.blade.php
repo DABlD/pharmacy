@@ -109,7 +109,9 @@
 				url: "{{ route('bhc.get') }}",
 				data: {
 					select: '*',
+					@if(auth()->user()->role == "RHU")
 					where: ['rhu_id', {{ auth()->user()->id }}]
+					@endif
 				},
 				success: bhcs => {
 					bhcs = JSON.parse(bhcs);
