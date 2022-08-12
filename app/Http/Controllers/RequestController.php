@@ -164,13 +164,13 @@ class RequestController extends Controller
         elseif(isset($req->status) && $req->status == "Incomplete Qty"){
             $request = Req::find($id);
 
-            $data->load('medicine');
+            $request->load('medicine');
             $item = $request->medicine->name;
             $ref = $request->reference;
             $rQty = $request->received_qty;
             $aQty = $request->approved_qty;
 
-            createAlert("Incomplete Delivery of $item with Reference No. $ref: $rQty/$aQty");
+            $this->createAlert("Incomplete Delivery of $item with Reference No. $ref: $rQty/$aQty");
         }
     }
 
