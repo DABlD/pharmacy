@@ -336,6 +336,7 @@ class ReportController extends Controller
         $rhus = Rhu::whereIn('user_id', array_keys($data->toArray()))->pluck('company_name', 'user_id');
 
         $labels = [];
+        $temp = [];
         foreach($data as $id => $a){
             foreach($dates as $date){
                 $date = now()->parse($date)->toDateString();
