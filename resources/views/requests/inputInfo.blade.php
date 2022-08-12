@@ -283,6 +283,7 @@
 			});
 
 			let date_dispatched = $("[name='date_dispatched']").val();
+			swal.showLoading();
 			toSave.forEach((request, index) => {
 				update({
 					url: "{{ route('request.update') }}",
