@@ -74,7 +74,7 @@
                     			<tr>
                     				<th>RHU</th>
                     				<th>Ref No</th>
-                    				<th>Requestor</th>
+                    				<th>Particulars</th>
                     				<th>Request Date</th>
                     				<th>Status</th>
                     				<th>Action</th>
@@ -468,7 +468,7 @@
 						<div class="col-md-5">
 							<div class="row">
 								<div class="col-md-5 reqLabel">
-									Requestor:
+									Particulars:
 								</div>
 								<div class="col-md-7">
 									${reqRequested_by}

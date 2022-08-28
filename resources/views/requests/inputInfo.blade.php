@@ -55,7 +55,7 @@
                     			
                     			<div class="row">
                     			    <div class="col-md-4 iLabel">
-                    			        Requested By
+                    			        Particulars
                     			    </div>
             			            <div class="col-md-8 iInput">
             			                {{ $data[0]->requested_by }}

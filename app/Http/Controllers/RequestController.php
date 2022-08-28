@@ -109,12 +109,11 @@ class RequestController extends Controller
             $data = new Req();
 
             $aId = auth()->user()->id;
-            $name = auth()->user()->name;
             $data->stock = Reorder::where('user_id', 1)->where('medicine_id', $temp->medicine_id)->first()->stock;
 
             $data->user_id = $aId;
             $data->reference = $temp->reference;
-            $data->requested_by = $temp->requested_by . " ($name)";
+            $data->requested_by = $temp->requested_by;
             $data->medicine_id = $temp->medicine_id;
             $data->request_qty = $temp->request_qty;
             $data->unit_price = $temp->unit_price;
