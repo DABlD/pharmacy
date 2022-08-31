@@ -71,7 +71,7 @@ class ReportController extends Controller
             foreach($dates as $date){
                 $total = 0;
                 foreach($medicine as $data){
-                    if($data->transaction_date == $date){
+                    if(now()->parse($data->transaction_date)->toDateString() == $date){
                         if($data->transaction_type->operator == "+"){
                             $total += $data->{$req->view};
                             $grandtotal += $data->{$req->view};
@@ -128,7 +128,7 @@ class ReportController extends Controller
             foreach($dates as $date){
                 $total = 0;
                 foreach($group as $data){
-                    if($data->transaction_date == $date){
+                    if(now()->parse($data->transaction_date)->toDateString() == $date){
                         if($data->transaction_type->operator == "-"){
                             $total += $data->{$req->view};
                             $grandTotal += $data->{$req->view};
@@ -184,7 +184,7 @@ class ReportController extends Controller
             foreach($dates as $date){
                 $total = 0;
                 foreach($group as $data){
-                    if($data->transaction_date == $date){
+                    if(now()->parse($data->transaction_date)->toDateString() == $date){
                         $total += $data->{$req->view};
                         $grandTotal += $data->{$req->view};
                     }
@@ -272,7 +272,7 @@ class ReportController extends Controller
 
         $data->load('transaction_type');
         $data->load('reorder.medicine.category');
-        $data = $data->groupBy('medicine_id');
+        $data = $data->sortByDesc('transaction_date')->groupBy('medicine_id');
 
         $array = [];
 

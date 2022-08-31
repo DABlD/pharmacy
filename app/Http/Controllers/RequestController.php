@@ -118,7 +118,7 @@ class RequestController extends Controller
             $data->request_qty = $temp->request_qty;
             $data->unit_price = $temp->unit_price;
             $data->amount = $temp->amount;
-            $data->transaction_date = $temp->transaction_date;
+            $data->transaction_date = $temp->transaction_date . ' ' . now()->toTimeString();
 
             $data->save();
         }
@@ -157,7 +157,7 @@ class RequestController extends Controller
             $data->qty = $request->approved_qty;
             $data->unit_price = $request->unit_price;
             $data->amount = $request->amount;
-            $data->transaction_date = $request->transaction_date;
+            $data->transaction_date = $request->transaction_date . ' ' . now()->toTimeString();
             $data->save();
         }
         elseif(isset($req->status) && $req->status == "Incomplete Qty"){

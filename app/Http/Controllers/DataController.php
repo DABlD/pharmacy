@@ -64,7 +64,7 @@ class DataController extends Controller
             $data->qty = $temp->qty;
             $data->unit_price = $temp->unit_price;
             $data->amount = $temp->amount;
-            $data->transaction_date = $temp->transaction_date;
+            $data->transaction_date = $temp->transaction_date . ' ' . now()->toTimeString();
             $data->user_id = auth()->user()->id;
 
             if(isset($temp->bhc_id)){
