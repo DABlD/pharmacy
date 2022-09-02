@@ -328,6 +328,17 @@ class ExportController extends Controller
         return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
+    public function exportSku(Request $req){
+        // $array = Medicine::join("reorders as r", "r.medicine_id", '=', 'medicines.id')
+        //             ->where('r.user_id', $req->user_id)
+        //             ->where('r.deleted_at', null)
+
+
+        // $array = $array->get();
+
+        // echo json_encode($array);
+    }
+
     private function getDates($from, $to){
         $dates = [];
 
