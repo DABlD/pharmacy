@@ -373,7 +373,6 @@ Route::group([
         // EXPORT
         // EXPORT
         // EXPORT
-
         $cname = "export";
         Route::group([
                 'as' => "$cname.",
@@ -385,6 +384,7 @@ Route::group([
                 Route::get($cname . "PurchaseOrder/", ucfirst($cname) . "Controller@$cname" . "PurchaseOrder")->name($cname . "PurchaseOrder");
                 Route::get($cname . "DailySheet/", ucfirst($cname) . "Controller@$cname" . "DailySheet")->name($cname . "DailySheet");
                 Route::get($cname . "Requests/", ucfirst($cname) . "Controller@$cname" . "Requests")->name($cname . "Requests");
+                Route::get($cname . "Sku/", ucfirst($cname) . "Controller@$cname" . "Sku")->name($cname . "Sku");
             }
         );
 
@@ -416,6 +416,7 @@ Route::group([
                 Route::get("receive", ucfirst($cname) . "Controller@receive")->name('receive');
                 Route::get("rx", ucfirst($cname) . "Controller@rx")->name('rx');
                 Route::get("location", ucfirst($cname) . "Controller@location")->name('location');
+                Route::get("data", ucfirst($cname) . "Controller@data")->name('data');
             }
         );
     }

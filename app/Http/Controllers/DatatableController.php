@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{User, Rhu, Bhc, Medicine, Category, TransactionType, Request as Req, Rx, Location};
+use App\Models\{User, Rhu, Bhc, Medicine, Category, TransactionType, Request as Req, Rx, Location, Data};
 use DB;
 
 class DatatableController extends Controller
@@ -429,5 +429,39 @@ class DatatableController extends Controller
             $item->actions = $item->actions;
         }
         echo json_encode($array->toArray());
+    }
+
+    public function data(Request $req){
+        $array = Data::select($req->select);
+
+        // IF HAS SORT PARAMETER $ORDER
+        if($req->order){
+            $array = $array->orderBy($req->order[0], $req->order[1]);
+        }
+
+
+        // IF HAS WHERE
+        if($req->where){
+            $array = $array->where($req->where[0], $req->where[1]);
+        }
+
+        $array = $array->get();
+
+        // IF HAS LOAD
+        if($array->count() && $req->load){
+            foreach($req->load as $table){
+                $array->load($table);
+            }
+        }
+
+        // IF HAS GROUP
+        if($req->group){
+            $array = $array->groupBy($req->group);
+        }
+
+        foreach($array as $item){
+            $item->actions = $item->actions;
+        }
+        echo json_encode($array);
     }
 }

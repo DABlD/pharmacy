@@ -4,6 +4,12 @@
 <section class="content">
     <div class="container-fluid">
 
+    	<div class="row">
+            <section class="col-lg-12">
+    			@include('datas.includes.toolbar')
+    		</section>
+    	</div>
+
         <div class="row">
             <section class="col-lg-4 connectedSortable">
                 <div class="card">
@@ -279,6 +285,121 @@
 
 		function initStyles(){
 			$('.iInput').css('margin', 'auto');
+		}
+
+		function viewDataEntry(){
+			Swal.fire({
+				title: 'Data Entries',
+				width: '95%',
+				showClass: {
+					backdrop: 'swal2-noanimation',
+					popup: '',
+					icon: ''
+				},
+				showCloseButton: true,
+				html: `
+					<table id="table4" style="width: '100%' !important;">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Date</th>
+								<th>User</th>
+								<th>Medicine</th>
+								<th>Tx Type</th>
+								<th>Reference</th>
+								<th>Particulars</th>
+								<th>Lot #</th>
+								<th>Expiry</th>
+								<th>Qty</th>
+								<th>Price</th>
+								<th>Amount</th>
+								<th>Edit</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				`,
+				didOpen: () => {
+					var table4 = $('#table4').DataTable({
+		        		pageLength: 25,
+		        		ordering: false,
+						ajax: {
+							url: "{{ route('datatable.data') }}",
+		                	dataType: "json",
+		                	dataSrc: "",
+							data: {
+								select: '*',
+								order: ['transaction_date', 'desc'],
+								load: ['reorder.medicine', 'user', 'transaction_type'],
+								where: ['user_id', {{ auth()->user()->id }}]
+							},
+						},
+						columns: [
+							{data: 'id'},
+							{
+								data: 'transaction_date',
+								render: date => {
+									return moment(date).format('MMM DD, YYYY')
+								}
+							},
+							{data: 'user.name'},
+							{data: 'reorder.medicine.name'},
+							{data: 'transaction_type.type'},
+							{data: 'reference'},
+							{data: 'particulars'},
+							{data: 'lot_number'},
+							{
+								data: 'expiry_date',
+								render: date => {
+									return moment(date).format('MMM DD, YYYY')
+								}
+							},
+							{data: 'qty'},
+							{data: 'unit_price'},
+							{data: 'amount'},
+							{data: 'actions'},
+						],
+		        		rowCallback: function( row, data, index ) {
+						    if (data['id'] == null) {
+						        $(row).hide();
+						    }
+						},
+				        drawCallback: function (settings) {
+				            let api = this.api();
+				            let rows = api.rows({ page: 'current' }).nodes();
+				            let last = null;
+				 
+				            api.column(1, { page: 'current' })
+				                .data()
+				                .each(function (transaction_date, i, row) {
+				                	transaction_date = moment(transaction_date).format('MMM DD, YYYY');
+				                    if (last !== transaction_date) {
+				                        $(rows)
+				                            .eq(i)
+				                            .before(`
+				                            	<tr class="group">
+				                            		<td colspan="13">
+				                            			${transaction_date}
+				                            		</td>
+				                            	</tr>
+				                            `);
+				 
+				                        last = transaction_date;
+				                    }
+				                });
+
+				            
+				        	let groups = $('tr.group td');
+				        	let grps = $('[class="group"]');
+				        	grps.each((index, group) => {
+				        		if(!$(group).next().is(':visible')){
+				        			$(group).remove();
+				        		}
+				        	});
+				        },
+					});
+				}
+			})
 		}
 
 		function initTransactionType(){

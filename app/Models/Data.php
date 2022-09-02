@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use App\Models\{Bhc, TransactionType, Reorder, Rhu};
+use App\Models\{Bhc, TransactionType, Reorder, Rhu, User};
+use App\Traits\DataAttribute;
 
 class Data extends Model
 {
-    use SoftDeletes;
+    use DataAttribute, SoftDeletes;
 
     protected $fillable = [
         'medicine_id', 'transaction_types_id', 'reference', 
@@ -30,6 +31,10 @@ class Data extends Model
 
     public function rhu(){
         return $this->hasOne(Rhu::class, 'user_id', 'user_id');
+    }
+
+    public function user(){
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
     public function bhc(){
