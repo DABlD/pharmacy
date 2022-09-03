@@ -620,6 +620,14 @@
 		    }, 1000);
 		}
 
+		function exportSku(){
+			let data = {
+				user_id: user_id
+			};
+
+			window.open("/export/exportSku?" + $.param(data), "_blank");
+		}
+
 		function del(id){
 			sc("Confirmation", "Are you sure you want to delete?", result => {
 				if(result.value){
