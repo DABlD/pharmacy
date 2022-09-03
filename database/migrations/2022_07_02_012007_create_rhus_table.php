@@ -16,6 +16,7 @@ class CreateRhusTable extends Migration
         Schema::create('rhus', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
+            $table->integer('admin_id')->unsigned();
 
             $table->string('company_name')->nullable();
             $table->string('company_code')->nullable();

@@ -15,12 +15,17 @@ class RhuSeeder extends Seeder
     public function run()
     {
         $size = 3;
-        for($i = 1; $i <= $size; $i++){
-            $this->addRhu($i);
+        $ctr = 1;
+
+        for($i = 1; $i <= 3; $i++){
+            for($j = 1; $j <= $size; $j++){
+                $this->addRhu($ctr, $i);
+                $ctr++;
+            }
         }
     }
 
-    public function addRhu($i){
+    public function addRhu($i, $aid){
         $user = new User();
         $user->username = "rhu$i";
         $user->name = "RHU $i";
@@ -33,6 +38,7 @@ class RhuSeeder extends Seeder
 
         $rhu = new Rhu();
         $rhu->user_id = $user->id;
+        $rhu->admin_id = $aid;
         $rhu->company_name = "RHU$i - Company Name";
         $rhu->company_code = "RHU$i - Company Name";
         $rhu->contact_personnel = "RHU$i - Contact Personnel";

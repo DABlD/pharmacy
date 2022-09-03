@@ -13,7 +13,7 @@ class Rhu extends Model
     use RhuAttribute, SoftDeletes;
 
     protected $fillable = [
-        'company_name', 'company_code', 'contact_personnel'
+        'company_name', 'company_code', 'contact_personnel', 'admin_id', 'user_id'
     ];
 
     protected $dates = [
@@ -27,5 +27,9 @@ class Rhu extends Model
 
     public function user(){
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function admin(){
+        return $this->belongsTo(User::class, 'id', 'admin_id');
     }
 }

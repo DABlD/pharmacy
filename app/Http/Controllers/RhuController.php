@@ -61,6 +61,7 @@ class RhuController extends Controller
 
         $rhu = new RHU();
         $rhu->user_id = $user->id;
+        $rhu->admin_id = auth()->user()->id;
         $rhu->company_name = $req->company_name;
         $rhu->contact_personnel = $req->contact_personnel;
         $rhu->company_code = ""; //LEAVE TO MUTATORS

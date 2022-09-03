@@ -10,6 +10,7 @@ class DatatableController extends Controller
 {
     public function rhu(Request $req){
         $array = Rhu::select($req->select);
+        $array->where('admin_id', auth()->user()->id);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
