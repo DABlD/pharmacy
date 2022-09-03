@@ -184,7 +184,7 @@ class RequestController extends Controller
         }
 
         $reorder = $reorder->first();
-        if($reorder->stock <= $reorder->point && $uid == 1){
+        if($reorder->stock <= $reorder->point && User::find($uid)->role == "Admin"){
             $reorder->load('medicine');
             $name = $reorder->medicine->name;
             $point = $reorder->point;
@@ -194,6 +194,7 @@ class RequestController extends Controller
 
     private function createAlert($message){
         $alert = new Alert();
+        $alert->user_id = auth()->user()->id;
         $alert->message = $message;
         $alert->save();
     }

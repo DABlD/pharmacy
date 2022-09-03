@@ -16,6 +16,9 @@ class CreateAlertsTable extends Migration
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
 
+            $table->unsignedInteger('user_id');
+            $table->boolean('seen')->default(0);
+
             $table->string('message');
             $table->timestamps();
             $table->softDeletes();

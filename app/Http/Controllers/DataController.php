@@ -91,7 +91,7 @@ class DataController extends Controller
         }
 
         $reorder = $reorder->first();
-        if($reorder->stock <= $reorder->point && $uid == 1){
+        if($reorder->stock <= $reorder->point && auth()->user()->role == "Admin"){
             $reorder->load('medicine');
             $name = $reorder->medicine->name;
             $point = $reorder->point;
@@ -101,6 +101,7 @@ class DataController extends Controller
 
     private function createAlert($message){
         $alert = new Alert();
+        $alert->user_id = auth()->user()->id;
         $alert->message = $message;
         $alert->save();
     }
