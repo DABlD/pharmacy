@@ -56,8 +56,14 @@ class DatatableController extends Controller
         }
 
         // IF HAS WHERE
+        if(auth()->user()->role == "Admin"){
+            $array = $array->where('r.admin_id', auth()->user()->id);
+        }
+        else{
+            $array = $array->where('r.user_id', auth()->user()->id);
+        }
+
         if($req->where){
-            $array = $array->where($req->where[0], $req->where[1]);
         }
 
         $array = $array->get();

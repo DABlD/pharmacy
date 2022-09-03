@@ -458,7 +458,6 @@
 				url: "{{ route('bhc.get2') }}",
 				data: {
 					select: "*",
-					where: ['rhu_id', {{ auth()->user()->id }}]
 				},
 				success: locations => {
 					locations = JSON.parse(locations);

@@ -62,13 +62,9 @@
                 	dataType: "json",
                 	dataSrc: "",
 					data: {
-						table: 'Rhu',
 						select: ['bhcs.*', 'r.id as rid'],
 						load: ['rhu'],
 						join: true,
-						@if(auth()->user()->role != "Admin")
-							where: ["r.user_id", {{ auth()->user()->id }}]
-						@endif
 					}
 				},
 				columns: [

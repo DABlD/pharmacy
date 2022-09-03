@@ -21,6 +21,11 @@ class BhcController extends Controller
     public function get(Request $req){
         $array = Bhc::select($req->select);
 
+        // IF HAS JOIN
+        if($req->join){
+            $array = $array->join('rhus as r', 'r.id', '=', 'bhcs.rhu_id');
+        }
+
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
@@ -50,12 +55,12 @@ class BhcController extends Controller
 
     public function get2(Request $req){
         $array = Bhc::select($req->select);
-
-        $rid = Rhu::where('user_id', $req->where[1])->first()->id;
+        $rhu = Rhu::where('user_id', auth()->user()->id)->first();
+        $array = $array->where('rhu_id', $rhu->id);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
-            $array = $array->orderBy($req->order[0], $rid);
+            $array = $array->orderBy($req->order[0], $rhu->id);
         }
 
         // IF HAS WHERE

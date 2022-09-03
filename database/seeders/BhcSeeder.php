@@ -14,15 +14,20 @@ class BhcSeeder extends Seeder
      */
     public function run()
     {
-        $size = 10;
-        for($i = 1; $i <= $size; $i++){
-            $this->addBhc($i);
+        $size = 3;
+        $ctr = 1;
+
+        for($i = 1; $i <= 9; $i++){
+            for($j = 1; $j <= $size; $j++){
+                $this->addBhc($ctr, $i);
+                $ctr++;
+            }
         }
     }
 
-    public function addBhc($i){
+    public function addBhc($i, $rid){
         $bhc = new Bhc();
-        $bhc->rhu_id = rand(2, 4);
+        $bhc->rhu_id = $rid;
         $bhc->code = rand(10000, 99999);
         $bhc->name = "BHC$i";
         $bhc->region = "BHC$i - Region";

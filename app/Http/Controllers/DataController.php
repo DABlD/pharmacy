@@ -9,7 +9,7 @@ use DB;
 class DataController extends Controller
 {
     public function __construct(){
-        $this->table = "datas";
+        $this->table = "data";
     }
 
     public function index(){
