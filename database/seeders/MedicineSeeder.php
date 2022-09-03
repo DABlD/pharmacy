@@ -14,9 +14,14 @@ class MedicineSeeder extends Seeder
      */
     public function run()
     {
-        $size = 30;
-        for($i = 1; $i <= $size; $i++){
-            $this->addMedicine($i, 1);
+        $size = 10;
+        $ctr = 1;
+
+        for($i = 2; $i <= 4; $i++){
+            for($j = 1; $j <= $size; $j++){
+                $this->addMedicine($ctr, $i);
+                $ctr++;
+            }
         }
     }
 

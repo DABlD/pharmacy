@@ -17,7 +17,7 @@ class RhuSeeder extends Seeder
         $size = 3;
         $ctr = 1;
 
-        for($i = 1; $i <= 3; $i++){
+        for($i = 2; $i <= 4; $i++){
             for($j = 1; $j <= $size; $j++){
                 $this->addRhu($ctr, $i);
                 $ctr++;
@@ -33,7 +33,7 @@ class RhuSeeder extends Seeder
         $user->email = "rhu$i@pharmacy.com";
         $user->address = "RHU$i ADDRESS";
         $user->contact = "09" . rand(100000000, 999999999);
-        $user->password = "12345678";
+        $user->password = "123456";
         $user->save();
 
         $rhu = new Rhu();

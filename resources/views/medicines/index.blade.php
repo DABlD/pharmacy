@@ -59,7 +59,7 @@
 	<script src="{{ asset('js/select2.min.js') }}"></script>
 
 	<script>
-		var user_id = 1;
+		var user_id = {{ auth()->user()->id }};
 
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
@@ -164,7 +164,8 @@
 			$.ajax({
 				url: '{{ route('rhu.get') }}',
 				data: {
-					select: ['user_id', 'company_name']
+					select: ['user_id', 'company_name'],
+					where: ['admin_id', {{ auth()->user()->id }}]
 				},
 				success: rhus => {
 					rhus = JSON.parse(rhus);

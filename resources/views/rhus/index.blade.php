@@ -189,8 +189,8 @@
 							_token: $('meta[name="csrf-token"]').attr('content')
 						},
 						success: () => {
-							ss("Success");
 							reload();
+							ss("Success");
 						}
 					})
 				}
@@ -267,10 +267,14 @@
 			}).then(result => {
 				if(result.value){
 					swal.showLoading();
+					
+					let company_name = $("[name='company_name']").val();
+					let contact_personnel = $("[name='contact_personnel']").val();
+					let id = $("[name='id']").val();
 					update({
 						url: "{{ route('user.update') }}",
 						data: {
-							id: $("[name='id']").val(),
+							id: id,
 							name: $("[name='name']").val(),
 							contact: $("[name='contact']").val(),
 							email: $("[name='email']").val(),
@@ -283,9 +287,9 @@
 								url: "{{ route('rhu.update') }}",
 								data: {
 									id: $("[name='id']").val(),
-									company_name: $("[name='company_name']").val(),
-									contact_personnel: $("[name='contact_personnel']").val(),
-									where: ['user_id', $("[name='id']").val()]
+									company_name: company_name,
+									contact_personnel: contact_personnel,
+									where: ['user_id', id]
 								},
 								message: "Success"
 							}, () => {
@@ -364,6 +368,7 @@
 				url: "{{ route('medicine.get') }}",
 				data: {
 					select: "medicines.*",
+					where: ["user_id", {{ auth()->user()->id }}],
 					load: ["reorder", "category"],
 				},
 				success: allMedicines => {

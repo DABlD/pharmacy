@@ -16,7 +16,7 @@
             </div>
             <div class="col-md-7 iInput">
                 <select id="user_id" class="form-control">
-                    <option value="1">Select RHU</option>
+                    <option value="{{ auth()->user()->id }}">Select RHU / All</option>
                 </select>
             </div>
         </div>
