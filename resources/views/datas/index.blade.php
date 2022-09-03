@@ -211,7 +211,6 @@
 
 	<script>
 		var category = 0;
-		var medicines = [];
 
 		$(document).ready(()=> {
 
@@ -535,71 +534,61 @@
 		// ACTIONS
 
 		function add(id){
-			if(medicines[id]){
-				medicines[id]++;
-				$(`[name="qty${id}"]`).val(medicines[id]);
-				computeTotal();
-			}
-			else{
-				$.ajax({
-					url: "{{ route('medicine.getReorder') }}",
-					data: {
-						select: "medicines.*",
-						where: ["r.id", id]
-					},
-					success: medicine => {
-						medicine = JSON.parse(medicine)[0];
-						medicines[id] = 1;
-						$('.footer').remove();
-						$("#table2 tbody").append(`
-							<tr class="item" data-id="${id}">
-								<td>${medicine.name}</td>
-								<td>
-									<input type="text" class="form-control lot_number">
-								</td>
-								<td>
-									<input type="text" class="form-control exp">
-								</td>
-								<td>
-									<input type="number" name="qty${id}" class="form-control qty" value="1" data-id=${id}>
-								</td>
-								<td class="price">
-									${toFloat(medicine.unit_price)}
-								</td>
-								<td>
-									<input type="number" class="form-control total" readonly>
-								</td>
-								<td>
-									<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" onclick="remove(${id})">
-									    <i class="fas fa-trash"></i>
-									</a>
-								</td>
-							</tr>
-						`);
-						addFooter();
-						initListener();
-						computeTotal();
-					}
-				})
-			}
+			$.ajax({
+				url: "{{ route('medicine.getReorder') }}",
+				data: {
+					select: "medicines.*",
+					where: ["r.id", id]
+				},
+				success: medicine => {
+					medicine = JSON.parse(medicine)[0];
+					$('.footer').remove();
+					$("#table2 tbody").append(`
+						<tr class="item" data-id="${id}">
+							<td>${medicine.name}</td>
+							<td>
+								<input type="text" class="form-control lot_number">
+							</td>
+							<td>
+								<input type="text" class="form-control exp">
+							</td>
+							<td>
+								<input type="number" name="qty${id}" class="form-control qty" value="1" data-id=${id}>
+							</td>
+							<td class="price">
+								${toFloat(medicine.unit_price)}
+							</td>
+							<td>
+								<input type="number" class="form-control total" readonly>
+							</td>
+							<td>
+								<a class="btn btn-danger btn-sm" data-toggle="tooltip" title="Remove" onclick="remove(${id})">
+								    <i class="fas fa-trash"></i>
+								</a>
+							</td>
+						</tr>
+					`);
+					addFooter();
+					initListener();
+					computeTotal();
+				}
+			})
 		}
 
 		function initListener(){
 			$('.qty').unbind('change');
 			$('.qty').on("change", qty => {
 				qty = $(qty.target);
-				medicines[qty.data("id")] = qty.val();
 
 				if(qty.val() == 0){
 					$(qty).parent().parent().remove();
-					delete medicines[qty.data("id")];
 				}
 				computeTotal();
 			});
 
 			$(".exp").flatpickr({
 				altInput: true,
-				altFormat: "F j, Y",
+				altFormat: "M j, Y",
 				dateFormat: "Y-m-d",
 			})
 		}
@@ -660,7 +649,6 @@
 						type: "POST",
 						success: () => {
 							ss("Success");
-							medicines = [];
 							$('#table2 tbody').html("");
 							$('#table2 tbody').append(footer);
 							$("[name='type']").val(null).trigger('change');
