@@ -353,7 +353,13 @@ class ReportController extends Controller
                         // ->where('user_id', '>', 1)
 
         if(auth()->user()->role == "RHU"){
-            $data->where('user_id', auth()->user()->id);
+            $data = $data->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $data = $data->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $data = $data->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $data = $data->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $data = $data->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $data = $data->get();
@@ -410,8 +416,12 @@ class ReportController extends Controller
         $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty'])
                     ->whereBetween('received_date', [$from, $to]);
 
+        $data = $data->join('rhus as r', 'r.user_id', '=', 'requests.user_id');
         if(auth()->user()->role == "RHU"){
-            $data->where('user_id', auth()->user()->id);
+            $data = $data->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $data = $data->where('r.admin_id', '=', auth()->user()->id);
         }
         $data = $data->get();
 
