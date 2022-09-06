@@ -11,7 +11,7 @@ class Rx extends Model
     // use ;
     protected $fillable = [
         'ticket_number','patient_id','patient_name',
-        'contact','address','amount','date',
+        'contact','address','amount','date', 'doctor_id'
     ];
 
     protected $dates = [

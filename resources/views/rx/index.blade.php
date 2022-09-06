@@ -21,6 +21,7 @@
                     		<thead>
                     			<tr>
                     				<th>Ticket #</th>
+                    				<th>Doctor</th>
                     				<th>Patient ID</th>
                     				<th>Name</th>
                     				<th>Contact</th>
@@ -67,6 +68,7 @@
 				},
 				columns: [
 					{data: 'ticket_number'},
+					{data: 'doctor_id'},
 					{data: 'patient_id'},
 					{data: 'patient_name'},
 					{data: 'contact'},

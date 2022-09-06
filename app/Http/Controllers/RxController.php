@@ -50,6 +50,7 @@ class RxController extends Controller
 
     public function store(Request $req){
         $data = new Rx();
+        $data->doctor_id = $req->doctor_id;
         $data->ticket_number = $req->ticket_number;
         $data->patient_id = $req->patient_id;
         $data->patient_name = $req->patient_name;

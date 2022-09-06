@@ -16,6 +16,7 @@ class CreateRxesTable extends Migration
         Schema::create('rxes', function (Blueprint $table) {
             $table->id();
             
+            $table->string('doctor_id');
             $table->string('ticket_number');
             $table->string('patient_id');
             $table->string('patient_name');
