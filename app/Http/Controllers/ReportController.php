@@ -51,12 +51,14 @@ class ReportController extends Controller
             ->whereNotNull('bhc_id')
             ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()]);
 
-        $temp = $temp->join('rhus as r', 'r.admin_id', '=', 'data.user_id');
         if(auth()->user()->role == "RHU"){
-            $temp = $temp->where('r.user_id', auth()->user()->id);
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
         }
         else{
-            $temp = $temp->where('r.admin_id', auth()->user()->id);
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $temp = $temp->get()->unique();
