@@ -27,7 +27,7 @@ Route::group([
             ->defaults('sidebar', 1)
             ->defaults('icon', 'fas fa-list')
             ->defaults('name', 'Dashboard')
-            ->defaults('roles', array('Admin', 'RHU'))
+            ->defaults('roles', array('Admin', 'RHU', 'Super Admin'))
             ->name('dashboard')
             ->defaults('href', 'dashboard');
 
@@ -123,7 +123,30 @@ Route::group([
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
                 Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
+                Route::post("restore/", ucfirst($cname) . "Controller@restore")->name('restore');
                 Route::post("updatePassword/", ucfirst($cname) . "Controller@updatePassword")->name('updatePassword');
+            }
+        );
+
+        // ADMIN ROUTES
+        $cname = "admin";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+
+                Route::get("/", ucfirst($cname) . "Controller@index")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fas fa-users")
+                    ->defaults("name", "Admin Management")
+                    ->defaults("roles", array("Super Admin"))
+                    ->name($cname)
+                    ->defaults("href", "/$cname");
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+                Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
+                Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
             }
         );
 
@@ -406,6 +429,7 @@ Route::group([
                 'prefix' => "$cname/"
             ], function () use($cname){
 
+                Route::get("admin", ucfirst($cname) . "Controller@admin")->name('admin');
                 Route::get("rhu", ucfirst($cname) . "Controller@rhu")->name('rhu');
                 Route::get("bhc", ucfirst($cname) . "Controller@bhc")->name('bhc');
                 Route::get("medicine", ucfirst($cname) . "Controller@medicine")->name('medicine');

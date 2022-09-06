@@ -13,17 +13,18 @@
                             List
                         </h3>
 
-                        @include('approvers.includes.toolbar')
+                        @include('admins.includes.toolbar')
                     </div>
 
                     <div class="card-body table-responsive">
-                    	<table id="table" class="table table-hover">
+                    	<table id="table" class="table table-hover" style="width: 100%;">
                     		<thead>
                     			<tr>
                     				<th>ID</th>
-                    				<th>Username</th>
                     				<th>Name</th>
+                    				<th>Username</th>
                     				<th>Email</th>
+                    				<th>Address</th>
                     				<th>Contact</th>
                     				<th>Actions</th>
                     			</tr>
@@ -55,20 +56,21 @@
 		$(document).ready(()=> {
 			var table = $('#table').DataTable({
 				ajax: {
-					url: "{{ route('datatable.approver') }}",
+					url: "{{ route('datatable.admin') }}",
                 	dataType: "json",
                 	dataSrc: "",
 					data: {
 						table: 'Users',
 						select: "*",
-						where: ["Role", "Approver"]
+						where: ["Role", "Admin"]
 					}
 				},
 				columns: [
 					{data: 'id'},
-					{data: 'username'},
 					{data: 'name'},
+					{data: 'username'},
 					{data: 'email'},
+					{data: 'address'},
 					{data: 'contact'},
 					{data: 'actions'},
 				],
@@ -86,9 +88,9 @@
 					select: '*',
 					where: ['id', id],
 				},
-				success: approver => {
-					approver = JSON.parse(approver)[0];
-					showDetails(approver);
+				success: admin => {
+					admin = JSON.parse(admin)[0];
+					showDetails(admin);
 				}
 			})
 		}
@@ -99,6 +101,7 @@
 	                ${input("name", "Name", null, 3, 9)}
 					${input("email", "Email", null, 3, 9, 'email')}
 	                ${input("contact", "Contact #", null, 3, 9)}
+	                ${input("address", "Address", null, 3, 9)}
 	                <br>
 	                ${input("username", "Username", null, 3, 9)}
 	                ${input("password", "Password", null, 3, 9, 'password')}
@@ -170,7 +173,8 @@
 							name: $("[name='name']").val(),
 							email: $("[name='email']").val(),
 							contact: $("[name='contact']").val(),
-							role: "Approver",
+							address: $("[name='address']").val(),
+							role: "Admin",
 							username: $("[name='username']").val(),
 							password: $("[name='password']").val(),
 							_token: $('meta[name="csrf-token"]').attr('content')
@@ -184,15 +188,16 @@
 			});
 		}
 
-		function showDetails(approver){
+		function showDetails(admin){
 			Swal.fire({
 				html: `
-	                ${input("id", "", approver.id, 3, 9, 'hidden')}
-	                ${input("name", "Name", approver.name, 3, 9)}
-					${input("email", "Email", approver.email, 3, 9, 'email')}
-	                ${input("contact", "Contact #", approver.contact, 3, 9)}
+	                ${input("id", "", admin.id, 3, 9, 'hidden')}
+	                ${input("name", "Name", admin.name, 3, 9)}
+					${input("email", "Email", admin.email, 3, 9, 'email')}
+	                ${input("contact", "Contact #", admin.contact, 3, 9)}
+	                ${input("address", "Address", admin.address, 3, 9)}
 	                <br>
-	                ${input("username", "Username", approver.username, 3, 9)}
+	                ${input("username", "Username", admin.username, 3, 9)}
 				`,
 				width: '800px',
 				confirmButtonText: 'Update',
@@ -217,7 +222,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length && result[0].id != approver.id){
+            						if(result.length && result[0].id != admin.id){
             			    			Swal.showValidationMessage('Email already used');
 	            						setTimeout(() => {resolve()}, 500);
             						}
@@ -230,7 +235,7 @@
 			            					},
 			            					success: result => {
 			            						result = JSON.parse(result);
-			            						if(result.length && result[0].id != approver.user.id){
+			            						if(result.length && result[0].id != admin.user.id){
 			            			    			Swal.showValidationMessage('Username already used');
 				            						setTimeout(() => {resolve()}, 500);
 			            						}
@@ -253,6 +258,7 @@
 							id: $("[name='id']").val(),
 							name: $("[name='name']").val(),
 							email: $("[name='email']").val(),
+							address: $("[name='address']").val(),
 							contact: $("[name='contact']").val(),
 							username: $("[name='username']").val(),
 						},
@@ -270,6 +276,21 @@
 					swal.showLoading();
 					update({
 						url: "{{ route('user.delete') }}",
+						data: {id: id},
+						message: "Success"
+					}, () => {
+						reload();
+					})
+				}
+			});
+		}
+
+		function res(id){
+			sc("Confirmation", "Are you sure you want to restore?", result => {
+				if(result.value){
+					swal.showLoading();
+					update({
+						url: "{{ route('user.restore') }}",
 						data: {id: id},
 						message: "Success"
 					}, () => {
