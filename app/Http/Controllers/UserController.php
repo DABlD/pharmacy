@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{User, Theme};
+use App\Models\{User, Theme, TransactionType};
 use DB;
 use Auth;
 
