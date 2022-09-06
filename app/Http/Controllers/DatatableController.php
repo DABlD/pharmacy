@@ -221,6 +221,14 @@ class DatatableController extends Controller
     public function transactionType(Request $req){
         $array = TransactionType::select($req->select);
 
+        if(auth()->user()->role == "Admin"){
+            $array = $array->where('admin_id', auth()->user()->id);
+        }
+        elseif(auth()->user()->role == "RHU"){
+            $array = $array->join('rhus as r', 'r.admin_id', '=', 'transaction_types.admin_id');
+            $array = $array->where('r.user_id', auth()->user()->id);
+        }
+
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);

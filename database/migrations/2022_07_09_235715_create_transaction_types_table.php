@@ -16,6 +16,7 @@ class CreateTransactionTypesTable extends Migration
         Schema::create('transaction_types', function (Blueprint $table) {
             $table->id();
 
+            $table->integer('admin_id')->unsigned();
             $table->string('type');
             $table->enum("operator", ["+", "-"])->nullable();
             $table->boolean('inDashboard')->default(false);

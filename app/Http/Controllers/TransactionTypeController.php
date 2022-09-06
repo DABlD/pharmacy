@@ -21,6 +21,11 @@ class TransactionTypeController extends Controller
     public function get(Request $req){
         $array = TransactionType::select($req->select);
 
+        // IF JOIN
+        if($req->join){
+            $array = $array->join('rhus as r', 'r.admin_id', '=', 'transaction_types.admin_id');
+        }
+
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
@@ -55,6 +60,7 @@ class TransactionTypeController extends Controller
 
     public function store(Request $req){
         $entry = new TransactionType();
+        $entry->admin_id = auth()->user()->id;
         $entry->type = $req->type;
         $entry->operator = $req->operator;
         $entry->save();

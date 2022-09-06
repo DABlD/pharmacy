@@ -26,13 +26,16 @@ class TransactionTypeSeeder extends Seeder
             ["Adj. Entry Minus", "-", 0, 0]
         ];
 
-        foreach($array as $type){
-            $this->addTransactionType($type[0], $type[1], $type[2], $type[3]);
+        for($i = 2; $i <= 4; $i++){
+            foreach($array as $type){
+                $this->addTransactionType($type[0], $type[1], $type[2], $type[3], $i);
+            }
         }
     }
 
-    public function addTransactionType($type, $operator, $inDashboard, $canDelete){
+    public function addTransactionType($type, $operator, $inDashboard, $canDelete, $admin_id){
         $tType = new TransactionType();
+        $tType->admin_id = $admin_id;
         $tType->type = $type;
         $tType->operator = $operator;
         $tType->inDashboard = $inDashboard;
