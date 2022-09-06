@@ -79,9 +79,13 @@
 			$.ajax({
 				url: "{{ route('bhc.get') }}",
 				data: {
-					select: '*',
+					select: 'bhcs.*',
 					@if(auth()->user()->role == "RHU")
-					where: ['rhu_id', {{ auth()->user()->id }}]
+						join: true,
+						where: ['r.user_id', {{ auth()->user()->id }}]
+					@else
+						join: true,
+						where: ['r.admin_id', {{ auth()->user()->id }}]
 					@endif
 				},
 				success: bhcs => {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{Data, Alert, TransactionType, Rhu, Request as Req};
+use DB;
 
 class ReportController extends Controller
 {
@@ -44,16 +45,21 @@ class ReportController extends Controller
     }
 
     public function getInventory(Request $req){
-        $temp = Data::where('transaction_types_id', $req->tType)
+        $temp = Data::select('data.*')
+            ->where('transaction_types_id', $req->tType)
             ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
-            ->whereBetween('transaction_date', [$req->from, $req->to]);
+            ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        $temp = $temp->join('rhus as r', 'r.admin_id', '=', 'data.user_id');
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->where('r.user_id', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->where('r.admin_id', auth()->user()->id);
         }
 
-        $temp = $temp->get();
+        $temp = $temp->get()->unique();
 
         $temp->load('reorder.medicine');
         $temp->load('transaction_type');
@@ -71,7 +77,7 @@ class ReportController extends Controller
             foreach($dates as $date){
                 $total = 0;
                 foreach($medicine as $data){
-                    if(now()->parse($data->transaction_date)->toDateString() == $date){
+                    if(now()->parse($data->transaction_date)->startOfDay()->toDateTimeString() == $date){
                         if($data->transaction_type->operator == "+"){
                             $total += $data->{$req->view};
                             $grandtotal += $data->{$req->view};
@@ -101,15 +107,22 @@ class ReportController extends Controller
     }
 
     public function getSales(Request $req){
-        $temp = Data::whereNotNull('bhc_id')
+        $temp = Data::select('data.*')
+                    ->whereNotNull('bhc_id')
                     ->whereIn('transaction_types_id', [2,3])
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
-        $temp = $temp->get();
+        $temp = $temp->get()->unique();
 
         $temp->load('bhc');
         $temp->load('transaction_type');
@@ -128,7 +141,7 @@ class ReportController extends Controller
             foreach($dates as $date){
                 $total = 0;
                 foreach($group as $data){
-                    if(now()->parse($data->transaction_date)->toDateString() == $date){
+                    if(now()->parse($data->transaction_date)->startOfDay()->toDateTimeString() == $date){
                         if($data->transaction_type->operator == "-"){
                             $total += $data->{$req->view};
                             $grandTotal += $data->{$req->view};

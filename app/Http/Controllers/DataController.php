@@ -9,7 +9,7 @@ use DB;
 class DataController extends Controller
 {
     public function __construct(){
-        $this->table = "data";
+        $this->table = "datas";
     }
 
     public function index(){
@@ -81,7 +81,7 @@ class DataController extends Controller
     }
 
     public function updateStock($uid, $mid, $operator, $num){
-        $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $mid);
+        $reorder = Reorder::find($mid);
 
         if($operator == "+"){
             $reorder->increment('stock', $num);
@@ -90,7 +90,6 @@ class DataController extends Controller
             $reorder->decrement('stock', $num);
         }
 
-        $reorder = $reorder->first();
         if($reorder->stock <= $reorder->point && auth()->user()->role == "Admin"){
             $reorder->load('medicine');
             $name = $reorder->medicine->name;
