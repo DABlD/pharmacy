@@ -61,8 +61,14 @@ class ExportController extends Controller
             ->whereNotNull('bhc_id')
             ->whereBetween('transaction_date', [$req->from, $req->to]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $temp = $temp->get();
@@ -116,8 +122,14 @@ class ExportController extends Controller
                     ->whereIn('transaction_types_id', [2,3])
                     ->whereBetween('transaction_date', [$req->from, $req->to]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $temp = $temp->get();
@@ -176,8 +188,14 @@ class ExportController extends Controller
                     ->where('transaction_types_id', 5)
                     ->whereBetween('transaction_date', [$req->from, $req->to]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $temp = $temp->get();
@@ -226,8 +244,14 @@ class ExportController extends Controller
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
                     ->whereBetween('transaction_date', [$req->from, $req->to]);
 
-        if(auth()->user()->role != "Admin"){
-            $temp = $temp->where('user_id', auth()->user()->id);
+        if(auth()->user()->role == "RHU"){
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
+            $temp = $temp->where('r.user_id', '=', auth()->user()->id);
+        }
+        else{
+            $temp = $temp->join('bhcs as b', 'b.id', '=', 'data.bhc_id');
+            $temp = $temp->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
         }
 
         $temp = $temp->get();
