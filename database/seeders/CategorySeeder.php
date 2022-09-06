@@ -14,15 +14,18 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        $size = 5;
-        for($i = 1; $i <= $size; $i++){
-            $this->addCategory($i);
+        for($i = 2; $i <= 4; $i++){
+            $size = rand(1,5);
+            for($j = 1; $j <= $size; $j++){
+                $this->addCategory($i, $j);
+            }
         }
     }
 
-    public function addCategory($i){
+    public function addCategory($i, $j){
         $category = new Category();
-        $category->name = "Category $i";
+        $category->admin_id = $i;
+        $category->name = "Category $j";
         $category->save();
     }
 }

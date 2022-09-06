@@ -234,6 +234,12 @@
 						url: "{{ route('medicine.getCategories') }}",
 						data: {
 							select: "*",
+							@if(auth()->user()->role == "Admin")
+								where: ['admin_id', {{ auth()->user()->id }}]
+							@else(auth()->user()->role == "RHU")
+								join: true,
+								where: ['r.user_id', {{ auth()->user()->id }}]
+							@endif
 						},
 						success: categories => {
 							categories = JSON.parse(categories);
@@ -359,7 +365,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length){
+            						if(result.length && result[0].admin_id == {{ auth()->user()->id }}){
             			    			Swal.showValidationMessage('Category already exists');
 	            						setTimeout(() => {resolve()}, 500);
             						}
@@ -418,7 +424,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length){
+            						if(result.length && result[0].admin_id == {{ auth()->user()->id }}){
             			    			Swal.showValidationMessage('Category already exists');
 	            						setTimeout(() => {resolve()}, 500);
             						}
@@ -514,6 +520,13 @@
 						url: "{{ route('medicine.getCategories') }}",
 						data: {
 							select: "*",
+							@if(auth()->user()->role == "Admin")
+								where: ['admin_id', {{ auth()->user()->id }}]
+							@else(auth()->user()->role == "RHU")
+								join: true,
+								where: ['r.admin_id', {{ auth()->user()->id }}]
+							@endif
+
 						},
 						success: categories => {
 							categories = JSON.parse(categories);

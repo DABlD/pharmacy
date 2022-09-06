@@ -183,7 +183,17 @@ class DatatableController extends Controller
     }
 
     private function addCategories($array){
-        $categories = Category::all();
+        $categories = Category::select('categories.*');
+
+        if(auth()->user()->role == "Admin"){
+            $categories = $categories->where('admin_id', auth()->user()->id);
+        }
+        elseif(auth()->user()->role == "RHU"){
+            $categories = $categories->join('rhus as r', 'r.admin_id', '=', 'categories.admin_id');
+            $categories = $categories->where('r.user_id', auth()->user()->id);
+        }
+
+        $categories = $categories->get();
 
         foreach($categories as $category){
 

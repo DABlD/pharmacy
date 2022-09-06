@@ -52,6 +52,11 @@ class MedicineController extends Controller
     public function getCategories(Request $req){
         $array = Category::select($req->select);
 
+        // IF JOIN
+        if($req->join){
+            $array = $array->join('rhus as r', 'r.admin_id', '=', 'categories.admin_id');
+        }
+
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
@@ -145,6 +150,7 @@ class MedicineController extends Controller
 
     public function storeCategory(Request $req){
         $entry = new Category();
+        $entry->admin_id = auth()->user()->id;
         $entry->name = $req->name;
         $entry->save();
     }

@@ -430,6 +430,12 @@
 				url: "{{ route('medicine.getCategories') }}",
 				data: {
 					select: "*",
+					@if(auth()->user()->role == "Admin")
+						where: ['admin_id', {{ auth()->user()->id }}]
+					@else(auth()->user()->role == "RHU")
+						join: true,
+						where: ['r.user_id', {{ auth()->user()->id }}]
+					@endif
 				},
 				success: categories => {
 					categories = JSON.parse(categories);
