@@ -36,10 +36,10 @@
           <li><a class="nav-link scrollto " href="#applications">Applications</a></li>
           <li><a class="nav-link scrollto" href="#contact-us" data-toggle="modal" data-target="#myModal">Contact Us</a></li>
           @guest
-          <li><a class="nav-link" href="{{ route('login') }}">Login</a></li>
+          {{-- <li><a class="nav-link" href="{{ route('login') }}">Login</a></li> --}}
           @endguest
           @auth
-          <li><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
+          {{-- <li><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li> --}}
           @endauth
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
@@ -57,7 +57,12 @@
         <header class="section-header">
           <h5 style="text-align: center; margin-top: 10px;">
           Pharmaceutical Inventory Management System<br>
-          {{-- <a href="/sedi/login.php" style="text-decoration: none;"><button style="margin-top: 10px; background-color: #F25420; color: #FFFFFF;" type="button" class="btn btn-warning">LOGIN</button></a> --}}
+          @guest
+          <a href="{{ route('login') }}" style="text-decoration: none;"><button style="margin-top: 10px; background-color: #F25420; color: #FFFFFF;" type="button" class="btn btn-warning">LOGIN</button></a>
+          @endguest
+          @auth
+          <a href="{{ route('dashboard') }}" style="text-decoration: none;"><button style="margin-top: 10px; background-color: #F25420; color: #FFFFFF;" type="button" class="btn btn-warning">Dashboard</button></a>
+          @endauth
           </h5>
           <div class="intro-info">
         </div>
