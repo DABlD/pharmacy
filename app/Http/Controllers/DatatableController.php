@@ -459,6 +459,7 @@ class DatatableController extends Controller
 
     public function location(Request $req){
         $array = Location::select($req->select);
+        $array = $array->where('admin_id', auth()->user()->id);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){

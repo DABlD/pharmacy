@@ -16,6 +16,7 @@ class CreateLocationsTable extends Migration
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
 
+            $table->integer('admin_id')->unsigned();
             $table->string('location');
             $table->string('contact');
 

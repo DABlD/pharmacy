@@ -11,7 +11,7 @@ class Location extends Model
     use LocationAttribute;
 
     protected $fillable = [
-        'location', 'contact'
+        'location', 'contact', 'admin_id'
     ];
 
     protected $dates = [

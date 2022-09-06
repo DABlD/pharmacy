@@ -51,6 +51,7 @@ class LocationController extends Controller
     public function store(Request $req){
         $data = new Location();
         
+        $data->admin_id = auth()->user()->id;
         $data->location = $req->location;
         $data->contact = $req->contact;
 
