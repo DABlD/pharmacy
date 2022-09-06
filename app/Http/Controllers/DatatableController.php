@@ -294,6 +294,7 @@ class DatatableController extends Controller
 
     public function approver(Request $req){
         $array = User::select($req->select);
+        $array = $array->where('admin_id', auth()->user()->id);
 
         // IF HAS SORT PARAMETER $ORDER
         if($req->order){

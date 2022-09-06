@@ -38,6 +38,9 @@ class UserController extends Controller
 
     public function store(Request $req){
         $user = new User();
+        if($req->role == "Approver" && auth()->user()->role == "Admin"){
+            $user->admin_id = auth()->user()->id;
+        }
         $user->name = $req->name;
         $user->contact = $req->contact;
         $user->email = $req->email;
