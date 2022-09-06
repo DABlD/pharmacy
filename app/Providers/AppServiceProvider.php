@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Models\Theme;
+use DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,7 +25,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer('*',function($view) {
-            $view->with('theme', Theme::pluck('value', 'name'));
+            $theme = DB::table('themes');
+
+            if(isset(auth()->user()->role)){
+                if(auth()->user()->role == "Admin"){
+                    $theme = $theme->where('admin_id', auth()->user()->id);
+                }
+                elseif(auth()->user()->role == "RHU"){
+                    $theme = $theme->join('rhus as r', 'r.admin_id', '=', 'themes.admin_id');
+                    $theme = $theme->where('r.user_id', auth()->user()->id);
+                }
+
+                $view->with('theme', $theme->pluck('value', 'name'));
+            }
         });
     }
 }

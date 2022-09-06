@@ -27,13 +27,16 @@ class ThemeSeeder extends Seeder
             ["table_group_font_color", "#ffffff"],
         ];
 
-        foreach($array as $theme){
-            $this->seed($theme[0], $theme[1]);
+        for($i = 2; $i <= 4; $i++){ 
+            foreach($array as $theme){
+                $this->seed($theme[0], $theme[1], $i);
+            }
         }
     }
 
-    private function seed($name, $value){
+    private function seed($name, $value, $aid){
         $data = new Theme();
+        $data->admin_id = $aid;
         $data->name = $name;
         $data->value = $value;
         $data->save();

@@ -29,7 +29,7 @@
 		<div class="container-login100">
 			<div class="wrap-login100">
 				<div class="login100-pic js-tilt" data-tilt>
-					<img src="{{ asset($theme['login_banner_img']); }}" width="500" height="300" alt="IMG">
+					<img src="{{ asset($theme['login_banner_img'] ?? "images/sedi_logo.png") }}" width="500" height="300" alt="IMG">
 				</div>
 
 				<form class="login100-form validate-form" method="POST" action="{{ route('login'); }}">
@@ -63,7 +63,7 @@
 					{{-- <div class="container-register100-form-btn">
 					</div> --}}
 
-					<div class="text-center p-t-12">
+					<div class="text-center p-t-12" style="visibility: hidden;">
 						<span class="txt1">
 							Forgot
 						</span>
@@ -72,7 +72,7 @@
 						</a>
 					</div>
 
-					<div class="text-center p-t-136">
+					<div class="text-center p-t-136" style="visibility: hidden;">
 						<a class="txt2" href="{{ route('register') }}">
 							Create your account
 							<i class="fas fa-arrow-right"></i>

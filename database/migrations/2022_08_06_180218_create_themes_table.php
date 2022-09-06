@@ -16,6 +16,7 @@ class CreateThemesTable extends Migration
         Schema::create('themes', function (Blueprint $table) {
             $table->id();
 
+            $table->string('admin_id');
             $table->string('name');
             $table->string('value')->nullable();
 
