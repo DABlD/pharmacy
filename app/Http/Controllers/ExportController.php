@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Exports\Report;
 use Maatwebsite\Excel\Facades\Excel;
 
-use App\Models\{Data, Request as Req, TransactionType};
+use App\Models\{Data, Request as Req, TransactionType, Medicine};
 
 class ExportController extends Controller
 {
@@ -353,16 +353,40 @@ class ExportController extends Controller
     }
 
     public function exportSku(Request $req){
-        $array = Medicine::join("reorders as r", "r.medicine_id", '=', 'medicines.id')
+        $array = Medicine::select('medicines.*', 'r.stock')
+            ->join("reorders as r", "r.medicine_id", '=', 'medicines.id')
             ->where('r.user_id', $req->user_id)
             ->where('r.deleted_at', null);
 
+        $array = $array->get();
         $array = $array->load('category');
         $array = $array->groupBy('category_id');
-        $array = $array->get();
-        dd($array);
 
-        echo json_encode($array);
+        $headers = ["ID", "Code", "Brand", "Name", "Packaging", "unit_price", "cost_price", "Stock"];
+
+        $data = [];
+        foreach($array as $category){
+            array_push($data, ["group" => $category[0]->category->name, "cols" => 8]);
+
+            foreach($category as $medicine){
+                $temp = [];
+                $temp["ID"] = $medicine->id;
+                $temp["Code"] = $medicine->code;
+                $temp["Brand"] = $medicine->brand;
+                $temp["Name"] = $medicine->name;
+                $temp["Packaging"] = $medicine->packaging;
+                $temp["unit_price"] = $medicine->unit_price;
+                $temp["cost_price"] = $medicine->cost_price;
+                $temp["Stock"] = $medicine->stock;;
+
+                array_push($data, $temp);
+            }
+        }
+
+        $array = $data;
+        $date = now()->toDateString();
+        $title = "SKU - $date";
+        return Excel::download(new Report($headers, $title, $array), $title . ".xlsx");
     }
 
     private function getDates($from, $to){
@@ -377,4 +401,3 @@ class ExportController extends Controller
         return $dates;
     }
 }
-        $data = $data->groupBy('medicine_id');
