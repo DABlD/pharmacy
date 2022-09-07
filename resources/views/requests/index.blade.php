@@ -605,5 +605,17 @@
 			}, 60000); //60 SECONDS
 		}
 		refresh();
+
+		function seenNewAlerts(){
+			$.ajax({
+				url: '{{ route('request.seenNewAlerts') }}',
+				success: () => {
+					setTimeout(() => {
+						seenNewAlerts();
+					}, 7000)
+				}
+			});
+		}
+		seenNewAlerts();
 	</script>
 @endpush

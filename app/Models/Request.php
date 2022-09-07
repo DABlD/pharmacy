@@ -17,7 +17,8 @@ class Request extends Model
         'status', 'lot_number', 'expiry_date', 
         'transaction_date', 'stock',
         'received_qty', 'received_date',
-        'date_dispatched'
+        'date_dispatched',
+        'new', 'admin_id'
     ];
 
     protected $dates = [

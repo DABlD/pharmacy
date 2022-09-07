@@ -16,6 +16,8 @@ class CreateRequestsTable extends Migration
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
 
+            $table->unsignedInteger('admin_id');
+            $table->boolean('new')->default(true);
             $table->unsignedInteger('user_id');
             $table->string('reference')->nullable();
             $table->string('requested_by')->nullable();

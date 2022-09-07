@@ -197,5 +197,27 @@
         @if(auth()->user()->name == null && auth()->user()->contact == null)
             $('#profile').click();
         @endif
+
+        @if(in_array(auth()->user()->role, ['Admin', 'RHU', 'Approver']))
+
+            function getNewAlerts(){
+                $('.badge').remove();
+
+                $.ajax({
+                    url: '{{ route('request.getNewAlerts') }}',
+                    success: result => {
+                        console.log(result);
+                        if(result > 0){
+                            $('.fa-light.fa-keyboard, .fa-light.fa-desktop').parent().append(`<span class="badge badge-danger">${result}</span>`);
+                        }
+
+                        setTimeout(() => {
+                            getNewAlerts();
+                        }, 3000);
+                    }
+                })
+            }
+            getNewAlerts();
+        @endif
     </script>
 @endpush

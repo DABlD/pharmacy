@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Request as Req;
-use App\Models\{Reorder, Data, Alert};
+use App\Models\{Reorder, Data, Alert, Rhu, User};
 
 use DB;
 
@@ -108,8 +108,9 @@ class RequestController extends Controller
 
             $data = new Req();
 
+            $data->admin_id = RHU::where('user_id', auth()->user()->id)->first()->admin_id;
             $aId = auth()->user()->id;
-            $data->stock = Reorder::where('user_id', 1)->where('medicine_id', $temp->medicine_id)->first()->stock;
+            $data->stock = Reorder::where('user_id', RHU::where('user_id', $aId)->first()->admin_id)->where('medicine_id', $temp->medicine_id)->first()->stock;
 
             $data->user_id = $aId;
             $data->reference = $temp->reference;
@@ -130,17 +131,25 @@ class RequestController extends Controller
 
         if($req->where){
             $id = $req->where[1];
-            $query = $query->where($req->where[0], $id)->update($req->except(['id', '_token', 'where']));
+            $query = $query->where($req->where[0], $id)->update(array_merge($req->except(['id', '_token', 'where']), ["new" => 1]));
         }
         else{
             $id = $req->id;
-            $query = $query->where('id', $id)->update($req->except(['id', '_token']));
+            $query = $query->where('id', $id)->update(array_merge($req->except(['id', '_token']), ["new" => 1]));
         }
 
         if(isset($req->status) && $req->status == "Approved"){
             $request = Req::find($req->id);
 
-            $this->updateStock(1, $request->medicine_id, "-", $request->approved_qty);
+            $admin_id = null;
+            if(auth()->user()->role == "Approver"){
+                $admin_id = auth()->user()->admin_id; 
+            }
+            elseif(auth()->user()->role == "Admin"){
+                $admin_id = auth()->user()->id;
+            }
+
+            $this->updateStock($admin_id, $request->medicine_id, "-", $request->approved_qty);
             $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
         }
         elseif(isset($req->status) && $req->status == "For Delivery"){
@@ -157,7 +166,7 @@ class RequestController extends Controller
             $data->qty = $request->approved_qty;
             $data->unit_price = $request->unit_price;
             $data->amount = $request->amount;
-            $data->transaction_date = $request->transaction_date . ' ' . now()->toTimeString();
+            $data->transaction_date = strlen($request->transaction_date) > 10 ? $request->transaction_date : $request->transaction_date . ' ' . now()->toTimeString();
             $data->save();
         }
         elseif(isset($req->status) && $req->status == "Incomplete Qty"){
@@ -189,6 +198,34 @@ class RequestController extends Controller
             $name = $reorder->medicine->name;
             $point = $reorder->point;
             $this->createAlert("$name stock is low: $point");
+        }
+    }
+
+    public function getNewAlerts(){
+        $requests = null;
+
+        if(in_array(auth()->user()->role, ['Admin'])){
+            $requests = Req::where('admin_id', auth()->user()->id)->whereIn('status', ['For Approval', 'Delivered', 'Incomplete Qty', 'Cancelled'])->where('new', 1)->count();
+        }
+        elseif(in_array(auth()->user()->role, ['"Approver"'])){
+            $requests = Req::where('admin_id', auth()->user()->admin_id)->whereIn('status', ['For Approval', 'Delivered', 'Incomplete Qty', 'Cancelled'])->where('new', 1)->count();
+        }
+        elseif(in_array(auth()->user()->role, ['RHU'])){
+            $requests = Req::where('user_id', auth()->user()->id)->whereIn('status', ['Approved', 'Declined', 'For Delivery'])->where('new', 1)->count();
+        }
+
+        echo $requests;
+    }
+
+    public function seenNewAlerts(){
+        if(in_array(auth()->user()->role, ['Admin'])){
+            $requests = Req::where('admin_id', auth()->user()->id)->where('new', 1)->update(['new' => 0]);
+        }
+        elseif(in_array(auth()->user()->role, ["Approver"])){
+            $requests = Req::where('admin_id', auth()->user()->admin_id)->where('new', 1)->update(['new' => 0]);
+        }
+        elseif(in_array(auth()->user()->role, ['RHU'])){
+            $requests = Req::where('user_id', auth()->user()->id)->where('new', 1)->update(['new' => 0]);
         }
     }
 

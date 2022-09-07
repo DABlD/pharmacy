@@ -353,14 +353,16 @@ class ExportController extends Controller
     }
 
     public function exportSku(Request $req){
-        // $array = Medicine::join("reorders as r", "r.medicine_id", '=', 'medicines.id')
-        //             ->where('r.user_id', $req->user_id)
-        //             ->where('r.deleted_at', null)
+        $array = Medicine::join("reorders as r", "r.medicine_id", '=', 'medicines.id')
+            ->where('r.user_id', $req->user_id)
+            ->where('r.deleted_at', null);
 
+        $array = $array->load('category');
+        $array = $array->groupBy('category_id');
+        $array = $array->get();
+        dd($array);
 
-        // $array = $array->get();
-
-        // echo json_encode($array);
+        echo json_encode($array);
     }
 
     private function getDates($from, $to){
@@ -375,3 +377,4 @@ class ExportController extends Controller
         return $dates;
     }
 }
+        $data = $data->groupBy('medicine_id');

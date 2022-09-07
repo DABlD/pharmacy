@@ -53,6 +53,8 @@ Route::group([
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
 
                 Route::get("inputInfo", ucfirst($cname) . "Controller@inputInfo")->name('inputInfo');
+                Route::get("getNewAlerts", ucfirst($cname) . "Controller@getNewAlerts")->name('getNewAlerts');
+                Route::get("seenNewAlerts", ucfirst($cname) . "Controller@seenNewAlerts")->name('seenNewAlerts');
             }
         );
 

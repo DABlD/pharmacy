@@ -95,10 +95,10 @@
                     			
                     			<div class="row">
                     			    <div class="col-md-3 iLabel">
-                    			        Requested By
+                    			        Particulars
                     			    </div>
             			            <div class="col-md-9 iInput">
-            			                <textarea name="requested_by" placeholder="Requestor" class="form-control" cols="10" rows="2"></textarea>
+            			                <textarea name="requested_by" class="form-control" cols="10" rows="2"></textarea>
             			            </div>
                     			</div>
 
