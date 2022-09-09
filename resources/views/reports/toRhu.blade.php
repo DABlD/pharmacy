@@ -29,9 +29,9 @@
                     				<th>Qty</th>
                     				<th>Particulars</th>
                     				<th>Lot #</th>
-                    				<th>Expiry</th>
-                    				<th>Date Dispatched</th>
-                    				<th>Date Received</th>
+                    				<th>Tx Date</th>
+                    				<th>Dispatched On</th>
+	                    			<th>Received On</th>
                     				<th>Status</th>
                     			</tr>
                     		</thead>
@@ -165,7 +165,7 @@
 					{data: 'approved_qty'},
 					{data: 'requested_by'},
 					{data: 'lot_number'},
-					{data: 'expiry_date'},
+					{data: 'transaction_date'},
 					{data: 'date_dispatched'},
 					{data: 'received_date'},
 					{data: 'status'},

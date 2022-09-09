@@ -194,7 +194,7 @@ class ReportController extends Controller
     public function getPurchaseOrder(Request $req){
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
                     ->where('transaction_types_id', 5)
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()]);;
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
@@ -248,7 +248,7 @@ class ReportController extends Controller
 
     public function getDailySheet(Request $req){
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()]);
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
@@ -362,8 +362,8 @@ class ReportController extends Controller
     }
 
     public function salesPerRhu(){
-        $from = now()->subDays(6)->toDateString();
-        $to = now()->toDateString();
+        $from = now()->subDays(6)->startOfDay()->toDateString();
+        $to = now()->endOfDay()->toDateString();
 
         $dates = $this->getDates($from, $to);
         $data = Data::whereBetween('transaction_date', [$from, $to])
@@ -426,33 +426,65 @@ class ReportController extends Controller
         echo json_encode(['labels' => $labels, 'dataset' => $dataset]);
     }
 
-    // ID
-    // RHU
-    // Ref
-    // Medicine
-    // Qty
-    // Particulars
-    // Lot #
-    // Expiry
-    // Date Dispatched
-
-    // f.from = from;
-    // f.to = to;
-    // f.rhu = rhu;
-    // f.sku = sku;
-
     public function getToRhu(Request $req){
         $data = Req::select('requests.*', 'r.company_name', 'm.name as mname')
                     ->join('rhus as r', 'r.user_id', '=', 'requests.user_id')
                     ->join('medicines as m', 'm.id', '=', 'requests.medicine_id')
                     ->where('r.admin_id', '=', auth()->user()->id)
-                    ->whereBetween('received_date', [$req->from, $req->to])
-                    ->where('medicine_id', 'like', "%$req->sku%")
-                    ->where('requests.user_id', 'like', "%$req->rhu%")
-                    ->whereIn('status', ['Delivered', 'Incomplete Qty']);
+                    ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()])
+                    ->where('medicine_id', 'like', $req->sku)
+                    ->where('requests.user_id', 'like', $req->rhu)
+                    ->whereIn('status', ['Delivered', 'Incomplete Qty'])
+                    ->get();
 
+        echo json_encode($data);
+    }
+
+    public function getToBarangay(Request $req){
+        $data = Data::select('data.*', 'b.name as bname', 'm.name as mname', "m.packaging")
+                    ->join('bhcs as b', 'b.id', '=', 'data.bhc_id')
+                    ->join('transaction_types as t', 't.id', '=', 'data.transaction_types_id')
+                    ->join('reorders as rod', 'rod.id', '=', 'data.medicine_id')
+                    ->join('medicines as m', 'm.id', '=', 'rod.medicine_id')
+                    ->whereBetween('transaction_date', [now()->parse($req->from)->startOfDay()->toDateTimeString(), now()->parse($req->to)->endOfDay()->toDateTimeString()])
+                    ->where('data.bhc_id', 'like', $req->bhc)
+                    ->where('t.operator', '-');
+
+        if($req->rhu != "%%"){
+            $data = $data->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $data = $data->where('r.user_id', '=', $req->rhu);
+        }
+        else{
+            $data = $data->join('rhus as r', 'r.id', '=', 'b.rhu_id');
+            $data = $data->where('r.admin_id', '=', auth()->user()->id);
+        }
+        
         $data = $data->get();
-        $data = $data->load('medicine');
+
+        $temp = [];
+
+        foreach($data->unique('mname')->pluck('mname', 'packaging') as $packaging => $medicine){
+            $temp[$medicine]["packaging"] = $packaging;
+            foreach($data->unique('bname')->pluck('bname') as $bhc){
+                $temp[$medicine]["bhcs"][$bhc] = 0;
+            }
+        }
+
+        foreach($data as $data2){
+            $mname = $data2->mname;
+            $bname = $data2->bname;
+
+            $temp[$mname]["bhcs"][$bname] = $temp[$mname]["bhcs"][$bname] + $data2->qty;
+        }
+
+        $data = [];
+        foreach($temp as $medicine => $temp2){
+            array_push($data, array_merge([
+                "medicine" => $medicine,
+                "packaging" => $temp2['packaging'],
+                "total" => array_sum($temp2["bhcs"])
+            ], $temp2["bhcs"]));
+        }
 
         echo json_encode($data);
     }
