@@ -80,6 +80,10 @@ class DataController extends Controller
         }
     }
 
+    public function update(Request $req){
+        DB::table('data')->where('id', $req->id)->update($req->except(['id', '_token']));
+    }
+
     public function updateStock($uid, $mid, $operator, $num){
         $reorder = Reorder::find($mid);
 

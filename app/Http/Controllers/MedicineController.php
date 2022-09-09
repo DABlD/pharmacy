@@ -23,6 +23,11 @@ class MedicineController extends Controller
         $array = Medicine::select($req->select);
 
         // IF HAS SORT PARAMETER $ORDER
+        if($req->join){
+            $array = $array->join('reorders as r', 'r.medicine_id', '=', 'medicine.id');
+        }
+
+        // IF HAS SORT PARAMETER $ORDER
         if($req->order){
             $array = $array->orderBy($req->order[0], $req->order[1]);
         }

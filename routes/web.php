@@ -74,6 +74,7 @@ Route::group([
 
                 Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
                 Route::post("store/", ucfirst($cname) . "Controller@store")->name('store');
+                Route::post("update/", ucfirst($cname) . "Controller@update")->name('update');
                 Route::post("delete/", ucfirst($cname) . "Controller@delete")->name('delete');
             }
         );
@@ -373,6 +374,46 @@ Route::group([
                     ->defaults("href", "/$cname/binCard");
 
                 Route::get("getBinCard/", ucfirst($cname) . "Controller@getBinCard")->name('getBinCard');
+
+                // DISPOSED TO RHU
+                // DISPOSED TO RHU
+                // DISPOSED TO RHU
+                Route::get("toRhu/", ucfirst($cname) . "Controller@toRhu")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-right-left")
+                    ->defaults("name", "Transferred to RHU")
+                    ->defaults("roles", array("Admin"))
+                    ->defaults("group", "Reports")
+                    ->name('toRhu')
+                    ->defaults("href", "/$cname/toRhu");
+
+                Route::get("getToRhu/", ucfirst($cname) . "Controller@getToRhu")->name('getToRhu');
+
+                // DISPOSED TO BARANGAY
+                // DISPOSED TO BARANGAY
+                // DISPOSED TO BARANGAY
+                Route::get("toBarangay/", ucfirst($cname) . "Controller@toBarangay")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-right-left")
+                    ->defaults("name", "Transferred to Barangay")
+                    ->defaults("roles", array("Admin", "RHU"))
+                    ->defaults("group", "Reports")
+                    ->name('toBarangay')
+                    ->defaults("href", "/$cname/toBarangay");
+
+                Route::get("getToBarangay/", ucfirst($cname) . "Controller@getToBarangay")->name('getToBarangay');
+
+                // WASTED MEDICINES
+                Route::get("wastedMedicine/", ucfirst($cname) . "Controller@wastedMedicine")
+                    ->defaults("sidebar", 1)
+                    ->defaults("icon", "fa-solid fa-dumpster")
+                    ->defaults("name", "Wasted Medicinces")
+                    ->defaults("roles", array("Admin", "RHU"))
+                    ->defaults("group", "Reports")
+                    ->name('wastedMedicine')
+                    ->defaults("href", "/$cname/wastedMedicine");
+
+                Route::get("getWastedMedicine/", ucfirst($cname) . "Controller@getWastedMedicine")->name('getWastedMedicine');
 
                 // ALERT REPORT
                 // ALERT REPORT

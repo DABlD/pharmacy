@@ -44,6 +44,24 @@ class ReportController extends Controller
         ]);
     }
 
+    public function toRhu(){
+        return $this->_view('toRhu', [
+            'title' => 'Transferred to RHU',
+        ]);
+    }
+
+    public function toBarangay(){
+        return $this->_view('toBarangay', [
+            'title' => 'Transferred to Barangay',
+        ]);
+    }
+
+    public function wastedMedicine(){
+        return $this->_view('wastedMedicine', [
+            'title' => 'Wasted Medicinces',
+        ]);
+    }
+
     public function getInventory(Request $req){
         $temp = Data::select('data.*')
             ->where('transaction_types_id', $req->tType)
@@ -406,6 +424,37 @@ class ReportController extends Controller
         }
 
         echo json_encode(['labels' => $labels, 'dataset' => $dataset]);
+    }
+
+    // ID
+    // RHU
+    // Ref
+    // Medicine
+    // Qty
+    // Particulars
+    // Lot #
+    // Expiry
+    // Date Dispatched
+
+    // f.from = from;
+    // f.to = to;
+    // f.rhu = rhu;
+    // f.sku = sku;
+
+    public function getToRhu(Request $req){
+        $data = Req::select('requests.*', 'r.company_name', 'm.name as mname')
+                    ->join('rhus as r', 'r.user_id', '=', 'requests.user_id')
+                    ->join('medicines as m', 'm.id', '=', 'requests.medicine_id')
+                    ->where('r.admin_id', '=', auth()->user()->id)
+                    ->whereBetween('received_date', [$req->from, $req->to])
+                    ->where('medicine_id', 'like', "%$req->sku%")
+                    ->where('requests.user_id', 'like', "%$req->rhu%")
+                    ->whereIn('status', ['Delivered', 'Incomplete Qty']);
+
+        $data = $data->get();
+        $data = $data->load('medicine');
+
+        echo json_encode($data);
     }
 
     public function deliveredRequests(){

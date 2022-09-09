@@ -435,7 +435,7 @@
 			$.ajax({
 				url: "{{ route('medicine.getCategories') }}",
 				data: {
-					select: "*",
+					select: "categories.*",
 					@if(auth()->user()->role == "Admin")
 						where: ['admin_id', {{ auth()->user()->id }}]
 					@else(auth()->user()->role == "RHU")
@@ -446,6 +446,7 @@
 				success: categories => {
 					categories = JSON.parse(categories);
 					let categoryString = "";
+					console.log(categories);
 
 					categories.forEach(temp => {
 						categoryString += `
@@ -677,6 +678,81 @@
 			else{
 				se("No item selected");
 			}
+		}
+
+		function view(id){
+			$.ajax({
+				url: '{{ route('data.get') }}',
+				data: {
+					where: ['id', id],
+					select: '*'
+				},
+				success: tt => {
+					tt = JSON.parse(tt)[0];
+					showDetails(tt);
+				}
+			})
+		}
+
+		function showDetails(tt){
+			Swal.fire({
+				html: `
+	                ${input("id", "", tt.id, 3, 9, 'hidden')}
+	                ${input("transaction_date2", "Date", tt.transaction_date, 3, 9)}
+					${input("reference2", "Ref", tt.reference, 3, 9)}
+	                ${input("particulars2", "Particulars", tt.particulars, 3, 9)}
+	                ${input("qty", "Qty", tt.qty, 3, 9)}
+	                ${input("unit_price", "", tt.unit_price, 3, 9, 'hidden')}
+				`,
+				width: '800px',
+				confirmButtonText: 'Update',
+				showCancelButton: true,
+				cancelButtonColor: errorColor,
+				cancelButtonText: 'Cancel',
+				didOpen: () => {
+					$("[name='transaction_date2']").flatpickr({
+						altInput: true,
+						altFormat: "F j, Y",
+						dateFormat: "Y-m-d",
+					})
+				},
+				preConfirm: () => {
+				    swal.showLoading();
+				    return new Promise(resolve => {
+				    	let bool = true;
+
+			            if($('.swal2-container input:placeholder-shown').length){
+			                Swal.showValidationMessage('Fill all fields');
+			            }
+			            else{
+			            	let bool = false;
+							setTimeout(() => {resolve()}, 500);
+			            }
+
+			            bool ? setTimeout(() => {resolve()}, 500) : "";
+				    });
+				},
+			}).then(result => {
+				if(result.value){
+					swal.showLoading();
+					update({
+						url: "{{ route('data.update') }}",
+						data: {
+							id: $("[name='id']").val(),
+							transaction_date: $("[name='transaction_date2']").val(),
+							reference: $("[name='reference2']").val(),
+							particulars: $("[name='particulars2']").val(),
+							qty: $("[name='qty']").val(),
+							amount: $("[name='qty']").val() * $("[name='unit_price']").val()
+						},
+						message: "Success"
+					},	() => {
+						setTimeout(() => {
+							viewDataEntry();
+						}, 800);
+					});
+				}
+			});
 		}
 	</script>
 @endpush

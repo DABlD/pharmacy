@@ -213,7 +213,7 @@
 
                         setTimeout(() => {
                             getNewAlerts();
-                        }, 3000);
+                        }, 60000);
                     }
                 })
             }
