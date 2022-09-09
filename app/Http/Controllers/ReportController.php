@@ -489,6 +489,10 @@ class ReportController extends Controller
         echo json_encode($data);
     }
 
+    public function getWastedMedicine(Request $req){
+
+    }
+
     public function deliveredRequests(){
         $from = now()->subDays(6)->toDateString();
         $to = now()->toDateString();
