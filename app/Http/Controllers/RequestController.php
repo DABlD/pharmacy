@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Request as Req;
-use App\Models\{Reorder, Data, Alert, Rhu, User};
+use App\Models\{Reorder, Data, Alert, Rhu, User, Stock};
 
 use DB;
 
@@ -149,8 +149,11 @@ class RequestController extends Controller
                 $admin_id = auth()->user()->id;
             }
 
-            $this->updateStock($admin_id, $request->medicine_id, "-", $request->approved_qty);
-            $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
+            // $this->updateStock($admin_id, $request->medicine_id, "-", $request->approved_qty);
+            // $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
+
+            $this->updateStock("-", $admin_id, $request);
+            $this->updateStock("+", $request->user_id, $request);
         }
         elseif(isset($req->status) && $req->status == "For Delivery"){
             $request = Req::find($req->id);
@@ -182,14 +185,38 @@ class RequestController extends Controller
         }
     }
 
-    public function updateStock($uid, $mid, $operator, $num){
-        $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $mid);
+    // public function updateStock($uid, $mid, $operator, $num){
+    public function updateStock($operator, $uid, $request){
+        $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $request->medicine_id);
 
         if($operator == "+"){
-            $reorder->increment('stock', $num);
+            $reorder->increment('stock', $request->qty);
         }
         elseif($operator == "-"){
-            $reorder->decrement('stock', $num);
+            $reorder->decrement('stock', $request->qty);
+        }
+
+        $stock = Stock::where('reorder_id', $reorder->id)
+                    ->where('lot_number', $request->lot_number)
+                    ->where('expiry_date', $request->expiry_date->toDateTimeString())
+                    ->where('unit_price', $request->unit_price);
+
+        if($stock->get()->count()){
+            if($operator == "+"){
+                $stock->increment('qty', $request->qty);
+            }
+            elseif($operator == "-"){
+                $stock->decrement('qty', $request->qty);
+            }
+        }
+        else{
+            $stock = new Stock();
+            $stock->reorder_id = $reorder->id;
+            $stock->lot_number = $request->lot_number;
+            $stock->expiry_date = $request->expiry_date;
+            $stock->unit_price = $request->unit_price;
+            $stock->qty = $request->qty;
+            $stock->save();
         }
 
         $reorder = $reorder->first();

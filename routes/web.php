@@ -254,6 +254,17 @@ Route::group([
             }
         );
 
+        // STOCK ROUTES
+        $cname = "stock";
+        Route::group([
+                'as' => "$cname.",
+                'prefix' => "$cname/"
+            ], function () use($cname){
+
+                Route::get("get/", ucfirst($cname) . "Controller@get")->name('get');
+            }
+        );
+
         // TRANSACTION TYPE ROUTES
         $cname = "transactionType";
         Route::group([

@@ -471,6 +471,67 @@
 			})
 		}
 
+		function inv(id){
+			$.ajax({
+				url: '{{ route('stock.get') }}',
+				data: {
+					select: 'stocks.*',
+					join: true,
+					where: ['r.user_id', {{ auth()->user()->id }}],
+					where2: ['r.medicine_id', id]
+				},
+				success: stocks => {
+					stocks = JSON.parse(stocks);
+					
+					stockString = "";
+
+					let total = 0;
+					stocks.forEach(stock => {
+						total += stock.qty;
+						stockString += `
+							<tr>
+								<td>${stock.lot_number}</td>
+								<td>${moment(stock.expiry_date).format(dateFormat2)}</td>
+								<td>${stock.unit_price}</td>
+								<td>${stock.qty}</td>
+							</tr>
+						`;
+					});
+
+					if(stockString == ""){
+						stockString = `
+							<tr>
+								<td colspan="4">No Stocks</td>
+							</tr>
+						`;
+					}
+
+					Swal.fire({
+						html: `
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>Lot Number</th>
+										<th>Expiry Date</th>
+										<th>Unit Price</th>
+										<th>Qty</th>
+									</tr>
+								</thead>
+								<tbody>
+									${stockString}
+									<tr>
+										<td colspan="2"></td>
+										<td>TOTAL</td>
+										<td>${total}</td>
+									</tr>
+								</tbody>
+							</table>
+						`
+					})
+				}
+			})
+		}
+
 		function showDetails(medicine){
 			Swal.fire({
 				html: `

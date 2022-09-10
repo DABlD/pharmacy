@@ -8,6 +8,9 @@ trait MedicineAttribute{
 
 		$string = "<a class='btn btn-success' data-toggle='tooltip' title='View' onClick='view($id)'>" .
 	        "<i class='fas fa-search'></i>" .
+	    "</a>&nbsp;" . 
+	    "<a class='btn btn-info' data-toggle='tooltip' title='Inventory' onClick='inv($id)'>" .
+	        "<i class='fas fa-inventory'></i>" .
 	    "</a>&nbsp;";
 
 	    if(auth()->user()->role == "Admin"){
