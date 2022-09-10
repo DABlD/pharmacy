@@ -261,7 +261,9 @@ class RequestController extends Controller
                     ->where('seen', 0)
                     ->first();
 
-        $alert->update(['seen' => 1]);
+        if($alert){
+            $alert->update(['seen' => 1]);
+        }
 
         echo json_encode($alert);
     }

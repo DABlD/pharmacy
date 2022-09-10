@@ -226,13 +226,15 @@
                     url: '{{ route('request.getAdminAlert') }}',
                     success: alert => {
                         alert = JSON.parse(alert);
-                        Swal.fire({
-                            icon: 'error',
-                            title: alert.message
-                        })
+                        if(alert){
+                            Swal.fire({
+                                icon: 'error',
+                                title: alert.message
+                            })
+                        }
 
                         setTimeout(() => {
-                            getNewAlerts();
+                            getAdminAlert();
                         }, 60000);
                     }
                 })
