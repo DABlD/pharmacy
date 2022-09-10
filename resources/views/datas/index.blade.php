@@ -528,7 +528,7 @@
 
 			items.each((index, item) => {
 				let parent = $(item).parent().parent();
-				let price = parent.find(".price")[0].innerText;
+				let price = parent.find(".price")[0].value;
 				let qty = parent.find(".qty")[0].value;
 
 				item.value = toFloat(price * qty);
@@ -565,8 +565,8 @@
 							<td>
 								<input type="number" name="qty${id}" class="form-control qty" value="1" data-id=${id}>
 							</td>
-							<td class="price">
-								${toFloat(medicine.unit_price)}
+							<td>
+								<input type="number" name="price${id}" class="form-control price" data-id=${id}>
 							</td>
 							<td>
 								<input type="number" class="form-control total" readonly>
@@ -596,6 +596,16 @@
 				computeTotal();
 			});
 
+			$('.price').unbind('change');
+			$('.price').on("change", price => {
+				price = $(price.target);
+
+				if(price.val() == 0){
+					$(price).parent().parent().remove();
+				}
+				computeTotal();
+			});
+
 			$(".exp").flatpickr({
 				altInput: true,
 				altFormat: "M j, Y",
@@ -606,6 +616,8 @@
 		function remove(id){
 			$(`[name="qty${id}"]`).val(0);
 			$(`[name="qty${id}"]`).trigger('change');
+			$(`[name="price${id}"]`).val(0);
+			$(`[name="price${id}"]`).trigger('change');
 		}
 
 		function submit(){
@@ -626,7 +638,7 @@
 						lot_number: $(item).find(".lot_number").val(),
 						expiry_date: $(item).find(".exp").val(),
 						qty: $(item).find(".qty").val(),
-						unit_price: $(item).find(".price")[0].innerText,
+						unit_price: $(item).find(".price").val(),
 						amount: $(item).find(".total").val(),
 						transaction_date: $("[name='transaction_date']").val(),
 						@if(auth()->user()->role != "Admin")

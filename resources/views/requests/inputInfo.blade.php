@@ -254,7 +254,7 @@
 									let unit_price = $(lot).find(":selected").data("unit_price");
 
 									$(lot).parent().find('.expiry_date').text(moment(expiry_date).format(dateFormat));
-									$(lot).parent().find('.unit_price').text(unit_price);
+									$(lot).parent().find('.unit_price').text(toFloat(unit_price));
 								});
 							}
 						})
