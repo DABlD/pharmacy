@@ -106,7 +106,7 @@
                     			
                     			<div class="row">
                     			    <div class="col-md-3 iLabel">
-                    			        Pariculars
+                    			        Particulars
                     			    </div>
             			            <div class="col-md-9 iInput">
             			                <textarea name="particulars" placeholder="Enter Particulars" class="form-control" cols="10" rows="2"></textarea>
@@ -312,7 +312,6 @@
 								<th>Qty</th>
 								<th>Price</th>
 								<th>Amount</th>
-								<th>Edit</th>
 							</tr>
 						</thead>
 						<tbody></tbody>
@@ -356,7 +355,6 @@
 							{data: 'qty'},
 							{data: 'unit_price'},
 							{data: 'amount'},
-							{data: 'actions'},
 						],
 		        		rowCallback: function( row, data, index ) {
 						    if (data['id'] == null) {

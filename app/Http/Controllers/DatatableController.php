@@ -519,9 +519,9 @@ class DatatableController extends Controller
             $array = $array->groupBy($req->group);
         }
 
-        foreach($array as $item){
-            $item->actions = $item->actions;
-        }
+        // foreach($array as $item){
+        //     $item->actions = $item->actions;
+        // }
         echo json_encode($array);
     }
 }

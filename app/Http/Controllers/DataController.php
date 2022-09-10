@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data, Reorder, TransactionType, Alert};
+use App\Models\{Data, Reorder, TransactionType, Alert, Stock};
 use DB;
 
 class DataController extends Controller
@@ -76,7 +76,7 @@ class DataController extends Controller
                 $operator = TransactionType::find($data->transaction_types_id)->operator;
             }
 
-            $this->updateStock($data->user_id, $data->medicine_id, $operator, $data->qty);
+            $this->updateStock($operator, $data);
         }
     }
 
@@ -84,14 +84,39 @@ class DataController extends Controller
         DB::table('data')->where('id', $req->id)->update($req->except(['id', '_token']));
     }
 
-    public function updateStock($uid, $mid, $operator, $num){
-        $reorder = Reorder::find($mid);
+    public function updateStock($operator, $data){
+        $reorder = Reorder::find($data->medicine_id);
 
         if($operator == "+"){
-            $reorder->increment('stock', $num);
+            $reorder->increment('stock', $data->qty);
         }
         elseif($operator == "-"){
-            $reorder->decrement('stock', $num);
+            $reorder->decrement('stock', $data->qty);
+        }
+
+        $stock = Stock::where('reorder_id', $reorder->id)
+                    ->where('lot_number', $data->lot_number)
+                    ->where('expiry_date', $data->expiry_date->toDateTimeString())
+                    ->where('unit_price', $data->unit_price);
+
+        if($stock->get()->count()){
+            if($operator == "+"){
+                $stock->increment('qty', $data->qty);
+            }
+            elseif($operator == "-"){
+                $stock->decrement('qty', $data->qty);
+            }
+        }
+        else{
+            if($operator == "+"){
+                $stock = new Stock();
+                $stock->reorder_id = $reorder->id;
+                $stock->lot_number = $data->lot_number;
+                $stock->expiry_date = $data->expiry_date;
+                $stock->unit_price = $data->unit_price;
+                $stock->qty = $data->qty;
+                $stock->save();
+            }
         }
 
         if($reorder->stock <= $reorder->point && auth()->user()->role == "Admin"){
