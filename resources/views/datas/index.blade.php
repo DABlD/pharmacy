@@ -249,7 +249,7 @@
 										${row.brand}
 									</div>
 									<div class="col-md-4" style="text-align: right;">
-										₱${toFloat(row.unit_price)}
+										
 									</div>
 								</div>
 							`;
