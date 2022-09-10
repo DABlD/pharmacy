@@ -55,6 +55,7 @@ Route::group([
                 Route::get("inputInfo", ucfirst($cname) . "Controller@inputInfo")->name('inputInfo');
                 Route::get("getNewAlerts", ucfirst($cname) . "Controller@getNewAlerts")->name('getNewAlerts');
                 Route::get("seenNewAlerts", ucfirst($cname) . "Controller@seenNewAlerts")->name('seenNewAlerts');
+                Route::get("getAdminAlert/", ucfirst($cname) . "Controller@getAdminAlert")->name('getAdminAlert');
             }
         );
 

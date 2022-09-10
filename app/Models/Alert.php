@@ -9,7 +9,7 @@ class Alert extends Model
     use SoftDeletes;
     
     protected $fillable = [
-        'message'
+        'message', 'seen'
     ];
 
     protected $dates = [

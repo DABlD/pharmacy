@@ -219,5 +219,27 @@
             }
             getNewAlerts();
         @endif
+
+        @if(in_array(auth()->user()->role, ['Admin']))
+            function getAdminAlert(){
+                $.ajax({
+                    url: '{{ route('request.getAdminAlert') }}',
+                    success: alert => {
+                        alert = JSON.parse(alert);
+                        Swal.fire({
+                            icon: 'error',
+                            title: alert.message
+                        })
+
+                        setTimeout(() => {
+                            getNewAlerts();
+                        }, 60000);
+                    }
+                })
+            }
+            setTimeout(() => {
+                getAdminAlert();
+            }, 1500);
+        @endif
     </script>
 @endpush

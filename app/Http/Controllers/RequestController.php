@@ -178,7 +178,9 @@ class RequestController extends Controller
             $rQty = $request->received_qty;
             $aQty = $request->approved_qty;
 
-            $this->createAlert("Incomplete Delivery of $item with Reference No. $ref: $rQty/$aQty");
+            $rid = Rhu::where('user_id', auth()->user()->id)->first()->admin_id;
+
+            $this->createAlert("Incomplete Delivery of $item with Reference No. $ref: $rQty/$aQty", $rid);
         }
     }
 
@@ -254,9 +256,19 @@ class RequestController extends Controller
         }
     }
 
-    private function createAlert($message){
+    public function getAdminAlert(){
+        $alert = Alert::where('user_id', auth()->user()->id)
+                    ->where('seen', 0)
+                    ->first();
+
+        $alert->update(['seen' => 1]);
+
+        echo json_encode($alert);
+    }
+
+    private function createAlert($message, $id = null){
         $alert = new Alert();
-        $alert->user_id = auth()->user()->id;
+        $alert->user_id = $id ?? auth()->user()->id;
         $alert->message = $message;
         $alert->save();
     }
