@@ -138,24 +138,7 @@ class RequestController extends Controller
             $query = $query->where('id', $id)->update(array_merge($req->except(['id', '_token']), ["new" => 1]));
         }
 
-        if(isset($req->status) && $req->status == "Approved"){
-            $request = Req::find($req->id);
-
-            $admin_id = null;
-            if(auth()->user()->role == "Approver"){
-                $admin_id = auth()->user()->admin_id; 
-            }
-            elseif(auth()->user()->role == "Admin"){
-                $admin_id = auth()->user()->id;
-            }
-
-            // $this->updateStock($admin_id, $request->medicine_id, "-", $request->approved_qty);
-            // $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
-
-            $this->updateStock("-", $admin_id, $request);
-            $this->updateStock("+", $request->user_id, $request);
-        }
-        elseif(isset($req->status) && $req->status == "For Delivery"){
+        if(isset($req->status) && $req->status == "For Delivery"){
             $request = Req::find($req->id);
 
             $data = new Data();
@@ -171,6 +154,20 @@ class RequestController extends Controller
             $data->amount = $request->amount;
             $data->transaction_date = strlen($request->transaction_date) > 10 ? $request->transaction_date : $request->transaction_date . ' ' . now()->toTimeString();
             $data->save();
+
+            // UPDATE STOCKS
+            // $this->updateStock($admin_id, $request->medicine_id, "-", $request->approved_qty);
+            // $this->updateStock($request->user_id, $request->medicine_id, "+", $request->approved_qty);
+            $admin_id = null;
+            if(auth()->user()->role == "Approver"){
+                $admin_id = auth()->user()->admin_id; 
+            }
+            elseif(auth()->user()->role == "Admin"){
+                $admin_id = auth()->user()->id;
+            }
+
+            $this->updateStock("-", $admin_id, $request);
+            $this->updateStock("+", $request->user_id, $request);
         }
         elseif(isset($req->status) && $req->status == "Incomplete Qty"){
             $request = Req::find($id);
@@ -190,12 +187,13 @@ class RequestController extends Controller
         $reorder = Reorder::where('user_id', $uid)->where('medicine_id', $request->medicine_id);
 
         if($operator == "+"){
-            $reorder->increment('stock', $request->qty);
+            $reorder->increment('stock', $request->approved_qty);
         }
         elseif($operator == "-"){
-            $reorder->decrement('stock', $request->qty);
+            $reorder->decrement('stock', $request->approved_qty);
         }
 
+        $reorder = $reorder->first();
         $stock = Stock::where('reorder_id', $reorder->id)
                     ->where('lot_number', $request->lot_number)
                     ->where('expiry_date', $request->expiry_date->toDateTimeString())
@@ -203,10 +201,10 @@ class RequestController extends Controller
 
         if($stock->get()->count()){
             if($operator == "+"){
-                $stock->increment('qty', $request->qty);
+                $stock->increment('qty', $request->approved_qty);
             }
             elseif($operator == "-"){
-                $stock->decrement('qty', $request->qty);
+                $stock->decrement('qty', $request->approved_qty);
             }
         }
         else{
@@ -215,7 +213,7 @@ class RequestController extends Controller
             $stock->lot_number = $request->lot_number;
             $stock->expiry_date = $request->expiry_date;
             $stock->unit_price = $request->unit_price;
-            $stock->qty = $request->qty;
+            $stock->qty = $request->approved_qty;
             $stock->save();
         }
 

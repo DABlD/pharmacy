@@ -93,9 +93,9 @@
                     							<td class="center">{{ $request->id }}</td>
                     							<td class="center">{{ $request->medicine->name }}</td>
                     							<td class="center lot" data-id="{{ $request->id }}"></td>
-                    							<td class="center exp" data-id="{{ $request->id }}"></td>
+                    							<td class="center expiry_date" data-id="{{ $request->id }}"></td>
                     							<td class="center">{{ $request->approved_qty }}</td>
-                    							<td class="center">{{ $request->unit_price }}</td>
+                    							<td class="center unit_price" data-id="{{ $request->id }}"></td>
                     							<td class="center">{{ $request->amount }}</td>
                     						</tr>
 	                    					@php
@@ -207,17 +207,68 @@
 				</tr>
 			`);
 
-			$('.lot').each((index, lot) => {
-				let id = $(lot).data('id');
-				let inp = input("lot", "", null, 0, 12, 'text', ` data-id="${id}"`);
-				$(lot).append(inp);
+			// $('.lot').each((index, lot) => {
+			// 	let id = $(lot).data('id');
+			// 	let inp = input("lot", "", null, 0, 12, 'text', ` data-id="${id}"`);
+			// 	$(lot).append(inp);
+			// });
+
+			$('.lot').each((i, lot) => {
+				let id = lot.dataset.id;
+				$.ajax({
+					url: "{{ route('request.get') }}",
+					data: {
+						select: 'medicine_id',
+						where: ['id', id]
+					},
+					success: request => {
+						request = JSON.parse(request)[0];
+						
+						$.ajax({
+							url: '{{ route('stock.get') }}',
+							data: {
+								select: 'stocks.*',
+								join: true,
+								where: ['r.user_id', {{ auth()->user()->id }}],
+								where2: ['r.medicine_id', request.medicine_id]
+							},
+							success: stocks => {
+								stocks = JSON.parse(stocks);
+								
+								$(lot).append(`<select data-id='${id}' class='form-control'></select>`);
+
+								stockString = '<option value="" data-expiry_date="" data-unit_price=""></option>';
+								stocks.forEach(stock => {
+									stockString += `
+										<option value="${stock.lot_number}" data-expiry_date="${stock.expiry_date}" data-unit_price="${stock.unit_price}">${stock.lot_number} (Stock - ${stock.qty})</option>
+									`;
+								});
+
+								$(lot).find('select').append(stockString);
+								$(lot).find('select').select2({
+									placeholder: 'Select Lot Number'
+								});
+
+								$(lot).find('select').on('change', e => {
+									let expiry_date = $(lot).find(":selected").data("expiry_date");
+									let unit_price = $(lot).find(":selected").data("unit_price");
+
+									$(lot).parent().find('.expiry_date').text(moment(expiry_date).format(dateFormat));
+									$(lot).parent().find('.unit_price').text(unit_price);
+								});
+							}
+						})
+					}
+				})
 			});
 
-			$('.exp').each((index, exp) => {
-				let id = $(exp).data('id');
-				let inp = input("exp", "", null, 0, 12, 'text', ` data-id="${id}"`);
-				$(exp).append(inp);
-			});
+			// $('.exp').each((index, exp) => {
+			// 	let id = $(exp).data('id');
+			// 	let inp = input("exp", "", null, 0, 12, 'text', ` data-id="${id}"`);
+			// 	$(exp).append(inp);
+			// });
+
+
 
 			$('[name="exp"]').flatpickr({
 				dateFormat: "Y-m-d"
@@ -266,8 +317,9 @@
 				request = $(request);
 				let temp = {};
 
-				let lot = request.find('.lot input').val();
-				let exp = request.find('.exp input').val();
+				let lot = request.find('select').val();
+				let exp = request.find('.expiry_date').text();
+				let unit_price = request.find('.unit_price').text();
 				let id = request.attr('id');
 
 				if(lot == "" || exp == ""){
@@ -277,6 +329,7 @@
 					temp.lot = lot;
 					temp.exp = exp;
 					temp.id = id;
+					temp.unit_price = unit_price;
 
 					toSave.push(temp);
 				}
@@ -291,6 +344,7 @@
 						id: request.id,
 						lot_number: request.lot,
 						expiry_date: request.exp,
+						unit_price: request.unit_price,
 						date_dispatched: date_dispatched,
 						status: 'For Delivery'
 					},

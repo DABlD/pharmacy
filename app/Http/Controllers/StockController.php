@@ -9,7 +9,6 @@ use DB;
 class StockController extends Controller
 {
     public function get(Request $req){
-        DB::enableQueryLog();
         $array = Stock::select($req->select);
 
         // IF HAS SORT PARAMETER $ORDER
