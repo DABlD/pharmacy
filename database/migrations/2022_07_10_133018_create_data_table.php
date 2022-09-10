@@ -24,6 +24,7 @@ class CreateDataTable extends Migration
             $table->string('particulars');
             $table->string('lot_number');
             $table->datetime('expiry_date');
+            $table->string('supplier')->nullable();
 
             $table->unsignedInteger('qty');
             $table->float("unit_price", 8, 2);

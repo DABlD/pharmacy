@@ -144,6 +144,7 @@
                     					<tr>
                     						<th>Item</th>
                     						<th>Lot Number</th>
+                    						<th>Supplier</th>
                     						<th>Expiry Date</th>
                     						<th>Qty</th>
                     						<th>Price</th>
@@ -308,6 +309,7 @@
 								<th>Reference</th>
 								<th>Particulars</th>
 								<th>Lot #</th>
+								<th>Supplier</th>
 								<th>Expiry</th>
 								<th>Qty</th>
 								<th>Price</th>
@@ -346,6 +348,7 @@
 							{data: 'reference'},
 							{data: 'particulars'},
 							{data: 'lot_number'},
+							{data: 'supplier'},
 							{
 								data: 'expiry_date',
 								render: date => {
@@ -560,6 +563,9 @@
 								<input type="text" class="form-control lot_number">
 							</td>
 							<td>
+								<input type="text" class="form-control supplier">
+							</td>
+							<td>
 								<input type="text" class="form-control exp">
 							</td>
 							<td>
@@ -636,6 +642,7 @@
 						reference: $("[name='reference']").val(),
 						particulars: $("[name='particulars']").val(),
 						lot_number: $(item).find(".lot_number").val(),
+						supplier: $(item).find(".supplier").val(),
 						expiry_date: $(item).find(".exp").val(),
 						qty: $(item).find(".qty").val(),
 						unit_price: $(item).find(".price").val(),

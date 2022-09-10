@@ -14,7 +14,7 @@ class Data extends Model
         'medicine_id', 'transaction_types_id', 'reference', 
         'particulars', 'lot_number', 'qty', 
         'unit_price', 'amount', 'transaction_date', 
-        'expiry_date', 'user_id', 'bhc_id'
+        'expiry_date', 'user_id', 'bhc_id', 'supplier'
     ];
 
     //NOTE!!! MEDICINE_ID IS ACTUALLY REORDER ID

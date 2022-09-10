@@ -60,6 +60,7 @@ class DataController extends Controller
             $data->reference = $temp->reference;
             $data->particulars = $temp->particulars;
             $data->lot_number = $temp->lot_number;
+            $data->supplier = $temp->supplier;
             $data->expiry_date = $temp->expiry_date;
             $data->qty = $temp->qty;
             $data->unit_price = $temp->unit_price;
