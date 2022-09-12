@@ -52,7 +52,8 @@ class UserController extends Controller
         $user->password = $req->password;
         $user->save();
         if($req->role == "Admin"){
-            $req->login_link = "?u=$user->id";
+            $user->login_link = "?u=$user->id";
+            $user->save();
         }
 
         if($user->role == "Admin"){
