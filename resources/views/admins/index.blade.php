@@ -198,6 +198,7 @@
 	                ${input("address", "Address", admin.address, 3, 9)}
 	                <br>
 	                ${input("username", "Username", admin.username, 3, 9)}
+	                ${input("login_link", "Login Link", "{{ url('login') }}" + admin.login_link, 3, 9, 'text', 'readonly')}
 				`,
 				width: '800px',
 				confirmButtonText: 'Update',

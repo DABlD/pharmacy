@@ -51,6 +51,9 @@ class UserController extends Controller
         $user->username = $req->username;
         $user->password = $req->password;
         $user->save();
+        if($req->role == "Admin"){
+            $req->login_link = "?u=$user->id";
+        }
 
         if($user->role == "Admin"){
             $this->initAdmin($user);

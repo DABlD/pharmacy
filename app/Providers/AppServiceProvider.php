@@ -38,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
 
                 $view->with('theme', $theme->pluck('value', 'name'));
             }
+            elseif(isset($_GET['u'])){
+                $theme = $theme->where('admin_id', $_GET['u']);
+                $view->with('theme', $theme->pluck('value', 'name'));
+            }
         });
     }
 }

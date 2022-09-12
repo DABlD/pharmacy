@@ -27,6 +27,7 @@ class CreateUsersTable extends Migration
             $table->string('contact')->nullable();
 
             $table->string('password')->nullable();
+            $table->string('login_link')->unique()->nullable();
 
             $table->timestamps();
             $table->softDeletes();

@@ -30,14 +30,17 @@ class UserSeeder extends Seeder
     }
 
     private function createAdmin($i){
-        User::create([
-            'username' => "centrapharm$i",
-            'name' => "CENTRAPHARM$i",
-            'role' => 'Admin',
-            'email' => "centrapharm$i@pharmacy.com",
-            'address' => "CENTRAPHARM$i ADDRESS",
-            'contact' => "09" . rand(100000000, 999999999),
-            'password' => '123456'
-        ]);
+        $user = new User();
+        $user->username = "centrapharm$i";
+        $user->name = "CENTRAPHARM$i";
+        $user->role = 'Admin';
+        $user->email = "centrapharm$i@pharmacy.com";
+        $user->address = "CENTRAPHARM$i ADDRESS";
+        $user->contact = "09" . rand(100000000, 999999999);
+        $user->password = '123456';
+        $user->save();
+
+        $user->login_link = "?u=$user->id";
+        $user->save();
     }
 }
