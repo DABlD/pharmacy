@@ -362,8 +362,8 @@ class ReportController extends Controller
     }
 
     public function salesPerRhu(){
-        $from = now()->subDays(6)->startOfDay()->toDateString();
-        $to = now()->endOfDay()->toDateString();
+        $from = now()->subDays(6)->startOfDay()->toDateTimeString();
+        $to = now()->endOfDay()->toDateTimeString();
 
         $dates = $this->getDates($from, $to);
         $data = Data::whereBetween('transaction_date', [$from, $to])
@@ -529,8 +529,8 @@ class ReportController extends Controller
     }
 
     public function deliveredRequests(){
-        $from = now()->subDays(6)->toDateString();
-        $to = now()->toDateString();
+        $from = now()->subDays(6)->startOfDay()->toDateTimeString();
+        $to = now()->endOfDay()->toDateTimeString();
 
         $dates = $this->getDates($from, $to);
         $data = Req::whereIn('status', ['Delivered', 'Incomplete Qty'])

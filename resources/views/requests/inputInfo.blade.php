@@ -213,8 +213,8 @@
 			// 	$(lot).append(inp);
 			// });
 
-			$('.lot').each((i, lot) => {
-				let id = lot.dataset.id;
+			$('.expiry_date').each((i, expiry_date) => {
+				let id = expiry_date.dataset.id;
 				$.ajax({
 					url: "{{ route('request.get') }}",
 					data: {
@@ -230,31 +230,33 @@
 								select: 'stocks.*',
 								join: true,
 								where: ['r.user_id', {{ auth()->user()->id }}],
-								where2: ['r.medicine_id', request.medicine_id]
+								where2: ['r.medicine_id', request.medicine_id],
+								order: ['expiry_date', 'desc']
+
 							},
 							success: stocks => {
 								stocks = JSON.parse(stocks);
 								
-								$(lot).append(`<select data-id='${id}' class='form-control'></select>`);
+								$(expiry_date).append(`<select data-id='${id}' class='form-control'></select>`);
 
 								stockString = '<option value="" data-expiry_date="" data-unit_price=""></option>';
 								stocks.forEach(stock => {
 									stockString += `
-										<option value="${stock.lot_number}" data-expiry_date="${stock.expiry_date}" data-unit_price="${stock.unit_price}">${stock.lot_number} (Stock - ${stock.qty})</option>
+										<option value="${stock.expiry_date}" data-lot_number="${stock.lot_number}" data-unit_price="${stock.unit_price}">${moment(stock.expiry_date).format(dateFormat2)} (#${stock.qty})</option>
 									`;
 								});
 
-								$(lot).find('select').append(stockString);
-								$(lot).find('select').select2({
-									placeholder: 'Select Lot Number'
+								$(expiry_date).find('select').append(stockString);
+								$(expiry_date).find('select').select2({
+									placeholder: 'Select Expiry Date'
 								});
 
-								$(lot).find('select').on('change', e => {
-									let expiry_date = $(lot).find(":selected").data("expiry_date");
-									let unit_price = $(lot).find(":selected").data("unit_price");
+								$(expiry_date).find('select').on('change', e => {
+									let lot_number = $(expiry_date).find(":selected").data("lot_number");
+									let unit_price = $(expiry_date).find(":selected").data("unit_price");
 
-									$(lot).parent().find('.expiry_date').text(moment(expiry_date).format(dateFormat));
-									$(lot).parent().find('.unit_price').text(toFloat(unit_price));
+									$(expiry_date).parent().find('.lot').text(lot_number);
+									$(expiry_date).parent().find('.unit_price').text(toFloat(unit_price));
 								});
 							}
 						})

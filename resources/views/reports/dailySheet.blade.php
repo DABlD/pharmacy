@@ -140,7 +140,7 @@
 			$.ajax({
 				url: "{{ route('transactionType.get') }}",
 				data: {
-					select: ["id", "type", "operator"],
+					select: ["transaction_types.id", "type", "operator"],
 					whereNotNull: 'operator',
 					@if(auth()->user()->role == "Admin")
 						where: ['admin_id', {{ auth()->user()->id }}]

@@ -456,7 +456,8 @@
 					select: 'stocks.*',
 					join: true,
 					where: ['r.user_id', {{ auth()->user()->id }}],
-					where2: ['r.medicine_id', id]
+					where2: ['r.medicine_id', id],
+					order: ['expiry_date', 'desc']
 				},
 				success: stocks => {
 					stocks = JSON.parse(stocks);

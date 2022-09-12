@@ -26,8 +26,8 @@ class CreateMedicinesTable extends Migration
             $table->string("brand");
             $table->string("name");
             $table->string("packaging");
-            $table->float("unit_price", 10, 2);
-            $table->float("cost_price", 10, 2);
+            $table->float("unit_price", 10, 2)->nullable();
+            $table->float("cost_price", 10, 2)->nullable();
 
             $table->timestamps();
             $table->softDeletes();

@@ -406,7 +406,7 @@
 			$.ajax({
 				url: "{{ route('transactionType.get') }}",
 				data: {
-					select: "*",
+					select: "transaction_types.*",
 					@if(auth()->user()->role == "Admin")
 						where: ['admin_id', {{ auth()->user()->id }}]
 					@else(auth()->user()->role == "RHU")
@@ -417,8 +417,8 @@
 				success: types => {
 					types = JSON.parse(types);
 					typeString = "";
-
 					types.forEach(type => {
+						console.log(type);
 						typeString += `
 							<option value="${type.id}">${type.type}</option>
 						`;

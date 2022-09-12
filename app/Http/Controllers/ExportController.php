@@ -56,10 +56,13 @@ class ExportController extends Controller
     }
 
     public function exportInventory(Request $req){
+        $from = now()->parse($req->from)->startOfDay()->toDateTimeString();
+        $to = now()->parse($req->to)->endOfDay()->toDateTimeString();
+
         $temp = Data::where('transaction_types_id', $req->tType)
             ->where('bhc_id', 'like', $req->outlet)
             ->whereNotNull('bhc_id')
-            ->whereBetween('transaction_date', [$req->from, $req->to]);
+            ->whereBetween('transaction_date', [$from, $to]);
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
@@ -118,9 +121,12 @@ class ExportController extends Controller
     }
 
     public function exportSales(Request $req){
+        $from = now()->parse($req->from)->startOfDay()->toDateTimeString();
+        $to = now()->parse($req->to)->endOfDay()->toDateTimeString();
+
         $temp = Data::whereNotNull('bhc_id')
                     ->whereIn('transaction_types_id', [2,3])
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [$from, $to]);
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
@@ -184,9 +190,12 @@ class ExportController extends Controller
     }
 
     public function exportPurchaseOrder(Request $req){
+        $from = now()->parse($req->from)->startOfDay()->toDateTimeString();
+        $to = now()->parse($req->to)->endOfDay()->toDateTimeString();
+
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
                     ->where('transaction_types_id', 5)
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [$from, $to]);
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');
@@ -241,8 +250,11 @@ class ExportController extends Controller
     }
 
     public function exportDailySheet(Request $req){
+        $from = now()->parse($req->from)->startOfDay()->toDateTimeString();
+        $to = now()->parse($req->to)->endOfDay()->toDateTimeString();
+
         $temp = Data::where('bhc_id', 'like', $req->bhc_id)
-                    ->whereBetween('transaction_date', [$req->from, $req->to]);
+                    ->whereBetween('transaction_date', [$from, $to]);
 
         if(auth()->user()->role == "RHU"){
             $temp = $temp->join('rhus as r', 'r.user_id', '=', 'data.user_id');

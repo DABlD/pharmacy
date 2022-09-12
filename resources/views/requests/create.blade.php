@@ -259,6 +259,8 @@
 				url: "{{ route('medicine.getCategories') }}",
 				data: {
 					select: "*",
+					join: true,
+					where: ['r.user_id', {{ auth()->user()->id }}]
 				},
 				success: categories => {
 					categories = JSON.parse(categories);
