@@ -22,6 +22,7 @@
                     	<table id="table" class="table table-hover">
                     		<thead>
                     			<tr>
+                    				<th>User</th>
                     				<th>Medicine</th>
                     				<th>Category</th>
                     				<th>Code</th>
@@ -29,7 +30,6 @@
                     				<th>Packaging</th>
                     				<th>Qty</th>
                     				<th>Date Wasted</th>
-                    				<th>RHU</th>
                     			</tr>
                     		</thead>
 
@@ -155,18 +155,18 @@
 					}
 				},
 				columns: [
-					{data: 'medicine.name'},
-					{data: 'category.name'},
-					{data: 'medicine.code'},
-					{data: 'medicine.brand'},
-					{data: 'medicine.packaging'},
+					{data: 'rname'},
+					{data: 'mname'},
+					{data: 'mcode'},
+					{data: 'mbrand'},
+					{data: 'mpack'},
+					{data: 'lot_number'},
 					{data: 'qty'},
 					{data: 'expiry_date'},
-					{data: 'r.name'},
 				],
 				columnDefs: [
 					{
-						targets: [7,8,9],
+						targets: 6,
 						render: date =>{;
 							return moment(date).format('MMM DD, YYYY');
 						}

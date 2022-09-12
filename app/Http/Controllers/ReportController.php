@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Data, Alert, TransactionType, Rhu, Request as Req};
+use App\Models\{Data, Alert, TransactionType, Rhu, Request as Req, Stock};
 use DB;
 
 class ReportController extends Controller
@@ -490,7 +490,42 @@ class ReportController extends Controller
     }
 
     public function getWastedMedicine(Request $req){
+        // DB::enableQueryLog();
+        $from = now()->parse($req->from)->startOfDay()->toDateTimeString();
+        $to = now()->parse($req->to)->startOfDay()->toDateTimeString();
 
+        $data = Stock::select('stocks.*', 'm.name as mname', 'm.code as mcode', 'm.brand as mbrand', 'm.packaging as mpack', 'u.name as rname')
+                    ->join('reorders', 'reorders.id', '=', 'stocks.reorder_id')
+                    ->join('users as u', 'u.id', '=', 'reorders.user_id')
+                    ->join('medicines as m', 'm.id', '=', 'reorders.medicine_id')
+                    ->whereBetween('expiry_date', [$from, $to])
+                    ->where('reorders.medicine_id', 'like', $req->sku);
+
+        if(auth()->user()->role == "RHU"){
+            $data = $data->where('u.id', '=', auth()->user()->id);
+            $data = $data->get();
+        }
+        else{
+            // GET FROM CENTRAPHARMS RHU
+            $temp = clone $data;
+            $temp = $temp->join('rhus as r', 'r.user_id', '=', 'u.id');
+            $temp = $temp->where('r.admin_id', '=', auth()->user()->id);
+            $temp = $temp->where('r.user_id', 'like', $req->rhu);
+            $temp = $temp->get();
+
+            if($req->rhu == "%%"){
+                // GET FROM CENTRAPHARM
+                $data = $data->where('u.id', auth()->user()->id);
+                $data = $data->get();
+                $data = $temp->merge($data);
+            }
+            else{
+                $data = $temp;
+            }
+        }
+
+        // dd(DB::getQueryLog());
+        echo json_encode($data);
     }
 
     public function deliveredRequests(){
