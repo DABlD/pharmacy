@@ -156,7 +156,7 @@
             					},
             					success: result => {
             						result = JSON.parse(result);
-            						if(result.length){
+            						if(result.length && result[0].admin_id == {{ auth()->user()->id }}){
             			    			Swal.showValidationMessage('Transaction Type Already Exists');
 	            						setTimeout(() => {resolve()}, 500);
             						}
