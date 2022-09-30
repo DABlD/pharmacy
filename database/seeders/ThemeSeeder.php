@@ -27,7 +27,7 @@ class ThemeSeeder extends Seeder
             ["table_group_font_color", "#ffffff"],
         ];
 
-        for($i = 2; $i <= 4; $i++){ 
+        for($i = 1; $i <= 1; $i++){ 
             foreach($array as $theme){
                 $this->seed($theme[0], $theme[1], $i);
             }

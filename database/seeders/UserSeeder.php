@@ -24,9 +24,9 @@ class UserSeeder extends Seeder
             'password' => '123456'
         ]);
 
-        for($i = 1; $i <= 3; $i++){
-            $this->createAdmin($i);
-        }
+        // for($i = 1; $i <= 3; $i++){
+            // $this->createAdmin($i);
+        // }
     }
 
     private function createAdmin($i){

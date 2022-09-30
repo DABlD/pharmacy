@@ -19,6 +19,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
+// API
+Route::group([
+        'prefix' => "api/"
+    ], function (){
+        Route::post('testendpoint', 'TestController@index');
+        Route::post('rx/store', 'RxController@receive');
+    }
+);
+
 Route::group([
         'middleware' => 'auth',
     ], function() {
@@ -27,7 +36,7 @@ Route::group([
             ->defaults('sidebar', 1)
             ->defaults('icon', 'fas fa-list')
             ->defaults('name', 'Dashboard')
-            ->defaults('roles', array('Admin', 'RHU', 'Super Admin'))
+            ->defaults('roles', array('Admin', 'RHU'))
             ->name('dashboard')
             ->defaults('href', 'dashboard');
 
