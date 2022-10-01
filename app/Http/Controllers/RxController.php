@@ -59,6 +59,12 @@ class RxController extends Controller
         $data->address = $req->address;
         $data->amount = $req->amount;
         $data->date = $req->date;
+        $data->item_code = $req->item_code;
+        $data->item_name = $req->item_name;
+        $data->item_description = $req->item_description;
+        $data->price = $req->price;
+        $data->qty = $req->qty;
+        $data->lot_number = $req->lot_number;
 
         $data->save();
     }
@@ -89,6 +95,12 @@ class RxController extends Controller
             $data->address = $req->address;
             $data->amount = $req->amount;
             $data->date = $req->date;
+            $data->item_code = $req->item_code;
+            $data->item_name = $req->item_name;
+            $data->item_description = $req->item_description;
+            $data->price = $req->price;
+            $data->qty = $req->qty;
+            $data->lot_number = $req->lot_number;
 
             $data->save();
         } catch (Exception $e) {
