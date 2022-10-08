@@ -96,7 +96,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="5">
+		                            		<td colspan="6">
 		                            			${company}
 		                            		</td>
 		                            	</tr>
@@ -107,22 +107,22 @@
 		                });
 
 		            
-		        	let groups = $('tr.group td');
+		        	// let groups = $('tr.group td');
 
-		        	if(groups.length){
-		        		groups.each((index, row) => {
-		        			let rhu = row.innerText;
-		        			$(row).after(`
-		        				<td>
-                        			@if(auth()->user()->role == "RHU")
-		        					<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Bhc' onclick='create("${rhu}")'>
-		        					    <i class='fas fa-plus fa-2xl'></i>
-		        					</a>
-		        					@endif
-		        				</td>
-		        			`);
-		        		});
-		        	}
+		        	// if(groups.length){
+		        	// 	groups.each((index, row) => {
+		        	// 		let rhu = row.innerText;
+		        	// 		$(row).after(`
+		        	// 			<td>
+           //              			@if(auth()->user()->role == "RHU")
+		        	// 				<a class='btn btn-primary btn-sm' data-toggle='tooltip' title='Add Bhc' onclick='create("${rhu}")'>
+		        	// 				    <i class='fas fa-plus fa-2xl'></i>
+		        	// 				</a>
+		        	// 				@endif
+		        	// 			</td>
+		        	// 		`);
+		        	// 	});
+		        	// }
 
 		        	let grps = $('[class="group"]');
 		        	grps.each((index, group) => {
