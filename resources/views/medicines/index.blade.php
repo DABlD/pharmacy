@@ -29,6 +29,8 @@
                     				<th>Brand</th>
                     				<th>Name</th>
                     				<th>Packaging</th>
+                    				<th>Unit Price</th>
+                    				<th>Cost Price</th>
                     				<th>Reorder Point</th>
                     				<th>Stock</th>
                     				<th>Actions</th>
@@ -79,6 +81,8 @@
 					{data: 'brand'},
 					{data: 'name'},
 					{data: 'packaging'},
+					{data: 'unit_price'},
+					{data: 'cost_price'},
 					{data: 'reorder.point'},
 					{data: 'rs'},
 					{data: 'actions'},
@@ -103,7 +107,13 @@
 								return img;
 							}
 						}
-					}
+					},
+					{
+						targets: [7,8],
+						render: (value, display, row) =>{;
+							return "₱" + parseFloat(value).toFixed(2);
+						}
+					},
 				],
 		        drawCallback: function (settings) {
 		            let api = this.api();
@@ -118,7 +128,7 @@
 		                            .eq(i)
 		                            .before(`
 		                            	<tr class="group">
-		                            		<td colspan="8">
+		                            		<td colspan="10">
 		                            			${medicine}
 		                            		</td>
 		                            	</tr>
@@ -210,6 +220,8 @@
 	                ${input("brand", "Brand", null, 3, 9)}
 	                ${input("name", "Generic Name", null, 3, 9)}
 	                ${input("packaging", "Packaging", null, 3, 9)}
+	                ${input("unit_price", "Unit Price", null, 3, 9, 'number')}
+	                ${input("cost_price", "Cost Price", null, 3, 9, 'number')}
 	                ${input("reorder_point", "Reorder Point", null, 3, 9)}
 				`,
 				width: '800px',
@@ -267,6 +279,12 @@
 			            if($('.swal2-container input:placeholder-shown').length || $("[name='rhu_id']").val() == ""){
 			                Swal.showValidationMessage('Fill all fields');
 			            }
+			            else if($('[name="unit_price"]').val() <= 0){
+			                Swal.showValidationMessage('Unit Price must be greater than 0');
+			            }
+			            else if($('[name="cost_price"]').val() <= 0){
+			                Swal.showValidationMessage('Cost Price must be greater than 0');
+			            }
 			            else if($('[name="reorder_point"]').val() < 0){
 			                Swal.showValidationMessage('Cost Price must not be less than 0');
 			            }
@@ -288,6 +306,8 @@
 						brand: $("[name='brand']").val(),
 						name: $("[name='name']").val(),
 						packaging: $("[name='packaging']").val(),
+						unit_price: $("[name='unit_price']").val(),
+						cost_price: $("[name='cost_price']").val(),
 						reorder_point: $("[name='reorder_point']").val(),
 						_token: $('meta[name="csrf-token"]').attr('content')
 					});
@@ -303,6 +323,8 @@
 		    formData.append('brand', data.brand);
 		    formData.append('name', data.name);
 		    formData.append('packaging', data.packaging);
+		    formData.append('unit_price', data.unit_price);
+		    formData.append('cost_price', data.cost_price);
 		    formData.append('reorder_point', data.reorder_point);
 		    formData.append('_token', data._token);
 
@@ -544,6 +566,8 @@
 	                ${input("brand", "Brand", medicine.brand, 3, 9)}
 	                ${input("name", "Generic Name", medicine.name, 3, 9)}
 	                ${input("packaging", "Packaging", medicine.packaging, 3, 9)}
+	                ${input("unit_price", "Unit Price", medicine.unit_price, 3, 9, 'number')}
+	                ${input("cost_price", "Cost Price", medicine.cost_price, 3, 9, 'number')}
 	                @endif
 	                ${input("reorder_point", "Reorder Point", medicine.reorder.point, 3, 9)}
 				`,
@@ -625,6 +649,8 @@
 							brand: $("[name='brand']").val(),
 							name: $("[name='name']").val(),
 							packaging: $("[name='packaging']").val(),
+							unit_price: $("[name='unit_price']").val(),
+							cost_price: $("[name='cost_price']").val(),
 							_token: $('meta[name="csrf-token"]').attr('content')
 						});
 					@endif
@@ -654,6 +680,8 @@
 		    formData.append('brand', data.brand);
 		    formData.append('name', data.name);
 		    formData.append('packaging', data.packaging);
+		    formData.append('unit_price', data.unit_price);
+		    formData.append('cost_price', data.cost_price);
 		    formData.append('_token', data._token);
 
 		    if(data.image != undefined){
